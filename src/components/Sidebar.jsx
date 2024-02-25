@@ -1,18 +1,26 @@
+import { NavLink } from "react-router-dom";
+import "../assets/css/sidebar.css";
+
 const Sidebar = () => {
   return (
     <div className="sidebar shadow">
       <nav className="sidebar-nav">
         <ul className="nav">
           <li className="nav-item mb-2">
-            <a
-              className="nav-link {{ Request::is('home*') ? 'active' : '' }}"
-              href="{{ route('home') }}"
+            {/* {{ Request::is('home*') ? 'active' : '' }} */}
+            <NavLink
+              key="beranda"
+              to="/home"
+              className={({ isActive }) => {
+                return "nav-link " + (!isActive ? "active" : "");
+              }}
               style={{ fontSize: "14px", fontWeight: "bold" }}
             >
               <i className="nav-icon icon-home"></i>Beranda
-            </a>
+            </NavLink>
           </li>
-          <li className="nav-item nav-dropdown mb-2">
+          {/* Admin */}
+          {/* <li className="nav-item nav-dropdown mb-2">
             <a
               className="nav-link nav-dropdown-toggle "
               href="#"
@@ -62,7 +70,6 @@ const Sidebar = () => {
               </li>
             </ul>
           </li>
-
           <li className="nav-item nav-dropdown mb-2">
             <a
               className="nav-link nav-dropdown-toggle "
@@ -202,6 +209,396 @@ const Sidebar = () => {
               </li>
             </ul>
           </li>
+          */}
+          {/* End of Admin */}
+
+          {/* Student */}
+          <li className="nav-item nav-dropdown mb-2">
+            <a
+              className="nav-link nav-dropdown-toggle {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('slides*') ? 'active' : '' }} {{ Request::is('teams*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-user"></i>Mahasiswa
+            </a>
+            <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('sidangs*') ? 'active' : '' }} open"
+                  href="{{ route('sidangs.create') }}"
+                >
+                  <i className="nav-icon icon-info ml-1"></i>
+                  <span>Informasi Pendaftaran</span>
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('slides.index') ? 'active' : '' }}"
+                  href="{{ route('slides.index') }}"
+                >
+                  <i className="nav-icon fa fa-folder-o ml-1"></i>
+                  <span>Materi Presentasi</span>
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('teams.index') ? 'active' : '' }}"
+                  href="{{ route('teams.index') }}"
+                >
+                  <i className="nav-icon fa fa-users ml-1"></i>
+                  <span>Buat Tim</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {/* <a
+            href="#submenumhs1"
+            data-toggle="collapse"
+            aria-expanded="false"
+            className="bg-dark list-group-item list-group-item-action flex-column align-items-start {{ Request::is('sidangs*') ? 'active' : '' }}
+{{ Request::is('slides*') ? 'active' : '' }} {{ Request::is('teams*') ? 'active' : '' }}"
+          >
+            <div className="d-flex w-100 justify-content-start align-items-center">
+              <i className="nav-icon icon-user"></i>
+              <li style={{ padding: "7px 5px 7px 20px", fontWeight: "bold" }}>
+                Mahasiswa
+              </li>
+              <i className="nav-icon icon-arrow-right ml-auto"></i>
+            </div>
+          </a>
+          <div id="submenumhs1" className="collapse sidebar-submenu">
+            <li className="nav-item  {{ Request::is('sidangs*') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('sidangs.create') }}">
+                <i className="nav-icon icon-plus"></i>
+                <span>Pendaftaran</span>
+              </a>
+            </li>
+
+            <li className="nav-item {{ Request::is('slides.index') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('slides.index') }}">
+                <i className="nav-icon icon-cursor"></i>
+                <span>Materi Presentasi</span>
+              </a>
+            </li>
+            <li className="nav-item {{ Request::is('teams.index') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('teams.index') }}">
+                <i className="nav-icon icon-user"></i>
+                <span>Tim</span>
+              </a>
+            </li>
+          </div> */}
+          <li className="nav-item nav-dropdown mb-2">
+            <a
+              className="nav-link nav-dropdown-toggle {{ Request::is('schedule*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-list"></i>Jadwal Sidang
+            </a>
+            <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('schedule.mahasiswa') ? 'active' : '' }}"
+                  href="{{ route('schedule.mahasiswa') }}"
+                >
+                  <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
+                  <span>Jadwal Sidang</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {/* <a
+            href="#submenumhs2"
+            data-toggle="collapse"
+            aria-expanded="false"
+            className="bg-dark list-group-item list-group-item-action flex-column align-items-start {{ Request::is('schedule*') ? 'active' : '' }}"
+          >
+            <div className="d-flex w-100 justify-content-start align-items-center">
+              <i className="nav-icon icon-list"></i>
+              <li style={{ padding: "7px 5px 7px 20px", fontWeight: "bold" }}>
+                Jadwal Sidang
+              </li>
+              <i className="nav-icon icon-arrow-right ml-auto"></i>
+            </div>
+          </a>
+          <div id="submenumhs2" className="collapse sidebar-submenu">
+            <li className="nav-item {{ Request::is('schedule.mahasiswa') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('schedule.mahasiswa') }}">
+                <i className="nav-icon icon-list"></i>
+                <span>Jadwal Sidang</span>
+              </a>
+            </li>
+          </div> */}
+          {/* <a
+            href="#submenumhs3"
+            data-toggle="collapse"
+            aria-expanded="false"
+            className="bg-dark list-group-item list-group-item-action flex-column align-items-start {{ Request::is('revision*') ? 'active' : '' }}"
+          >
+            <div className="d-flex w-100 justify-content-start align-items-center">
+              <i className="nav-icon icon-note"></i>
+              <li style={{ padding: "7px 5px 7px 20px", fontWeight: "bold" }}>
+                Revisi TA
+              </li>
+              <i className="nav-icon icon-arrow-right ml-auto"></i>
+            </div>
+          </a> */}
+          <div id="submenumhs3" className="collapse sidebar-submenu">
+            <li className="nav-item {{ Request::is('revisions.index.mahasiswa') ? 'active' : '' }}">
+              <a
+                className="nav-link"
+                href="{{ route('revisions.index.mahasiswa') }}"
+              >
+                <i className="nav-icon icon-note"></i>
+                <span>Revisi TA</span>
+              </a>
+            </li>
+          </div>
+          <li className="nav-item nav-dropdown mb-2">
+            <a
+              className="nav-link nav-dropdown-toggle {{ Request::is('revision*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-note"></i>Revisi TA
+            </a>
+            <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('revisions.index.mahasiswa') ? 'active' : '' }}"
+                  href="{{ route('revisions.index.mahasiswa') }}"
+                >
+                  <i className="nav-icon fa fa-check-square-o ml-1"></i>
+                  <span>Revisi TA</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {/* End of Student
+
+          {/* Pembimbing or Penguji */}
+          {/* <a
+            href="#submenudsn1"
+            data-toggle="collapse"
+            aria-expanded="false"
+            className="bg-dark list-group-item list-group-item-action flex-column align-items-start {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('schedule*') ? 'active' : '' }}"
+          >
+            <div className="d-flex w-100 justify-content-start align-items-center">
+              <i className="nav-icon icon-list"></i>
+              <li style={{ padding: "7px 5px 7px 20px", fontWeight: "bold" }}>
+                Pembimbing
+              </li>
+              <i className="nav-icon icon-arrow-right ml-auto"></i>
+            </div>
+          </a>
+          <div id="submenudsn1" className="collapse sidebar-submenu">
+            <li className="nav-item {{ Request::is('sidangs.pembimbing') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('sidangs.pembimbing') }}">
+                <i className="nav-icon icon-list"></i>
+                <span>Bimbingan TA</span>
+              </a>
+            </li>
+            <li className="nav-item {{ Request::is('schedule.pembimbing') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('schedule.pembimbing') }}">
+                <i className="nav-icon icon-calendar"></i>
+                <span>Jadwal Sidang Bimbingan</span>
+              </a>
+            </li>
+          </div>
+          <li className="nav-item nav-dropdown mb-2">
+            <a
+              className="nav-link nav-dropdown-toggle {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('schedule*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-list"></i>Pembimbing
+            </a>
+            <a
+              className="nav-link nav-dropdown-toggle"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon fa fa-book"></i>Pembimbing
+            </a>
+            <ul className="nav-dropdown-items">
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('sidangs.pembimbing') ? 'active' : '' }}"
+                  href="{{ route('sidangs.pembimbing') }}"
+                >
+                  <i className="nav-icon fa fa-check-square-o ml-1"></i>
+                  <span>Bimbingan TA</span>
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('schedule.pembimbing') ? 'active' : '' }}"
+                  href="{{ route('schedule.pembimbing') }}"
+                >
+                  <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
+                  <span>Jadwal Sidang Bimbingan</span>
+                </a>
+              </li>
+            </ul>
+          </li> */}
+          {/* Penguji */}
+          {/* <a
+            href="#submenudsn2"
+            data-toggle="collapse"
+            aria-expanded="false"
+            className="bg-dark list-group-item list-group-item-action flex-column align-items-start {{ Request::is('schedule*') ? 'active' : '' }}"
+          >
+            <div className="d-flex w-100 justify-content-start align-items-center">
+              <i className="nav-icon icon-calendar"></i>
+              <li style={{ padding: "7px 5px 7px 20px", fontWeight: "bold" }}>
+                Jadwal Sidang
+              </li>
+              <i className="nav-icon icon-arrow-right ml-auto"></i>
+            </div>
+          </a>
+          <div id="submenudsn2" className="collapse sidebar-submenu">
+            <li className="nav-item {{ Request::is('schedule.penguji') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('schedule.penguji') }}">
+                <i className="nav-icon icon-calendar"></i>
+                <span>Jadwal Sidang Penguji</span>
+              </a>
+            </li>
+          </div>
+          <li className="nav-item nav-dropdown mb-2">
+            <a
+              className="nav-link nav-dropdown-toggle  {{ Request::is('schedule*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-calendar"></i>Jadwal Sidang
+            </a>
+            <a
+              className="nav-link nav-dropdown-toggle"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon fa fa-hourglass-half"></i>Penguji
+            </a>
+            <ul className="nav-dropdown-items">
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('schedule.penguji') ? 'active' : '' }}"
+                  href="{{ route('schedule.penguji') }}"
+                >
+                  <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
+                  <span>Jadwal Sidang Penguji</span>
+                </a>
+              </li>
+            </ul>
+          </li> */}
+          {/* End of Penguji */}
+
+          {/* <li className="nav-item nav-dropdown">
+            <a
+              className="nav-link nav-dropdown-toggle {{ Request::is('revision*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-note"></i>Revisi Sidang
+            </a>
+            <ul className="nav-dropdown-items">
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('revisions.index.dosen') ? 'active' : '' }}"
+                  href="{{ route('revisions.index.dosen') }}"
+                >
+                  <i className="nav-icon fa fa-check-square-o ml-1"></i>
+                  <span>Revisi Mahasiswa</span>
+                </a>
+              </li>
+            </ul>
+          </li> */}
+          {/* End of Pembimbing or Penguji */}
+
+          {/* ? PIC  */}
+          {/* <a
+            href="#submenupic1"
+            data-toggle="collapse"
+            aria-expanded="false"
+            className="bg-dark list-group-item list-group-item-action flex-column align-items-start {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('schedules*') ? 'active' : '' }} {{ Request::is('schedule*') ? 'active' : '' }}"
+          >
+            <div className="d-flex w-100 justify-content-start align-items-center">
+              <i className="nav-icon icon-list"></i>
+              <li style={{ padding: "7px 5px 7px 20px", fontWeight: "bold" }}>
+                PIC TA
+              </li>
+              <i className="nav-icon icon-arrow-right ml-auto"></i>
+            </div>
+          </a>
+          <div id="submenupic1" className="collapse sidebar-submenu">
+            <li className="nav-item {{ Request::is('sidangs.pic') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('sidangs.pic') }}">
+                <i className="nav-icon icon-list"></i>
+                <span>Penjadwalan Sidang</span>
+              </a>
+            </li>
+            <li className="nav-item {{ Request::is('schedules.index') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('schedules.index') }}">
+                <i className="nav-icon icon-calendar"></i>
+                <span>Jadwal Sidang KK</span>
+              </a>
+            </li>
+
+            <li className="nav-item {{ Request::is('schedule.bukaAkses') ? 'active' : '' }}">
+              <a className="nav-link" href="{{ route('schedule.bukaAkses') }}">
+                <i className="nav-icon icon-key"></i>
+                <span>Buka Akses Menu</span>
+              </a>
+            </li>
+          </div>{" "}
+          <li className="nav-item nav-dropdown mb-2">
+            <a
+              className="nav-link nav-dropdown-toggle {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('schedules*') ? 'active' : '' }} {{ Request::is('schedule*') ? 'active' : '' }}"
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-list"></i>PIC TA
+            </a>{" "}
+            <a
+              className="nav-link nav-dropdown-toggle "
+              href="#"
+              style={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              <i className="nav-icon icon-list"></i>PIC TA
+            </a>
+            <ul className="nav-dropdown-items">
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('sidangs.pic') ? 'active' : '' }}"
+                  href="{{ route('sidangs.pic') }}"
+                >
+                  <i className="nav-icon fa fa-calendar ml-1"></i>
+                  <span>Penjadwalan Sidang</span>
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('schedules.index') ? 'active' : '' }}"
+                  href="{{ route('schedules.index') }}"
+                >
+                  <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
+                  <span>Jadwal Sidang KK</span>
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link {{ Request::is('schedule.bukaAkses') ? 'active' : '' }}"
+                  href="{{ route('schedule.bukaAkses') }}"
+                >
+                  <i className="nav-icon icon-key ml-1"></i>
+                  <span>Buka Akses Menu</span>
+                </a>
+              </li>
+            </ul>
+          </li> */}
+          {/* End of PIC */}
+
+          {/* Guide Book */}
           <li className="nav-item nav-dropdown mb-2">
             <a
               className="nav-link nav-dropdown-toggle "
@@ -211,7 +608,7 @@ const Sidebar = () => {
               <i className="nav-icon fa fa-bookmark-o"></i>Guide Book
             </a>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-              <li className="nav-item {{ Request::is('guide_book_admin') ? 'active' : '' }}">
+              {/* <li className="nav-item {{ Request::is('guide_book_admin') ? 'active' : '' }}">
                 <a
                   className="nav-link {{ Request::is('guide_book_admin') ? 'active' : '' }}"
                   href="{{route('guide_book_admin')}}"
@@ -237,7 +634,7 @@ const Sidebar = () => {
                 >
                   <i className="nav-icon icon-notebook"></i>Dosen
                 </a>
-              </li>
+              </li> */}
               <li className="nav-item {{ Request::is('guide_book_student') ? 'active' : '' }}">
                 <a
                   className="nav-link {{ Request::is('guide_book_admin_student') ? 'active' : '' }}"
@@ -249,6 +646,7 @@ const Sidebar = () => {
               </li>
             </ul>
           </li>
+          {/* End of Guide Book */}
         </ul>
       </nav>
       <button
