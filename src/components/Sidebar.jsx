@@ -1,16 +1,22 @@
+import { NavLink } from "react-router-dom";
+import "../assets/css/sidebar.css";
+
 const Sidebar = () => {
   return (
     <div className="sidebar shadow">
       <nav className="sidebar-nav">
         <ul className="nav">
           <li className="nav-item mb-2">
-            <a
-              className="nav-link {{ Request::is('home*') ? 'active' : '' }}"
-              href="{{ route('home') }}"
+            <NavLink
+              key="beranda"
+              to="/home"
+              className={({ isActive }) => {
+                return "nav-link " + (!isActive ? "active" : "");
+              }}
               style={{ fontSize: "14px", fontWeight: "bold" }}
             >
               <i className="nav-icon icon-home"></i>Beranda
-            </a>
+            </NavLink>
           </li>
           <li className="nav-item nav-dropdown mb-2">
             <a
