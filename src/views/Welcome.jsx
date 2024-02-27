@@ -44,7 +44,7 @@ function Welcome() {
         {/* <NavLink key="home" to="/home">
           <Button value="Home" variant="btn-primary" />
         </NavLink> */}
-        <NavLink key="home" to="/lohin">
+        <NavLink key="home" to="/login">
           <Button value="Login" variant="btn-primary" />
         </NavLink>
       </div>

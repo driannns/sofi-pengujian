@@ -3,18 +3,18 @@ import { MainLayout } from "./layouts/MainLayout";
 const Home = () => {
   return (
     <MainLayout>
-      <div class="container-fluid">
-        <div class="animated fadeIn">
-          <div class="row mt-3">
-            <div class="col-12">@include('flash::message')</div>
+      <div className="container-fluid">
+        <div className="animated fadeIn">
+          <div className="row mt-3">
+            <div className="col-12">{/*@include('flash::message')*/}</div>
           </div>
-          <div class="row">
+          <div className="row">
             {/* Admin */}
-            {/* <div class="card">
-              <div class="card-header">
+            {/* <div className="card">
+              <div className="card-header">
                 <h1>Selamat Datang username(admin)</h1>
               </div>
-              <div class="card-body">
+              <div className="card-body">
                 <p>
                   <ol>
                     <li>
@@ -35,34 +35,34 @@ const Home = () => {
             {/* End of Admin */}
 
             {/* else */}
-            <div class="col-12">
+            <div className="col-12">
               <h3>TATA TERTIB PELAKSAAN SIDANG TUGAS AKHIR</h3>
               {/* <!-- update notif lulus --> */}
               {/* @if(Auth::user()->isStudent())
                     @if($statussidang)
                         @if($statussidang->status == 'lulus')
-                            <div class="alert alert-success" role="alert">
+                            <div className="alert alert-success" role="alert">
                                 Selamat Anda Dinyatakan <b>LULUS</b> pada sidang periode {{$statussidang->period_id}}
                             </div>
                         @endif
                     @endif
                 @endif */}
-              <hr class="mt-0" />
-              <h6 class="mb-3">
-                <a href="{{ route('home') }}" class="text-dark">
+              <hr className="mt-0" />
+              <h6 className="mb-3">
+                <a href="{{ route('home') }}" className="text-dark">
                   BERANDA
                 </a>
               </h6>
-              <div class="card">
-                <div class="card-body">
+              <div className="card">
+                <div className="card-body">
                   <p>
                     Jika sudah mendapatkan jadwal sidang Mohon konfirmasi ke
                     dosen pembimbing dan penguji
                   </p>
                 </div>
               </div>
-              <div class="card">
-                <div class="card-body">
+              <div className="card">
+                <div className="card-body">
                   <p>
                     Berikut adalah tata tertib yang harus dipenuhi selama sidang
                     tugas akhir berlangsung:
@@ -103,7 +103,7 @@ const Home = () => {
                     Ka.Urusan Akademik
                     <br></br>
                     <br></br>
-                    <span class="font-weight-bold">
+                    <span className="font-weight-bold">
                       php echo $kaur_akademik
                     </span>
                   </p>
@@ -117,13 +117,13 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div class="row">
+          <div className="row">
             {/* Dosen */}
-            {/* <div class="col-4">
+            {/* <div className="col-4">
               <h5>DAFTAR SIDANG BELUM DI MULAI</h5>
-              <div class="card">
-                <div class="card-body">
-                  <table class="table table-striped" id="schedules-table">
+              <div className="card">
+                <div className="card-body">
+                  <table className="table table-striped" id="schedules-table">
                     <thead>
                       <tr>
                         <th>NIM</th>
@@ -140,7 +140,7 @@ const Home = () => {
                         <td>
                           <a
                             href="{{ route('scores.pembimbing.create', [$schedule->id]) }}"
-                            class="btn btn-primary w-100"
+                            className="btn btn-primary w-100"
                           >
                             Nilai
                           </a>
@@ -152,11 +152,11 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div class="col-4">
+            <div className="col-4">
               <h5>DAFTAR REVISI BELUM DI APPROVE</h5>
-              <div class="card">
-                <div class="card-body">
-                  <table class="table table-striped" id="revisions-table">
+              <div className="card">
+                <div className="card-body">
+                  <table className="table table-striped" id="revisions-table">
                     <thead>
                       <tr>
                         <th>NIM</th>
@@ -173,7 +173,7 @@ const Home = () => {
                         <td>
                           <a
                             href="{{ route('revisions.index.dosen') }}"
-                            class="btn btn-warning w-100"
+                            className="btn btn-warning w-100"
                           >
                             Revisi
                           </a>
@@ -185,11 +185,11 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div class="col-4">
+            <div className="col-4">
               <h5>DAFTAR SIDANG BELUM DI TUTUP</h5>
-              <div class="card">
-                <div class="card-body">
-                  <table class="table table-striped" id="revisions-table">
+              <div className="card">
+                <div className="card-body">
+                  <table className="table table-striped" id="revisions-table">
                     <thead>
                       <tr>
                         <th>NIM</th>
@@ -206,7 +206,7 @@ const Home = () => {
                         <td>
                           <a
                             href="{{ route('scores.simpulan', [$schedule->id]) }}"
-                            class="btn btn-danger w-100"
+                            className="btn btn-danger w-100"
                           >
                             Simpulan
                           </a>
