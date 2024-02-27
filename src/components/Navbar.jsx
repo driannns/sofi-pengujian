@@ -1,6 +1,18 @@
 import telkomLogo from "../assets/images/telkom.png";
+import { jwtDecode } from "jwt-decode";
+import { useCookies } from "react-cookie";
+import { useAuth } from "../middleware/AuthContext";
 
 const Navbar = () => {
+  const { logout } = useAuth();
+
+  const [cookies] = useCookies();
+  const decodedToken = jwtDecode(cookies["auth-token"]);
+
+  const handleLogout = () => {
+    logout();
+  };
+
   const handleClick = () => {
     event.preventDefault();
     document.getElementById("logout-form").submit();
@@ -84,14 +96,14 @@ const Navbar = () => {
         <li className="nav-item dropdown">
           <a
             className="nav-link font-weight-bold"
-            style={{ marginRight: "40px" }}
+            style={{ marginRight: "40px", fontSize: "12px" }}
             data-toggle="dropdown"
             href="#"
             role="button"
             aria-haspopup="true"
             aria-expanded="false"
           >
-            admin
+            {decodedToken.nama}
           </a>
           <div
             className="dropdown-menu dropdown-menu-right"
@@ -101,9 +113,9 @@ const Navbar = () => {
               <strong>Account</strong>
             </div>
             <a
-              href="{{ url('/logout') }}"
+              // href="{{ url('/logout') }}"
               className="dropdown-item btn btn-default btn-flat"
-              onClick={handleClick}
+              onClick={handleLogout}
             >
               <i className="fa fa-lock"></i>Logout
             </a>

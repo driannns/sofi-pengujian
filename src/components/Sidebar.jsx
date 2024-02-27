@@ -7,14 +7,12 @@ const Sidebar = () => {
       <nav className="sidebar-nav">
         <ul className="nav">
           <li className="nav-item mb-2">
-            {/* {{ Request::is('home*') ? 'active' : '' }} */}
-
             <NavLink
               key="beranda"
               to="/home"
-              className={({ isActive }) => {
-                return "nav-link " + (!isActive ? "active" : "");
-              }}
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
               style={{ fontSize: "14px", fontWeight: "bold" }}
             >
               <i className="nav-icon icon-home"></i>Beranda
@@ -224,13 +222,15 @@ const Sidebar = () => {
             </a>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
               <li className="nav-item">
-                <a
-                  className="nav-link {{ Request::is('sidangs*') ? 'active' : '' }} open"
-                  href="{{ route('sidangs.create') }}"
+                <NavLink
+                  to="sidangs/create"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active open" : "nav-link open"
+                  }
                 >
                   <i className="nav-icon icon-info ml-1"></i>
                   <span>Informasi Pendaftaran</span>
-                </a>
+                </NavLink>
               </li>
               <li className="nav-item">
                 <a
