@@ -1,8 +1,10 @@
 import telkomLogo from "../assets/images/telkom.png";
 import Button from "../components/Button";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../middleware/AuthContext";
 
 function Welcome() {
+  const { isLoggedIn } = useAuth();
   return (
     <div
       className="d-flex justify-content-center position-relative align-items-center text-center flex-column"
@@ -41,12 +43,15 @@ function Welcome() {
         </a>
       </div>
       <div className="form-group w-100">
-        {/* <NavLink key="home" to="/home">
-          <Button value="Home" variant="btn-primary" />
-        </NavLink> */}
-        <NavLink key="home" to="/login">
-          <Button value="Login" variant="btn-primary" />
-        </NavLink>
+        {isLoggedIn ? (
+          <NavLink key="home" to="/home">
+            <Button value="Home" variant="btn-primary" />
+          </NavLink>
+        ) : (
+          <NavLink key="home" to="/login">
+            <Button value="Login" variant="btn-primary" />
+          </NavLink>
+        )}
       </div>
     </div>
   );

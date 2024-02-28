@@ -1,14 +1,29 @@
 import { GuestLayout } from "../layouts/GuestLayout";
 import { NavLink } from "react-router-dom";
 import telkomLogo from "../../assets/images/telkom.png";
+import { useState } from "react";
+import { useAuth } from "../../middleware/AuthContext";
+import { useCookies } from "react-cookie";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginSSO = () => {
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    login(username, password);
+    setUsername("");
+    setPassword("");
+  };
+
   return (
     <GuestLayout>
       <div className="card p-4">
         <div className="card-body">
-          <form method="post" action="{{ url('/checkloginSSO') }}">
-            {/* @csrf */}
+          <form onSubmit={handleLogin}>
             <h1>Login</h1>
             <p className="text-muted">Sign In to your account</p>
             <div className="input-group mb-3">
@@ -21,8 +36,9 @@ const LoginSSO = () => {
                 type="username"
                 className="form-control {{ $errors->has('username')?'is-invalid':'' }}"
                 name="username"
-                value="username"
+                value={username}
                 placeholder=" igracias"
+                onChange={(e) => setUsername(e.target.value)}
               />
               {/* @if ($errors->has('username')) */}
               <span className="invalid-feedback">
@@ -40,6 +56,8 @@ const LoginSSO = () => {
                 type="password"
                 className="form-control {{ $errors->has('password')?'is-invalid':'' }}"
                 placeholder="password igracias"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 name="password"
               />
               {/* @if ($errors->has('password')) */}

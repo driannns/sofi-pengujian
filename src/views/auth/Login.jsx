@@ -1,12 +1,15 @@
 import { GuestLayout } from "../layouts/GuestLayout";
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
 
 const Login = () => {
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
   return (
     <GuestLayout>
       <div className="card p-4">
         <div className="card-body">
-          <form method="post" action="{{ url('/login') }}">
+          <form>
             <h1>Login</h1>
             <p className="text-muted">Sign In to your account</p>
             <div className="input-group mb-3">
@@ -19,7 +22,10 @@ const Login = () => {
                 type="username"
                 className="form-control {{ $errors->has('username')?'is-invalid':'' }}"
                 name="username"
-                value="username"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
                 placeholder="NIM / Kode Dosen"
               />
               {/* @if ($errors->has('username')) */}
@@ -39,6 +45,10 @@ const Login = () => {
                 className="form-control {{ $errors->has('password')?'is-invalid':'' }}"
                 placeholder="Password"
                 name="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
               />
               {/* @if ($errors->has('password')) */}
               <span className="invalid-feedback">
@@ -54,9 +64,9 @@ const Login = () => {
               </div>
               <div className="col-6 text-right">
                 <NavLink
-                  key="loginSSO"
-                  to="/loginSSO"
-                  classNameName="btn btn-link px-0"
+                  key="loginsso"
+                  to="/loginsso"
+                  className="btn btn-link px-0"
                 >
                   Login via SSO Igracias
                 </NavLink>
@@ -76,7 +86,7 @@ const Login = () => {
             Kontak LAAK FRI :{" "}
             <a
               className="btn btn-primary active mt-3"
-              href="http://wa.me>"
+              href="<?php echo 'http://wa.me/'.$no_laa ?>"
             >
              no_laa
             </a>
