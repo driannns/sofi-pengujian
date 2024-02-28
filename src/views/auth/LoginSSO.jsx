@@ -90,7 +90,7 @@ const LoginSSO = () => {
                   className="btn btn-primary active mt-3"
                   href="<?php echo 'http://wa.me/'.$no_laa ?>"
                 >
-                  php echo $no_laa
+                  no_laa
                 </a>
               </div>
             </div>
