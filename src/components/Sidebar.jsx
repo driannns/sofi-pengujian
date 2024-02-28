@@ -13,20 +13,23 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                fontSize: "14px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
             >
               <i className="nav-icon icon-home"></i>Beranda
             </NavLink>
           </li>
           {/* Admin */}
           {/* <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle "
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-list"></i>Sidang TA
-            </a>
+            </div>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
               <li className="nav-item {{ Request::is('sidangs') ? 'active' : '' }}">
                 <a className="nav-link" href="{{ route('sidangs.index') }}">
@@ -70,13 +73,12 @@ const Sidebar = () => {
             </ul>
           </li>
           <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle "
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon fa fa-database"></i>Data Master
-            </a>
+            </div>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
               <li className="nav-item {{ Request::is('users*') ? 'active' : '' }}">
                 <a
@@ -180,13 +182,12 @@ const Sidebar = () => {
             </ul>
           </li>
           <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle "
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-doc"></i>Export Data
-            </a>
+            </div>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
               <li className="nav-item {{ Request::is('cetak/index*') ? 'active' : '' }}">
                 <a
@@ -213,13 +214,17 @@ const Sidebar = () => {
 
           {/* Student */}
           <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('slides*') ? 'active' : '' }} {{ Request::is('teams*') ? 'active' : '' }}"
               href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                fontSize: "14px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
             >
               <i className="nav-icon icon-user"></i>Mahasiswa
-            </a>
+            </div>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
               <li className="nav-item">
                 <NavLink
@@ -292,7 +297,11 @@ const Sidebar = () => {
             <a
               className="nav-link nav-dropdown-toggle {{ Request::is('schedule*') ? 'active' : '' }}"
               href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                fontSize: "14px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
             >
               <i className="nav-icon icon-list"></i>Jadwal Sidang
             </a>
@@ -359,7 +368,11 @@ const Sidebar = () => {
             <a
               className="nav-link nav-dropdown-toggle {{ Request::is('revision*') ? 'active' : '' }}"
               href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                fontSize: "14px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
             >
               <i className="nav-icon icon-note"></i>Revisi TA
             </a>
@@ -407,20 +420,18 @@ const Sidebar = () => {
             </li>
           </div>
           <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('schedule*') ? 'active' : '' }}"
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-list"></i>Pembimbing
-            </a>
-            <a
+            </div>
+            <div
               className="nav-link nav-dropdown-toggle"
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon fa fa-book"></i>Pembimbing
-            </a>
+            </div>
             <ul className="nav-dropdown-items">
               <li className="nav-item">
                 <a
@@ -466,20 +477,20 @@ const Sidebar = () => {
             </li>
           </div>
           <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle  {{ Request::is('schedule*') ? 'active' : '' }}"
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-calendar"></i>Jadwal Sidang
-            </a>
-            <a
+            </div>
+            <div
               className="nav-link nav-dropdown-toggle"
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon fa fa-hourglass-half"></i>Penguji
-            </a>
+            </div>
             <ul className="nav-dropdown-items">
               <li className="nav-item">
                 <a
@@ -495,13 +506,13 @@ const Sidebar = () => {
           {/* End of Penguji */}
 
           {/* <li className="nav-item nav-dropdown">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle {{ Request::is('revision*') ? 'active' : '' }}"
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+           
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-note"></i>Revisi Sidang
-            </a>
+            </div>
             <ul className="nav-dropdown-items">
               <li className="nav-item">
                 <a
@@ -553,20 +564,20 @@ const Sidebar = () => {
             </li>
           </div>{" "}
           <li className="nav-item nav-dropdown mb-2">
-            <a
+            <div
               className="nav-link nav-dropdown-toggle {{ Request::is('sidangs*') ? 'active' : '' }} {{ Request::is('schedules*') ? 'active' : '' }} {{ Request::is('schedule*') ? 'active' : '' }}"
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+           
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-list"></i>PIC TA
-            </a>{" "}
-            <a
+            </div>{" "}
+            <div
               className="nav-link nav-dropdown-toggle "
-              href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+           
+              style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
             >
               <i className="nav-icon icon-list"></i>PIC TA
-            </a>
+            </div>
             <ul className="nav-dropdown-items">
               <li className="nav-item">
                 <a
@@ -604,7 +615,11 @@ const Sidebar = () => {
             <a
               className="nav-link nav-dropdown-toggle "
               href="#"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                fontSize: "14px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
             >
               <i className="nav-icon fa fa-bookmark-o"></i>Guide Book
             </a>
@@ -613,7 +628,7 @@ const Sidebar = () => {
                 <a
                   className="nav-link {{ Request::is('guide_book_admin') ? 'active' : '' }}"
                   href="{{route('guide_book_admin')}}"
-                  style={{ fontSize: "14px", fontWeight: "bold" }}
+                  style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
                 >
                   <i className="nav-icon icon-notebook"></i>Admin
                 </a>
@@ -622,7 +637,7 @@ const Sidebar = () => {
                 <a
                   className="nav-link {{ Request::is('guide_book_admin_PIC') ? 'active' : '' }}"
                   href="{{route('guide_book_PIC')}}"
-                  style={{ fontSize: "14px", fontWeight: "bold" }}
+                  style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
                 >
                   <i className="nav-icon icon-notebook"></i>PIC
                 </a>
@@ -631,7 +646,7 @@ const Sidebar = () => {
                 <a
                   className="nav-link {{ Request::is('guide_book_admin_pembimbing') ? 'active' : '' }}"
                   href="{{route('guide_book_pembimbing')}}"
-                  style={{ fontSize: "14px", fontWeight: "bold" }}
+                  style={{ fontSize: "14px", fontWeight: "bold", cursor: "pointer" }}
                 >
                   <i className="nav-icon icon-notebook"></i>Dosen
                 </a>
@@ -640,7 +655,11 @@ const Sidebar = () => {
                 <a
                   className="nav-link {{ Request::is('guide_book_admin_student') ? 'active' : '' }}"
                   href="{{route('guide_book_student')}}"
-                  style={{ fontSize: "14px", fontWeight: "bold" }}
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
                 >
                   <i className="nav-icon icon-notebook"></i>Mahasiswa
                 </a>
