@@ -3,20 +3,17 @@ import { NavLink } from "react-router-dom";
 import telkomLogo from "../../assets/images/telkom.png";
 import { useState } from "react";
 import { useAuth } from "../../middleware/AuthContext";
-import { useCookies } from "react-cookie";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const LoginSSO = () => {
   const { login } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     login(username, password);
-    setUsername("");
-    setPassword("");
+    setUsername();
+    setPassword();
   };
 
   return (

@@ -9,13 +9,25 @@ import SidangCreate from "./views/sidangs/Create";
 
 const router = (
   <Routes>
+    {/* Public Routes */}
     <Route path="/" element={<Welcome />} />
     <Route path="/login" element={<Login />} />
     <Route path="/loginsso" element={<LoginSSO />} />
 
-    <Route element={<PrivateRoutes role="RLMHS" />}>
+    {/* Auth Routes */}
+    <Route
+      element={
+        <PrivateRoutes
+          role={["RLADM", "RLPIC", "RLMHS", "RLPBB", "RLPGJ", "RLDSN"]}
+        />
+      }
+    >
       <Route path="/home" element={<Home />} />
-      <Route path="/sidang/create" element={<SidangCreate />} />
+    </Route>
+
+    {/* RLMHS Routes */}
+    <Route element={<PrivateRoutes role={["RLMHS"]} />}>
+      <Route path="/sidangs/create" element={<SidangCreate />} />
     </Route>
 
     <Route path="*" element={<p>404 Error - Nothing here...</p>} />

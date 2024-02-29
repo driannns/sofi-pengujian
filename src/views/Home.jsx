@@ -1,6 +1,12 @@
 import { MainLayout } from "./layouts/MainLayout";
+import { jwtDecode } from "jwt-decode";
+import { useCookies } from "react-cookie";
 
 const Home = () => {
+  const [cookies] = useCookies();
+  const authToken = cookies["auth-token"];
+  const userData = jwtDecode(authToken);
+
   return (
     <MainLayout>
       <div className="container-fluid">
@@ -9,30 +15,30 @@ const Home = () => {
             <div className="col-12">{/*@include('flash::message')*/}</div>
           </div>
           <div className="row">
-            {/* Admin */}
-            {/* <div className="card">
-              <div className="card-header">
-                <h1>Selamat Datang username(admin)</h1>
+            {userData.role?.find((roles) => "RLADM".includes(roles)) && (
+              <div className="card">
+                <div className="card-header">
+                  <h1>Selamat Datang username(admin)</h1>
+                </div>
+                <div className="card-body">
+                  <p>
+                    <ol>
+                      <li>
+                        Pastikan parameter pada id <b>academicPeriod</b> sudah
+                        sesuai dengan periode sidang sekarang
+                      </li>
+                      <li>Update dahulu data dosen di menu data dosen</li>
+                      <li>Isi Data Period</li>
+                      <li>Isi Data CLO di menu Setting CLO</li>
+                      <li>
+                        Jika ada user dosen yang ingin di set menjadi role
+                        tertentu silahkan masuk ke menu Manage Role
+                      </li>
+                    </ol>
+                  </p>
+                </div>
               </div>
-              <div className="card-body">
-                <p>
-                  <ol>
-                    <li>
-                      Pastikan parameter pada id <b>academicPeriod</b> sudah
-                      sesuai dengan periode sidang sekarang
-                    </li>
-                    <li>Update dahulu data dosen di menu data dosen</li>
-                    <li>Isi Data Period</li>
-                    <li>Isi Data CLO di menu Setting CLO</li>
-                    <li>
-                      Jika ada user dosen yang ingin di set menjadi role
-                      tertentu silahkan masuk ke menu Manage Role
-                    </li>
-                  </ol>
-                </p>
-              </div>
-            </div> */}
-            {/* End of Admin */}
+            )}
 
             {/* else */}
             <div className="col-12">
@@ -118,107 +124,118 @@ const Home = () => {
             </div>
           </div>
           <div className="row">
-            {/* Dosen */}
-            {/* <div className="col-4">
-              <h5>DAFTAR SIDANG BELUM DI MULAI</h5>
-              <div className="card">
-                <div className="card-body">
-                  <table className="table table-striped" id="schedules-table">
-                    <thead>
-                      <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($schedules as $data) @foreach( $data as
-                      $schedule)
-                      <tr>
-                        <td> $schedule-sidang-mahasiswa-nim</td>
-                        <td> $schedule-sidang-mahasiswa-user-nama</td>
-                        <td>
-                          <a
-                            href="{{ route('scores.pembimbing.create', [$schedule->id]) }}"
-                            className="btn btn-primary w-100"
-                          >
-                            Nilai
-                          </a>
-                        </td>
-                      </tr>
-                      @endforeach @endforeach
-                    </tbody>
-                  </table>
+            {userData.role?.find((roles) => "RLDSN".includes(roles)) && (
+              <>
+                <div className="col-4">
+                  <h5>DAFTAR SIDANG BELUM DI MULAI</h5>
+                  <div className="card">
+                    <div className="card-body">
+                      <table
+                        className="table table-striped"
+                        id="schedules-table"
+                      >
+                        <thead>
+                          <tr>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @foreach($schedules as $data) @foreach( $data as
+                          $schedule)
+                          <tr>
+                            <td> $schedule-sidang-mahasiswa-nim</td>
+                            <td> $schedule-sidang-mahasiswa-user-nama</td>
+                            <td>
+                              <a
+                                href="{{ route('scores.pembimbing.create', [$schedule->id]) }}"
+                                className="btn btn-primary w-100"
+                              >
+                                Nilai
+                              </a>
+                            </td>
+                          </tr>
+                          @endforeach @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="col-4">
-              <h5>DAFTAR REVISI BELUM DI APPROVE</h5>
-              <div className="card">
-                <div className="card-body">
-                  <table className="table table-striped" id="revisions-table">
-                    <thead>
-                      <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($revisions as $data) @foreach( $data as
-                      $revision)
-                      <tr>
-                        <td>$revision-sidang-mahasiswa-nim</td>
-                        <td>$revision-sidang-mahasiswa-user-nama</td>
-                        <td>
-                          <a
-                            href="{{ route('revisions.index.dosen') }}"
-                            className="btn btn-warning w-100"
-                          >
-                            Revisi
-                          </a>
-                        </td>
-                      </tr>
-                      @endforeach @endforeach
-                    </tbody>
-                  </table>
+                <div className="col-4">
+                  <h5>DAFTAR REVISI BELUM DI APPROVE</h5>
+                  <div className="card">
+                    <div className="card-body">
+                      <table
+                        className="table table-striped"
+                        id="revisions-table"
+                      >
+                        <thead>
+                          <tr>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @foreach($revisions as $data) @foreach( $data as
+                          $revision)
+                          <tr>
+                            <td>$revision-sidang-mahasiswa-nim</td>
+                            <td>$revision-sidang-mahasiswa-user-nama</td>
+                            <td>
+                              <a
+                                href="{{ route('revisions.index.dosen') }}"
+                                className="btn btn-warning w-100"
+                              >
+                                Revisi
+                              </a>
+                            </td>
+                          </tr>
+                          @endforeach @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="col-4">
-              <h5>DAFTAR SIDANG BELUM DI TUTUP</h5>
-              <div className="card">
-                <div className="card-body">
-                  <table className="table table-striped" id="revisions-table">
-                    <thead>
-                      <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($schedulesNotComplete as $data) @foreach( $data
-                      as $schedule)
-                      <tr>
-                        <td>$schedule-sidang-mahasiswa-nim</td>
-                        <td>$schedule-sidang-mahasiswa-user-nama</td>
-                        <td>
-                          <a
-                            href="{{ route('scores.simpulan', [$schedule->id]) }}"
-                            className="btn btn-danger w-100"
-                          >
-                            Simpulan
-                          </a>
-                        </td>
-                      </tr>
-                      @endforeach @endforeach
-                    </tbody>
-                  </table>
+                <div className="col-4">
+                  <h5>DAFTAR SIDANG BELUM DI TUTUP</h5>
+                  <div className="card">
+                    <div className="card-body">
+                      <table
+                        className="table table-striped"
+                        id="revisions-table"
+                      >
+                        <thead>
+                          <tr>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @foreach($schedulesNotComplete as $data) @foreach(
+                          $data as $schedule)
+                          <tr>
+                            <td>$schedule-sidang-mahasiswa-nim</td>
+                            <td>$schedule-sidang-mahasiswa-user-nama</td>
+                            <td>
+                              <a
+                                href="{{ route('scores.simpulan', [$schedule->id]) }}"
+                                className="btn btn-danger w-100"
+                              >
+                                Simpulan
+                              </a>
+                            </td>
+                          </tr>
+                          @endforeach @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div> */}
-            {/* End of Dosen */}
+              </>
+            )}
           </div>
         </div>
       </div>
