@@ -8,6 +8,7 @@ import React, {
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+const loginUrl = "https://f4a9-182-253-123-0.ngrok-free.app";
 
 export const AuthContext = createContext();
 
@@ -19,10 +20,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/login", {
-        username,
-        password,
-      });
+      const res = await axios.post(
+        `${loginUrl}/api/login`,
+        // { headers },
+        {
+          username,
+          password,
+        }
+      );
 
       if (res.data.status >= 200 && res.data.status < 300) {
         setCookies("auth-token", res.data.token, {
