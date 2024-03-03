@@ -8,7 +8,7 @@ import React, {
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const loginUrl = "https://444c-180-244-128-208.ngrok-free.app";
+const loginUrl = "https://9b57-180-244-128-208.ngrok-free.app";
 
 export const AuthContext = createContext();
 
@@ -36,6 +36,8 @@ export const AuthProvider = ({ children }) => {
         });
         setIsLoggedIn(true);
         navigate("/home");
+        window.location.reload();
+        // navigate.go(0)
       } else {
         console.error("Login failed");
       }

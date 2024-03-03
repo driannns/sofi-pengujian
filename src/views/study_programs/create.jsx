@@ -1,7 +1,25 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
+import axios from "axios";
+import { useState } from "react";
 
 const StudyProgramCreate = () => {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+
+  const studyName = (e) => {
+    setName(e.target.value);
+  };
+
+  const createProgramStudy = () => {
+    const data = { name };
+    fetch("http://localhost:3000/study_programs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }).then(navigate(-1));
+  };
+
   return (
     <MainLayout>
       <ol className="breadcrumb">
@@ -23,30 +41,40 @@ const StudyProgramCreate = () => {
                 <div className="card-body">
                   {/*{!! Form::open(['route' => 'studyPrograms.store']) !!}*/}
                   {/*<!-- Name Field -->*/}
-                  <div className="form-group col-sm-6">
+
+                  <div className="col-sm-6">
                     {/*{!! Form::label('name', 'Name:') !!}*/}
                     {/*{!! Form::text('name', null, ['className' => 'form-control','maxlength' => 255,'maxlength' => 255]) !!}*/}
-                    <form>
-                        <label htmlFor="name">Name:</label>
-                        <input type="text" id="name" name="name" className="form-control"/>
-                    </form>
+                    <label htmlFor="name">Name:</label>
+                    <input
+                      type="text"
+                      value={name}
+                      className="form-control"
+                      onChange={studyName}
+                    />
+                    <button
+                      onClick={createProgramStudy}
+                      className="btn btn-primary my-3"
+                    >
+                      Save
+                    </button>
+                    <Link
+                      //   href="{{ route('studyPrograms.index') }}"
+                      to="/studyPrograms"
+                      className="btn btn-secondary ml-1"
+                    >
+                      Cancel
+                    </Link>
                   </div>
 
                   {/*<!-- Submit Field -->*/}
                   <div className="form-group col-sm-12">
                     {/*{!! Form::submit('Save', ['className' => 'btn btn-primary']) !!}*/}
-                    <Link
+                    {/*<Link
                       className="btn btn-primary"
                     >
                     Save
-                    </Link>
-                    <Link
-                    //   href="{{ route('studyPrograms.index') }}"
-                        to="/studyPrograms"
-                      className="btn btn-secondary ml-1"
-                    >
-                      Cancel
-                    </Link>
+                    </Link>*/}
                   </div>
 
                   {/*@include('study_programs.fields')*/}

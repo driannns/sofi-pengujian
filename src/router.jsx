@@ -40,8 +40,8 @@ const router = (
     <Route element={<PrivateRoutes role={["RLADM"]} />}>
       <Route path="/studyPrograms" element={<StudyPrograms/>} />
       <Route path="/studyPrograms/create" element={<StudyProgramCreate />} />
-      <Route path="/studyPrograms/edit" element={<StudyProgramEdit/>} />
-      <Route path="/studyPrograms/show" element={<StudyProgramShow/>}/>
+      <Route path="/studyPrograms/:id/edit" element={<StudyProgramEdit/>} />
+      <Route path="/studyPrograms/:id" element={<StudyProgramShow/>}/>
     </Route>
 
     <Route path="*" element={<p>404 Error - Nothing here...</p>} />

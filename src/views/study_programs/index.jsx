@@ -1,7 +1,73 @@
 import { Link } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+// const getstudyPrograms = "https://fakestoreapi.com/products/";
+// const getstudyPrograms = "http://localhost:3000/study_programs";
 
 const StudyPrograms = () => {
+  const [studyprograms, setStudyPrograms] = useState([]);
+
+  // pakai axios
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const resStudyPrograms = await axios.get(getstudyPrograms);
+  //       setStudyPrograms(resStudyPrograms.data);
+  //       console.log(resStudyPrograms.data);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+
+  // pakai fectch
+  useEffect(function () {
+    async function getstudyPrograms() {
+      const request = await fetch("http://localhost:3000/study_programs");
+      const response = await request.json();
+
+      setStudyPrograms(response);
+    }
+    getstudyPrograms();
+  }, []);
+
+  // const handleDelete = async (id) => {
+  //   try{
+  //   await axios.delete(`http://localhost:3000/study_programs/${id}`);
+  //   const confirm = window.confirm("Are you sure?");
+  //   if (confirm) {
+  //     setStudyPrograms((studyprograms) =>
+  //       studyprograms.filter((studyprogram) => studyprogram.id !== id)
+  //     );
+  //   }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure?");
+    if (confirmDelete) {
+      try {
+        const response = await fetch(`http://localhost:3000/study_programs/${id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          setStudyPrograms((prevStudyPrograms) =>
+            prevStudyPrograms.filter((studyProgram) => studyProgram.id !== id)
+          );
+        } 
+      } catch (error) {
+        console.error("Gagal menghapus data:", error);
+        alert("Gagal menghapus data");
+      }
+    }
+  };
+  
+
   return (
     <MainLayout>
       <ol className="breadcrumb">
@@ -38,36 +104,42 @@ const StudyPrograms = () => {
                       </thead>
                       <tbody>
                         {/*@foreach($studyPrograms as $studyProgram)*/}
-                        <tr>
-                          <td>{/*{{ $studyProgram->name }}*/}S1 Sistem Informasi</td>
-                          <td>
-                            {/*{!! Form::open(['route' => ['studyPrograms.destroy', $studyProgram->id], 'method' => 'delete']) !!}*/}
-                            <div className="btn-group">
-                              <Link
-                                // href="{{ route('studyPrograms.show', [$studyProgram->id]) }}"
-                                to="/studyPrograms/show"
-                                className="btn btn-ghost-success"
-                              >
-                                <i className="fa fa-eye"></i>
-                              </Link>
-                              <Link
-                                // href="{{ route('studyPrograms.edit', [$studyProgram->id]) }}"
-                                to="/studyPrograms/edit"
-                                className="btn btn-ghost-info"
-                              >
-                                <i className="fa fa-edit"></i>
-                              </Link>
-                              <a
-                                href="{{ route('studyPrograms.edit', [$studyProgram->id]) }}"
-                                className="btn btn-ghost-danger"
-                              >
-                                <i className="fa fa-trash"></i>
-                              </a>
-                              {/*{!! Form::button('<i className="fa fa-trash"></i>', ['type' => 'submit', 'className' => 'btn btn-ghost-danger', 'onclick' => "return confirm('Are you sure?')"]) !!}*/}
-                            </div>
-                            {/*{!! Form::close() !!}*/}
-                          </td>
-                        </tr>
+                        {studyprograms.map((studyProgram) => (
+                          <tr key={studyProgram.id}>
+                            <td>
+                              {/*{{ $studyProgram->name }}*/}
+                              {studyProgram.name}
+                            </td>
+                            <td>
+                              {/*{!! Form::open(['route' => ['studyPrograms.destroy', $studyProgram->id], 'method' => 'delete']) !!}*/}
+                              <div className="btn-group">
+                                <Link
+                                  // href="{{ route('studyPrograms.show', [$studyProgram->id]) }}"
+                                  to={`/studyPrograms/${studyProgram.id}`}
+                                  className="btn btn-ghost-success"
+                                >
+                                  <i className="fa fa-eye"></i>
+                                </Link>
+                                <Link
+                                  // href="{{ route('studyPrograms.edit', [$studyProgram->id]) }}"
+                                  to={`/studyPrograms/${studyProgram.id}/edit`}
+                                  className="btn btn-ghost-info"
+                                >
+                                  <i className="fa fa-edit"></i>
+                                </Link>
+                                <Link
+                                  // href="{{ route('studyPrograms.edit', [$studyProgram->id]) }}"
+                                  className="btn btn-ghost-danger"
+                                  onClick={() => handleDelete(studyProgram.id)}
+                                >
+                                  <i className="fa fa-trash"></i>
+                                </Link>
+                                {/*{!! Form::button('<i className="fa fa-trash"></i>', ['type' => 'submit', 'className' => 'btn btn-ghost-danger', 'onclick' => "return confirm('Are you sure?')"]) !!}*/}
+                              </div>
+                              {/*{!! Form::close() !!}*/}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>

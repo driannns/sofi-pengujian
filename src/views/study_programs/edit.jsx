@@ -1,7 +1,37 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
+import { useEffect, useState } from "react";
 
 const StudyProgramEdit = () => {
+  const params = useParams();
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/study_programs/${params.id}`
+        );
+        const data = await response.json();
+        setName(data.name);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [params]);
+
+  const EditProgramStudy = () => {
+    const data = { name };
+    fetch(`http://localhost:3000/study_programs/${params.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }).then(navigate(-1));
+  };
+
   return (
     <MainLayout>
       <ol className="breadcrumb">
@@ -23,26 +53,26 @@ const StudyProgramEdit = () => {
                 <div className="card-body">
                   {/*{!! Form::open(['route' => 'studyPrograms.store']) !!}*/}
                   {/*<!-- Name Field -->*/}
-                  <div className="form-group col-sm-6">
+                  <div className="col-sm-6">
                     {/*{!! Form::label('name', 'Name:') !!}*/}
                     {/*{!! Form::text('name', null, ['className' => 'form-control','maxlength' => 255,'maxlength' => 255]) !!}*/}
-                    <form>
-                        <label htmlFor="name">Name:</label>
-                        <input type="text" id="name" name="name" className="form-control"/>
-                    </form>
-                  </div>
-
-                  {/*<!-- Submit Field -->*/}
-                  <div className="form-group col-sm-12">
-                    {/*{!! Form::submit('Save', ['className' => 'btn btn-primary']) !!}*/}
-                    <Link
-                      className="btn btn-primary"
+                    <label htmlFor="name">Name:</label>
+                    <input
+                      type="text"
+                      value={name}
+                      // placeholder={studyprograms.name}
+                      className="form-control"
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                    <button
+                      onClick={EditProgramStudy}
+                      className="btn btn-primary my-3"
                     >
-                    Save
-                    </Link>
+                      Save
+                    </button>
                     <Link
-                    //   href="{{ route('studyPrograms.index') }}"
-                        to="/studyPrograms"
+                      //   href="{{ route('studyPrograms.index') }}"
+                      to="/studyPrograms"
                       className="btn btn-secondary ml-1"
                     >
                       Cancel
