@@ -7,6 +7,8 @@ import Login from "./views/auth/Login";
 import LoginSSO from "./views/auth/LoginSSO";
 import SidangCreate from "./views/sidangs/Create";
 import SidangEdit from "./views/sidangs/Edit";
+import PowerPoint from "./views/sidangs/PowerPoint";
+import Teams from "./views/sidangs/Teams";
 
 const router = (
   <Routes>
@@ -29,7 +31,9 @@ const router = (
     {/* RLMHS Routes */}
     <Route element={<PrivateRoutes role={["RLMHS"]} />}>
       <Route path="/sidangs/create" element={<SidangCreate />} />
-      <Route path="/sidangs/edit" element={<SidangEdit />} />
+      <Route path="/sidangs/edit/:id" element={<SidangEdit />} />
+      <Route path="/slides" element={<PowerPoint />} />
+      <Route path="/teams" element={<Teams />} />
     </Route>
 
     <Route path="*" element={<p>404 Error - Nothing here...</p>} />
