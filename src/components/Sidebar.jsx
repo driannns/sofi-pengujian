@@ -56,22 +56,26 @@ const Sidebar = () => {
                     </NavLink>
                   </li>
                   <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('slides.index') ? 'active' : '' }}"
-                      href="{{ route('slides.index') }}"
+                    <NavLink
+                      to="/slides"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link active open" : "nav-link open"
+                      }
                     >
                       <i className="nav-icon fa fa-folder-o ml-1"></i>
                       <span>Materi Presentasi</span>
-                    </a>
+                    </NavLink>
                   </li>
                   <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('teams.index') ? 'active' : '' }}"
-                      href="{{ route('teams.index') }}"
+                    <NavLink
+                      to="/teams"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link active open" : "nav-link open"
+                      }
                     >
                       <i className="nav-icon fa fa-users ml-1"></i>
                       <span>Buat Tim</span>
-                    </a>
+                    </NavLink>
                   </li>
                 </ul>
               </li>

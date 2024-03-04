@@ -1,4 +1,6 @@
 import { MainLayout } from "../layouts/MainLayout";
+import { Link } from "react-router-dom";
+import Fields from "./Fields";
 
 const SidangEdit = () => {
   return (
@@ -8,10 +10,10 @@ const SidangEdit = () => {
           <h3>SIDANG</h3>
           <hr className="mt-0" />
           <h6 className="mb-3">
-            <a href="{{ route('home') }}" className="text-dark">
+            <Link to="/home" className="text-dark">
               BERANDA
-            </a>{" "}
-            /{" "}
+            </Link>
+            /
             <a href="{!! route('sidangs.index') !!}" className="text-dark">
               SIDANG
             </a>
@@ -21,10 +23,12 @@ const SidangEdit = () => {
 
       <div className="container-fluid">
         <div className="animated fadeIn">
+          {/* @include('coreui-templates::common.errors') @if
+          (Session::has('error')) */}
           <div className="alert alert-danger" role="alert">
             {/*{{Session::get('error')}}*/}
           </div>
-          @endif
+          {/* @endif */}
           <div className="row">
             <div className="col-12 col-md-6">
               <div className="card">
@@ -34,25 +38,12 @@ const SidangEdit = () => {
                   <strong>Edit Data Sidang</strong>
                 </div>
                 <div className="card-body">
-                  {/*{!! Form::model($sidang, ['route' => ['sidangs.update', $sidang->id], 'files' => true, 'id'=> 'frm1', 'method' => 'PUT']) !!}*/}
-
-                  {/*{!! Form::close() !!}*/}
+                  <Fields />
                 </div>
-                {/*--}}*/}
               </div>
             </div>
             <div className="col-12 col-md-6">
               <div className="card">
-                {/*{{--*/}{" "}
-                <div className="card-header">
-                  <i className="fa fa-history fa-lg"></i>
-                  {/* @if ( auth()->user()->isSuperadmin() )*/}
-                  <strong>Riwayat Proses</strong>
-                  @else
-                  <strong>Riwayat Proses Pengajuan</strong>
-                  @endif
-                </div>
-                {/*--}}*/}
                 <div className="card-body">
                   <div
                     className="table-responsive-sm"
@@ -68,7 +59,7 @@ const SidangEdit = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach($status_logs as $log)
+                        {/* @foreach($status_logs as $log) */}
                         <tr>
                           <td>
                             {/*{{ date('l, d F Y - d:m', strtotime($log->created_at)) }}*/}{" "}
@@ -78,7 +69,7 @@ const SidangEdit = () => {
                           <td>{/*{{$log->feedback}}*/}tes</td>
                           <td>{/*{{$log->user->username}}*/}tes</td>
                         </tr>
-                        @endforeach
+                        {/* @endforeach */}
                       </tbody>
                     </table>
                   </div>

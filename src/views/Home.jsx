@@ -1,18 +1,27 @@
 import { MainLayout } from "./layouts/MainLayout";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
   const [cookies] = useCookies();
   const authToken = cookies["auth-token"];
   const userData = jwtDecode(authToken);
-
+  const location = useLocation();
+  console.log(location.state?.error);
   return (
     <MainLayout>
       <div className="container-fluid">
         <div className="animated fadeIn">
           <div className="row mt-3">
-            <div className="col-12">{/*@include('flash::message')*/}</div>
+            {/* <div className="col-12">@include('flash::message')</div> */}
+            <div className="col-12">
+              {location.state?.error && (
+                <div class="alert alert-danger" role="alert">
+                  {location.state?.error}
+                </div>
+              )}
+            </div>
           </div>
           <div className="row">
             {userData.role?.find((roles) => "RLADM".includes(roles)) && (

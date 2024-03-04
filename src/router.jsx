@@ -12,6 +12,10 @@ import StudyProgramEdit from "./views/studyprograms/edit";
 import StudyProgramShow from "./views/studyprograms/show";
 import StudyPrograms from "./views/studyprograms";
 
+import SidangEdit from "./views/sidangs/Edit";
+import PowerPoint from "./views/sidangs/PowerPoint";
+import Teams from "./views/sidangs/Teams";
+
 const router = (
   <Routes>
     {/* Public Routes */}
@@ -33,7 +37,9 @@ const router = (
     {/* RLMHS Routes */}
     <Route element={<PrivateRoutes role={["RLMHS"]} />}>
       <Route path="/sidangs/create" element={<SidangCreate />} />
-      <Route path="/sidangs/edit" element={<SidangEdit/>} />
+      <Route path="/sidangs/edit/:id" element={<SidangEdit />} />
+      <Route path="/slides" element={<PowerPoint />} />
+      <Route path="/teams" element={<Teams />} />
     </Route>
 
     {/* RLADM Routes */}
