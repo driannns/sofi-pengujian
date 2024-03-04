@@ -1,4 +1,5 @@
 import { MainLayout } from "../layouts/MainLayout";
+import { Link } from "react-router-dom";
 
 const MateriPresentasi = () => {
   return (
@@ -6,11 +7,11 @@ const MateriPresentasi = () => {
       <ol className="breadcrumb mb-0">
         <div className="col-12">
           <h3>MATERI PRESENTASI</h3>
-          {/*<hr className="mt-0">*/}
+          <hr className="mt-0" />
           <h6 className="mb-3">
-            <a href="{{ route('home') }}" className="text-dark">
+            <Link to="home" className="text-dark">
               BERANDA
-            </a>{" "}
+            </Link>{" "}
             / UPLOAD MATERI PRESENTASI
           </h6>
         </div>
@@ -18,29 +19,25 @@ const MateriPresentasi = () => {
 
       <div className="container-fluid">
         <div className="animated fadeIn">
-        {/*@include('flash::message') @include('coreui-templates::common.errors')*/}  
-       {/*@if (Session::has('error'))*/}   
+          {/*@include('flash::message') @include('coreui-templates::common.errors')*/}
+          {/*@if (Session::has('error'))*/}
           <div className="alert alert-danger" role="alert">
             {/*{{Session::get('error')}}*/}
           </div>
-          @endif
+          {/* @endif */}
           {/*@if($sidang->status == 'tidak lulus' OR $sidang->status == 'tidak lulus (sudah update dokumen)' OR
         $sidang->status == 'tidak lulus (belum dijadwalkan)')*/}
           <div className="row">
             <div className="col-lg-12">
               <div className="card">
-                {/* {{-- <div className="card-header">
-                             <i className="fa fa-align-justify"></i>
-                             Update Data Sidang
-                         </div> --}}*/}
                 <div className="card-body">
                   <form
                     className=""
-                    action="{{ route('sidang-ulang.update', $sidang->id) }}"
-                    method="post"
+                    // action="{{ route('sidang-ulang.update', $sidang->id) }}"
+                    // method="post"
                     // enctype="multipart/form-data"
                   >
-                    @csrf
+                    {/* @csrf */}
                     <input
                       type="text"
                       name="sidang_id"
@@ -65,7 +62,9 @@ const MateriPresentasi = () => {
                             className="custom-file-input forminput"
                             name="dokumen_ta"
                           />
-                          <label className="custom-file-label">Choose file</label>
+                          <label className="custom-file-label">
+                            Choose file
+                          </label>
                         </div>
                       </div>
                       <div className="form-group">
@@ -76,7 +75,9 @@ const MateriPresentasi = () => {
                             className="custom-file-input forminput"
                             name="makalah"
                           />
-                          <label className="custom-file-label">Choose file</label>
+                          <label className="custom-file-label">
+                            Choose file
+                          </label>
                         </div>
                       </div>
                       <button
@@ -92,20 +93,16 @@ const MateriPresentasi = () => {
               </div>
             </div>
           </div>
-          @endif
-          
+          {/* @endif */}
           <div className="row">
             <div className="col-lg-12">
               <div className="card">
-                {/*{{-- <div className="card-header">
-                             <i className="fa fa-align-justify"></i>
-                             Materi Presentasi
-                         </div> --}}*/}
-
                 <div className="card-body">
                   <div className="row">
                     <div className="col">
-                      <h2 className="text-right">PILIH FILE MATERI PRESENTASI</h2>
+                      <h2 className="text-right">
+                        PILIH FILE MATERI PRESENTASI
+                      </h2>
                       <p className="text-right">
                         Format file <b> .ppt </b> atau <b> .pptx </b> (maksimal
                         10mb)
@@ -115,11 +112,11 @@ const MateriPresentasi = () => {
                     <div className="col">
                       <form
                         className=""
-                        action="{{ route('slides.upload') }}"
-                        method="post"
+                        // action="{{ route('slides.upload') }}"
+                        // method="post"
                         // enctype="multipart/form-data"
                       >
-                        @csrf
+                        {/* @csrf */}
                         <input
                           type="text"
                           name="sidang_id"
@@ -128,8 +125,7 @@ const MateriPresentasi = () => {
                         />
                         <div className="input-group mb-3">
                           <div className="custom-file">
-                            {/*{{-- <input type="file" className="custom-file-input forminput" name="slide"> --}}*/}
-                            @if($slide != null)
+                            {/* @if($slide != null) */}
                             <input
                               type="file"
                               className="custom-file-input forminput"
@@ -138,18 +134,20 @@ const MateriPresentasi = () => {
                             <label className="custom-file-label">
                               {/*{{ $slide->file_url }}*/}
                             </label>
-                            @elseif ($slide == null)
+                            {/* @elseif ($slide == null) */}
                             <input
                               type="file"
                               className="custom-file-input forminput"
                               name="slide"
                               required
                             />
-                            <label className="custom-file-label">Upload File</label>
-                            @endif
+                            <label className="custom-file-label">
+                              Upload File
+                            </label>
+                            {/* @endif */}
                           </div>
                         </div>
-                        @if($slide != null)
+                        {/* @if($slide != null) */}
                         <div className="row ml-0">
                           <a
                             href="/{{ $slide->file_url }}"
@@ -166,7 +164,7 @@ const MateriPresentasi = () => {
                             Upload Ulang
                           </button>
                         </div>
-                        @elseif ($slide == null)
+                        {/* @elseif ($slide == null) */}
                         <button
                           type="submit"
                           name="button"
@@ -174,7 +172,7 @@ const MateriPresentasi = () => {
                         >
                           Upload
                         </button>
-                        @endif
+                        {/* @endif */}
                       </form>
                     </div>
                   </div>
