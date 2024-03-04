@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
         });
         setIsLoggedIn(true);
         navigate("/home");
+        window.location.reload();
       } else {
         console.error("Login failed");
       }
