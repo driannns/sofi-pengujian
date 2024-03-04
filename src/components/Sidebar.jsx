@@ -616,14 +616,16 @@ const Sidebar = () => {
                       <span>Porsi Nilai</span>
                     </a>
                   </li>
-                  <li className="nav-item {{ Request::is('studyPrograms*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link"
-                      href="{{ route('studyPrograms.index') }}"
+                  <li className="nav-item">
+                    <NavLink
+                      to="/studyPrograms"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link active open" : "nav-link open"
+                      }
                     >
                       <i className="nav-icon icon-cursor"></i>
                       <span>Program Studi</span>
-                    </a>
+                    </NavLink>
                   </li>
                   <li className="nav-item {{ Request::is('parameters.index') ? 'active' : '' }}">
                     <a

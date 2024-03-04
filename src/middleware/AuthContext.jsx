@@ -8,7 +8,7 @@ import React, {
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const loginUrl = "https://9b57-180-244-128-208.ngrok-free.app";
+const loginUrl = "https://9e4e-180-244-128-208.ngrok-free.app";
 
 export const AuthContext = createContext();
 

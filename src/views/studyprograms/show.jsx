@@ -5,43 +5,19 @@ import axios from "axios";
 const StudyProgramShow = () => {
   const params = useParams();
   const [studyprograms, setStudyPrograms] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       // const {data: response} = await Axios.get(`http://localhost:3000/study_programs/${params.id}`);
-  //       const data = await axios.get(
-  //         `http://localhost:3000/study_programs/${params.id}`
-  //       );
-  //       if (data.status === 200) {
-  //         setTimeout(() => {
-  //           setLoading(true);
-  //           console.log(data.status);
-  //           setStudyPrograms(data.data);
-  //         }, 2000);
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [params]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/study_programs/${params.id}`);
-        const data = await response.json();
-        setTimeout(() => {
-          setLoading(true);
-          setStudyPrograms(data);
-        }, 2000);
+        const data = await axios.get(
+          `http://localhost:3000/study_programs/${params.id}`
+        );
+        console.log(data.status);
+        setStudyPrograms(data.data);
       } catch (error) {
         console.error(error);
       }
     };
-
     fetchData();
   }, [params]);
 
@@ -71,7 +47,6 @@ const StudyProgramShow = () => {
                 </div>
                 <div className="card-body">
                   {/*<!-- Name Field -->*/}
-                  {loading ? (
                     <div className="form-group">
                       {/*{!! Form::label('name', 'Name:') !!}*/}
                       <form>
@@ -82,9 +57,6 @@ const StudyProgramShow = () => {
                         {studyprograms.name}
                       </p>
                     </div>
-                  ) : (
-                    <p>Loading...</p>
-                  )}
                   {/*@include('study_programs.show_fields')*/}
                 </div>
               </div>

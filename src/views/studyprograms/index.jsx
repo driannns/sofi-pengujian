@@ -1,72 +1,41 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-// const getstudyPrograms = "https://fakestoreapi.com/products/";
-// const getstudyPrograms = "http://localhost:3000/study_programs";
+const getstudyPrograms = "http://localhost:3000/study_programs";
 
 const StudyPrograms = () => {
   const [studyprograms, setStudyPrograms] = useState([]);
+  const location = useLocation();
+  const { state } = location;
 
-  // pakai axios
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const resStudyPrograms = await axios.get(getstudyPrograms);
-  //       setStudyPrograms(resStudyPrograms.data);
-  //       console.log(resStudyPrograms.data);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
-
-  // pakai fectch
-  useEffect(function () {
-    async function getstudyPrograms() {
-      const request = await fetch("http://localhost:3000/study_programs");
-      const response = await request.json();
-
-      setStudyPrograms(response);
-    }
-    getstudyPrograms();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resStudyPrograms = await axios.get(getstudyPrograms);
+        setStudyPrograms(resStudyPrograms.data);
+        console.log(resStudyPrograms.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
   }, []);
 
-  // const handleDelete = async (id) => {
-  //   try{
-  //   await axios.delete(`http://localhost:3000/study_programs/${id}`);
-  //   const confirm = window.confirm("Are you sure?");
-  //   if (confirm) {
-  //     setStudyPrograms((studyprograms) =>
-  //       studyprograms.filter((studyprogram) => studyprogram.id !== id)
-  //     );
-  //   }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure?");
-    if (confirmDelete) {
+    const confirm = window.confirm("Are you sure?");
+    if (confirm) {
       try {
-        const response = await fetch(`http://localhost:3000/study_programs/${id}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          setStudyPrograms((prevStudyPrograms) =>
-            prevStudyPrograms.filter((studyProgram) => studyProgram.id !== id)
-          );
-        } 
+        await axios.delete(`http://localhost:3000/study_programs/${id}`);
+        setStudyPrograms((studyprograms) =>
+          studyprograms.filter((studyprogram) => studyprogram.id !== id),
+        );
       } catch (error) {
-        console.error("Gagal menghapus data:", error);
-        alert("Gagal menghapus data");
+        console.error(error);
       }
     }
   };
-  
 
   return (
     <MainLayout>
@@ -76,6 +45,9 @@ const StudyPrograms = () => {
       <div className="container-fluid">
         <div className="animated fadeIn">
           {/*@include('flash::message')*/}
+          <div>
+            <p>{state && state.successMessage}</p>
+          </div>
           <div className="row">
             <div className="col-lg-12">
               <div className="card">

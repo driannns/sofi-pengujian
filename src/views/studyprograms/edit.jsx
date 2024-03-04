@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const StudyProgramEdit = () => {
   const params = useParams();
@@ -10,26 +11,28 @@ const StudyProgramEdit = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
+        const data = await axios.get(
           `http://localhost:3000/study_programs/${params.id}`
         );
-        const data = await response.json();
-        setName(data.name);
+        console.log(data.status);
+        const { name } = data.data;
+        setName(name);
       } catch (error) {
         console.error(error);
       }
     };
-
     fetchData();
   }, [params]);
 
   const EditProgramStudy = () => {
     const data = { name };
-    fetch(`http://localhost:3000/study_programs/${params.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then(navigate(-1));
+    axios.put(`http://localhost:3000/study_programs/${params.id}`, data)
+    .then(() => {
+      navigate("/studyPrograms", { state: { successMessage: 'Program study updated successfully!' } });
+    })
+    .catch(error => {
+      console.error('Failed to update program study:', error);
+    });
   };
 
   return (

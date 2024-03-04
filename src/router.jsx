@@ -7,10 +7,10 @@ import Login from "./views/auth/Login";
 import LoginSSO from "./views/auth/LoginSSO";
 import SidangCreate from "./views/sidangs/Create";
 import SidangEdit from "./views/sidangs/edit";
-import StudyProgramCreate from "./views/study_programs/create";
-import StudyProgramEdit from "./views/study_programs/edit";
-import StudyProgramShow from "./views/study_programs/show";
-import StudyPrograms from "./views/study_programs";
+import StudyProgramCreate from "./views/studyprograms/create";
+import StudyProgramEdit from "./views/studyprograms/edit";
+import StudyProgramShow from "./views/studyprograms/show";
+import StudyPrograms from "./views/studyprograms";
 
 const router = (
   <Routes>
