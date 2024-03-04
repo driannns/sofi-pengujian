@@ -30,7 +30,7 @@ const Home = () => {
                   <h1>Selamat Datang username(admin)</h1>
                 </div>
                 <div className="card-body">
-                  <p>
+                  <p>                  </p>
                     <ol>
                       <li>
                         Pastikan parameter pada id <b>academicPeriod</b> sudah
@@ -44,7 +44,6 @@ const Home = () => {
                         tertentu silahkan masuk ke menu Manage Role
                       </li>
                     </ol>
-                  </p>
                 </div>
               </div>
             )}
@@ -81,6 +80,7 @@ const Home = () => {
                   <p>
                     Berikut adalah tata tertib yang harus dipenuhi selama sidang
                     tugas akhir berlangsung:
+                  </p>
                     <ol>
                       <li>
                         Peserta sidang berpakaian rapi dan Menggunakan jas
@@ -121,7 +121,6 @@ const Home = () => {
                     <span className="font-weight-bold">
                       php echo $kaur_akademik
                     </span>
-                  </p>
                   <p>
                     Kontak LAAK FRI :{" "}
                     <a href="<?php echo 'http://wa.me/'.$no_laa ?>">
