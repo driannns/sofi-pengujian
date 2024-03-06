@@ -6,6 +6,12 @@ import Home from "./views/Home";
 import Login from "./views/auth/Login";
 import LoginSSO from "./views/auth/LoginSSO";
 import SidangCreate from "./views/sidangs/Create";
+import SidangEdit from "./views/sidangs/edit";
+import StudyProgramCreate from "./views/studyprograms/create";
+import StudyProgramEdit from "./views/studyprograms/edit";
+import StudyProgramShow from "./views/studyprograms/show";
+import StudyPrograms from "./views/studyprograms";
+
 import SidangEdit from "./views/sidangs/Edit";
 import PowerPoint from "./views/sidangs/PowerPoint";
 import Teams from "./views/sidangs/Teams";
@@ -34,6 +40,14 @@ const router = (
       <Route path="/sidangs/edit/:id" element={<SidangEdit />} />
       <Route path="/slides" element={<PowerPoint />} />
       <Route path="/teams" element={<Teams />} />
+    </Route>
+
+    {/* RLADM Routes */}
+    <Route element={<PrivateRoutes role={["RLADM"]} />}>
+      <Route path="/studyPrograms" element={<StudyPrograms/>} />
+      <Route path="/studyPrograms/create" element={<StudyProgramCreate />} />
+      <Route path="/studyPrograms/:id/edit" element={<StudyProgramEdit/>} />
+      <Route path="/studyPrograms/:id" element={<StudyProgramShow/>}/>
     </Route>
 
     <Route path="*" element={<p>404 Error - Nothing here...</p>} />

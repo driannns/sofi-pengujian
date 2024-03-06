@@ -1,0 +1,20 @@
+{
+  "study_programs": [
+    {
+      "name": "S1 Sistem Informasi",
+      "id": "ee4f"
+    },
+    {
+      "id": "ffdd",
+      "name": "S1 Teknik Informatika"
+    },
+    {
+      "name": "S1 Teknik Industri",
+      "id": "ac6b"
+    },
+    {
+      "id": "166a",
+      "name": "S1 Teknologi Informasi"
+    }
+  ]
+}
