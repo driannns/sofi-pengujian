@@ -6,8 +6,8 @@ import { useAuth } from "../../middleware/AuthContext";
 
 const LoginSSO = () => {
   const { login } = useAuth();
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -55,7 +55,6 @@ const LoginSSO = () => {
                 placeholder="password igracias"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                name="password"
               />
               {/* @if ($errors->has('password')) */}
               <span className="invalid-feedback">
