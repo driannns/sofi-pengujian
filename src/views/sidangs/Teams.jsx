@@ -1,6 +1,10 @@
 import { MainLayout } from "../layouts/MainLayout";
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const Teams = () => {
+  useEffect(() => {}, []);
+
   return (
     <MainLayout>
       <>
@@ -9,21 +13,22 @@ const Teams = () => {
             <h3>TIM</h3>
             <hr className="mt-0" />
             <h6 className="mb-3">
-              <a href="{!! route('home') !!}" className="text-dark">
+              <Link to="/home" className="text-dark">
                 BERANDA
-              </a>{" "}
+              </Link>{" "}
               / TIM
-              {/* {{-- @if(!$isIndividu && !$isSudahDijadwalkan) */}
+              {/* {{-- @if(!$isIndividu && !$isSudahDijadwalkan)
               <a className="ml-2" href="{{ url('/teams/'.$team->id.'/edit') }}">
                 <i className="fa fa-edit fa-lg"></i>
               </a>
               <a className="ml-2" href="{{ url('/create-member') }}">
                 <i className="fa fa-plus-square fa-lg"></i>
               </a>
-              {/* @endif --}} */}
+              @endif --}} */}
             </h6>
           </div>
         </ol>
+
         <div className="container-fluid">
           <div className="animated fadeIn">
             {/* @include('flash::message')
