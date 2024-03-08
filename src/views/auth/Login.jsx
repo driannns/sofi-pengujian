@@ -3,8 +3,8 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 const Login = () => {
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <GuestLayout>
       <div className="card p-4">
@@ -88,9 +88,8 @@ const Login = () => {
               className="btn btn-primary active mt-3"
               href="<?php echo 'http://wa.me/'.$no_laa ?>"
             >
-             no_laa
-            </a>
-            {" "}
+              no_laa
+            </a>{" "}
           </div>
         </div>
       </div>
