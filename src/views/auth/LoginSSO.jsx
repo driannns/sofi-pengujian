@@ -12,8 +12,8 @@ const LoginSSO = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     login(username, password);
-    setUsername();
-    setPassword();
+    setUsername("");
+    setPassword("");
   };
 
   return (
