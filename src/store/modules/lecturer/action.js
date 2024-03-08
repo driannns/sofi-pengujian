@@ -9,6 +9,7 @@ const tokenSSO =
 
 const lecturerUrl =
   "https://dev-gateway.telkomuniversity.ac.id/0f5efc75bbfe9f82c255d0bca87c6d69/";
+const lecturerAPI = "http://127.0.0.1:8000/api/lecturer";
 
 const fetLecturerRequest = () => {
   return {
@@ -36,11 +37,12 @@ export const fetchLecturerList = () => {
   return async (dispatch) => {
     try {
       dispatch(fetLecturerRequest());
-      const res = await axios.get(lecturerUrl, {
-        headers: {
-          Authorization: `Bearer ${tokenSSO} `,
-        },
-      });
+      // const res = await axios.get(lecturerUrl, {
+      //   headers: {
+      //     Authorization: `Bearer ${tokenSSO} `,
+      //   },
+      // });
+      const res = await axios.get(lecturerAPI);
       dispatch(fetLecturerSuccess(res.data.data));
     } catch (e) {
       dispatch(fetLecturerFailure(e));
