@@ -1,8 +1,190 @@
 import { MainLayout } from "../layouts/MainLayout";
-import { Link } from "react-router-dom";
-import Fields from "./Fields";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useCookies } from "react-cookie";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../middleware/AuthContext";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchLecturerList } from "../../store/modules/lecturer/action";
+import { createSidang, checkSidang } from "../../store/modules/sidang/action";
+
+import "sweetalert2/dist/sweetalert2.min.css";
+import Swal from "sweetalert2";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const SidangEdit = () => {
+  const dispatch = useDispatch();
+  const { data: dataLecturer } = useSelector((state) => state.lecturer);
+  const { data: dataSidang } = useSelector((state) => state.sidang);
+
+  const { roles } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const sidang = null; //Sidang set to Null DUMMY
+
+  const [cookies] = useCookies("");
+  const [userInfo, setUserInfo] = useState({});
+  const [dataStudent, setDataStudent] = useState({});
+  const [statusLog, setStatusLog] = useState("");
+  const [peminatans, setPeminatans] = useState("");
+  const [periods, setPeriods] = useState("");
+  const languages = ["Indonesia", "English"];
+
+  const statusList = {
+    0: "--Pilihan Ubah Status--",
+    "ditolak oleh admin": "Ditolak Oleh Admin",
+    "belum disetujui admin": "Belum Disetujui Admin",
+    "telah disetujui admin": "Telah Disetujui Admin",
+    "tidak lulus": "Tidak Lulus",
+    "reset status": "Reset Status",
+  };
+
+  const [periodId, setPeriodId] = useState("");
+  const [pembimbing1, setPembimbing1] = useState("");
+  const [pembimbing2, setPembimbing2] = useState("");
+  const [judul, setJudul] = useState("");
+  const [isEnglish, setIsEnglish] = useState("");
+  const [status, setStatus] = useState("");
+  const [komentar, setKomentar] = useState("");
+  const [docTA, setDocTA] = useState("");
+  const [makalah, setMakalah] = useState("");
+  const [peminatanId, setPeminatanId] = useState("");
+  const form_bimbingan1 =
+    dataStudent.totalguidance_advisor1 === null
+      ? 0
+      : dataStudent.totalguidance_advisor1;
+  const form_bimbingan2 =
+    dataStudent.totalguidance_advisor2 === null
+      ? 0
+      : dataStudent.totalguidance_advisor2;
+
+  const jwtDecoded = jwtDecode(cookies["auth-token"]);
+
+  const handleDocTAChange = (e) => {
+    setDocTA(e.target.files[0]);
+  };
+
+  const handleMakalahChange = (e) => {
+    setMakalah(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        dispatch(fetchLecturerList());
+
+        const resUserInfo = await axios.get(
+          `${testLocal}/student/${jwtDecoded.id}`
+        );
+        setUserInfo(resUserInfo.data.data);
+        // Get Period Now
+
+        dispatch(checkSidang(cookies["auth-token"]));
+
+        console.log(dataSidang);
+        if (dataSidang.length > 0 && dataSidang.data.code === 200) {
+          if (
+            dataSidang.data.data.status === "pengajuan" ||
+            dataSidang.data.data.status === "ditolak oleh admin"
+          ) {
+            navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
+          } else {
+            navigate(`/sidang/show/${dataSidang.data.data.id}`);
+          }
+        }
+
+        // Parameter
+
+        const resStudentData = await axios.get(
+          // `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
+          `${getAllStudentAPI}/1202204011`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenSSO} `,
+            },
+          }
+        );
+        if (resStudentData.data.data.length === 0) {
+          // localStorage.setItem(
+          //   "error",
+          //   "Anda tidak terdaftar di periode akademik ini"
+          // );
+          navigate("/home", {
+            state: {
+              error: "Anda tidak terdaftar di periode akademik ini",
+            },
+          });
+        }
+        setDataStudent(resStudentData.data.data[0]);
+
+        const resStatusLog = await axios.get(
+          // `${getStatusLog}/${resUserInfo.data.data.nim}`,
+          `${getStatusLog}/"1202204011"`,
+          {
+            headers: { Authorization: `Bearer ${tokenSSO}` },
+          }
+        );
+        setStatusLog(resStatusLog.data.data[0]);
+
+        const resPeminatans = await axios.post(`${testLocal}/peminatans`, {
+          kk: resUserInfo.data.data.kk,
+        });
+        setPeminatans(resPeminatans.data.data);
+
+        const resALlPeriods = await axios.get(`${testLocal}/allPeriod`);
+        setPeriods(resALlPeriods.data.data);
+      } catch (e) {
+        console.error("Erorr fetching data:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  function attend2(e) {
+    e.preventDefault();
+    Swal.fire({
+      title: "Pastikan semua data anda benar.",
+      text: "Apakah anda yakin akan menyimpan data?",
+      icon: "info",
+      showCancelButton: true,
+      cancelButtonColor: "#f86c6b",
+      confirmButtonColor: "#43afd6",
+      cancelButtonText: "Batal",
+      confirmButtonText: "Simpan",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        dispatch(
+          createSidang({
+            nim: jwtDecoded.nim,
+            pembimbing1,
+            pembimbing2,
+            judul,
+            eprt: dataStudent.eprt,
+            docTA,
+            makalah,
+            tak: dataStudent.tak,
+            periodId,
+            totalguidance_advisor1: form_bimbingan1,
+            totalguidance_advisor2: form_bimbingan2,
+            peminatanId,
+            authToken: cookies["auth-token"],
+          })
+        );
+      } else if (result.isDenied) {
+        Swal.fire("Changes are not saved", "", "info");
+      }
+    });
+  }
+
   return (
     <MainLayout>
       <ol className="breadcrumb mb-0">
