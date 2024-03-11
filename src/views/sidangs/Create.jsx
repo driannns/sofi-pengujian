@@ -1,36 +1,31 @@
-// import Fields from "./Fields";
 import { MainLayout } from "../layouts/MainLayout";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../middleware/AuthContext";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturerList } from "../../store/modules/lecturer/action";
+import { createSidang, checkSidang } from "../../store/modules/sidang/action";
+
 import "sweetalert2/dist/sweetalert2.min.css";
 import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-const tokenAfif =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NTY2LCJ1c2VybmFtZSI6ImFyZGlhaHdhaHl1Y2FoeWFuaSIsIm5hbWEiOiJBUkRJQUggV0FIWVUgQ0FIWUFOSSIsIm5pbSI6MTIwMTE1NDQyNywibmlwIjpudWxsLCJyb2xlIjpbIlJMTUhTIl19.8QIA6dV7c1q8EEHJ_VNCEh78n3-AXTI4y-deDkF3Xd0";
 const tokenSSO =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiZmFmM2UxYTZkOTBkZWM2MDYyMDFiZjU1MzkzMzgzOTdjMjYzOGFlYTYyZmMyMDM0NGU5MzI5Zjg4YTY3YWRjZGI4Yzk1NjAwOTBmM2ZjNjkiLCJpYXQiOjE3MDkyNzcyMDYsIm5iZiI6MTcwOTI3NzIwNiwiZXhwIjoxNzA5MzYzNjA2LCJzdWIiOiJla2t5bm92cml6YWxhbSIsInNjb3BlcyI6WyJjZWxvZS1kYXNoYm9hcmQiLCJvbGQtZG9zZW4iLCJvbGQtZG9zZW4td2FsaSIsImFkbWlzc2lvbi1hZG1pbiIsImFkbWlzc2lvbi1kYXNoYm9hcmQtdXNlcnMiLCJhdHRlbmRhbmNlLWVtcGxveWVlIiwiZGFzaGJvYXJkLXVzZXIiLCJuZXctc3NvIiwib2xkLXBlZ2F3YWkiLCJzc28tb3BlbmxpYiIsInN0YWZmX3Rlc3Rfc3BzIiwib2xkLWtlbG9tcG9rLWtlYWhsaWFuIiwiZW1wbG95ZWUtc3RydWN0dXJhbCIsIm9sZC1hZG1pbi1yZWdpc3RyYXNpLWZha3VsdGFzIl19.RS7v3zkRBsgGnAqyFBH3IFEkW5sddqmYbg8uRjX6uS-3_S3wVmx5sqOodUlQr8fNS18dk-44lPwgBkrtC8m6pXgVrEU8-hlTbknqCXX-BGmM4j-kRv3SjjgbcAredazFMb8m1lxFMbbJohgJ2fitUDJwkryzdmz39LNKIAxBzLdAPTA8ttzRlURrfYzXlEGkBt5CZ_c5rsV0EV2F74l7X70WV4HPYWZwh1S3Z_iF29RVZpEd4MJQAcHVgyAN3MBQT0gX0cZNaQi3MOSFL7CE3qyxvOvzkGO3zwYxb79mRtJ5Xd0CBWfU4oN3HFGB7OPAcTNUh_xfXFp2nc13JvCFzbIhxLPeBD7Mvpkey-9lNkVpggyn5h_5V52N9-gqyQIKVig4AYqTZTWdpMxviTGngZVaIG6lhYx44DYiQKtNL4orNU2K47qYKpWtglmbG2KH9dBYlrEd1xSBzQfkPgaombuPG0ZvbP4ZFbjC6sPLgys2RxEHJkMm6A_FAddhOoHjfQ8R8j-5nj2rD2_alLVn_PFQq2CRGRLWq28llGgzxfMZ5KgFBECTZxw9_6Vuq4silQSj85TXds_sYs5PFA_0D3QA9vBbGYlJHTbcR2k1yy7WZtqc_Z_0PCjXSPJuMjDgjKK0mzC_broWrxnaQo3BDqDLtj7xnnzp0-XB_TeGyBg";
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiM2M4MWNmNTZiZTg3ZTY4MThjMDhlMjkyNDdkMjBhM2E0Mjc1OWJkNWMyMDNlNGU5Y2Y0ZDk1ZDNhODUxYzI5MzI0MTRkNmI4OTdjMjk1NjkiLCJpYXQiOjE3MTAxNjc3MjYsIm5iZiI6MTcxMDE2NzcyNiwiZXhwIjoxNzEwMjU0MTI2LCJzdWIiOiJla2t5bm92cml6YWxhbSIsInNjb3BlcyI6WyJjZWxvZS1kYXNoYm9hcmQiLCJvbGQtZG9zZW4iLCJvbGQtZG9zZW4td2FsaSIsImFkbWlzc2lvbi1hZG1pbiIsImFkbWlzc2lvbi1kYXNoYm9hcmQtdXNlcnMiLCJhdHRlbmRhbmNlLWVtcGxveWVlIiwiZGFzaGJvYXJkLXVzZXIiLCJuZXctc3NvIiwib2xkLXBlZ2F3YWkiLCJzc28tb3BlbmxpYiIsInN0YWZmX3Rlc3Rfc3BzIiwib2xkLWtlbG9tcG9rLWtlYWhsaWFuIiwiZW1wbG95ZWUtc3RydWN0dXJhbCIsIm9sZC1hZG1pbi1yZWdpc3RyYXNpLWZha3VsdGFzIl19.UkjYitwG_c4hk4__7AHL01gsEYcbsfbxlUEjQiXjAgW0IYmfV0ZpL4WZnrffrO3yYGFLeaoINQWUaD-mS3z9OR6jB0adQ9y9EQxsxY0raTLuuhwU-tXq9-DVOo1sN7ZpQWPAXywHKnm1WvIJ-9hWuhY0s7EtHXCVCSSN628wMJp6srcnwLvykHSasE2iXDlwoEjhRaD_lWOClf1WFIoYfTy8o0eSHZ8jRGTmrCyXhB2n3-MTFz7AHiJH3agSNk_lGS4iHVTJdE2Byk6KQdUDyQYuOOp1toEsoCB9iei8tdX1Ua6Nu-DO6nSX_yQXUK5qF5tML5v2dhAjiD1b8FmdMsRekWM6WnmPtx-j3n4FMLN5_H-VGukxrPYEM_oVzkYcGTTJrtdFTAJ7Emeizu0gYxWLoRYIox6uQ_OI79N35_9w9kmKU3bUI1E8xF0eJY1NhlPot6xIC6Xt2p2Zgu94S7zkH3f4z_mpd1pK7cck9qWnefYDBkvbd4agfXry4JIJ1Xqkmy666qJvyR-_1QYcY46mt1VRpWRUNfPsEDr_1woPAmabyYZyDf4gWAvb26yUDDw6mq4F2hV8KoREDUF_R1fwqIQBGoojC4lU3BW9BGYv-TM5GNIHpkiRyW6gBWbeSjAUkd0CGbZUlygFQ5Xr7HpVj_E1a2Hz-ix5jOvXObs";
 const getAllStudentAPI =
   "https://dev-gateway.telkomuniversity.ac.id/bf7b719639cf0e2ef94a1cf212e00ce6/2324-2"; //2324-2
 const getStatusLog =
   "https://dev-gateway.telkomuniversity.ac.id/d650182722315309a25aa5a43a033303/2324-2"; //2324-2
 const testLocal = "http://127.0.0.1:8000/api";
-const beAfif = "https://d875-36-65-247-251.ngrok-free.app/api";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
-  const {
-    loading: loadingLecturer,
-    data: dataLecturer,
-    error: errorLecturer,
-  } = useSelector((state) => state.lecturer);
+  const { data: dataLecturer } = useSelector((state) => state.lecturer);
+  const { data: dataSidang } = useSelector((state) => state.sidang);
 
   const { roles } = useAuth();
   const location = useLocation();
@@ -39,12 +34,12 @@ const SidangCreate = () => {
 
   const sidang = null; //Sidang set to Null DUMMY
 
-  const [cookies] = useCookies();
+  const [cookies] = useCookies("");
   const [userInfo, setUserInfo] = useState({});
   const [dataStudent, setDataStudent] = useState({});
-  const [statusLog, setStatusLog] = useState();
-  const [peminatans, setPeminatans] = useState();
-  const [periods, setPeriods] = useState();
+  const [statusLog, setStatusLog] = useState("");
+  const [peminatans, setPeminatans] = useState("");
+  const [periods, setPeriods] = useState("");
   const languages = ["Indonesia", "English"];
 
   const statusList = {
@@ -63,9 +58,17 @@ const SidangCreate = () => {
   const [isEnglish, setIsEnglish] = useState("");
   const [status, setStatus] = useState("");
   const [komentar, setKomentar] = useState("");
-  const [docTA, setDocTA] = useState(null);
-  const [makalah, setMakalah] = useState(null);
+  const [docTA, setDocTA] = useState("");
+  const [makalah, setMakalah] = useState("");
   const [peminatanId, setPeminatanId] = useState("");
+  const form_bimbingan1 =
+    dataStudent.totalguidance_advisor1 === null
+      ? 0
+      : dataStudent.totalguidance_advisor1;
+  const form_bimbingan2 =
+    dataStudent.totalguidance_advisor2 === null
+      ? 0
+      : dataStudent.totalguidance_advisor2;
 
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
 
@@ -81,6 +84,7 @@ const SidangCreate = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+
         dispatch(fetchLecturerList());
 
         const resUserInfo = await axios.get(
@@ -88,24 +92,37 @@ const SidangCreate = () => {
         );
         setUserInfo(resUserInfo.data.data);
         // Get Period Now
-        // Check Sidang ifexist
+
+        dispatch(checkSidang(cookies["auth-token"]));
+
+        console.log(dataSidang);
+        if (dataSidang.length > 0 && dataSidang.data.code === 200) {
+          if (
+            dataSidang.data.data.status === "pengajuan" ||
+            dataSidang.data.data.status === "ditolak oleh admin"
+          ) {
+            navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
+          } else {
+            navigate(`/sidang/show/${dataSidang.data.data.id}`);
+          }
+        }
 
         // Parameter
 
         const resStudentData = await axios.get(
-          `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
+          // `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
+          `${getAllStudentAPI}/1202204011`,
           {
             headers: {
               Authorization: `Bearer ${tokenSSO} `,
             },
           }
         );
-
         if (resStudentData.data.data.length === 0) {
-          localStorage.setItem(
-            "error",
-            "Anda tidak terdaftar di periode akademik ini"
-          );
+          // localStorage.setItem(
+          //   "error",
+          //   "Anda tidak terdaftar di periode akademik ini"
+          // );
           navigate("/home", {
             state: {
               error: "Anda tidak terdaftar di periode akademik ini",
@@ -115,7 +132,8 @@ const SidangCreate = () => {
         setDataStudent(resStudentData.data.data[0]);
 
         const resStatusLog = await axios.get(
-          `${getStatusLog}/${resUserInfo.data.data.nim}`,
+          // `${getStatusLog}/${resUserInfo.data.data.nim}`,
+          `${getStatusLog}/"1202204011"`,
           {
             headers: { Authorization: `Bearer ${tokenSSO}` },
           }
@@ -139,19 +157,6 @@ const SidangCreate = () => {
   }, []);
 
   function attend2(e) {
-    const formData = new FormData();
-    formData.append("nim", jwtDecoded.nim);
-    formData.append("pembimbing1_id", pembimbing1);
-    formData.append("pembimbing2_id", pembimbing2);
-    formData.append("judul", judul);
-    formData.append("eprt", dataStudent.eprt);
-    formData.append("doc_ta", docTA);
-    formData.append("makalah", makalah);
-    formData.append("tak", dataStudent.tak);
-    formData.append("period_id", periodId);
-    formData.append("form_bimbingan1", dataStudent.totalguidance_advisor1);
-    formData.append("form_bimbingan2", dataStudent.totalguidance_advisor2);
-    formData.append("peminatan", peminatanId);
     e.preventDefault();
     Swal.fire({
       title: "Pastikan semua data anda benar.",
@@ -164,19 +169,24 @@ const SidangCreate = () => {
       confirmButtonText: "Simpan",
       reverseButtons: true,
     }).then(async (result) => {
-      console.log(formData);
       if (result.isConfirmed) {
-        try {
-          const res = await axios.post(`${beAfif}/pengajuan/create`, formData, {
-            headers: {
-              Authorization: `Bearer ${tokenAfif}`,
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          console.log(res);
-        } catch (err) {
-          console.error(err);
-        }
+        dispatch(
+          createSidang({
+            nim: jwtDecoded.nim,
+            pembimbing1,
+            pembimbing2,
+            judul,
+            eprt: dataStudent.eprt,
+            docTA,
+            makalah,
+            tak: dataStudent.tak,
+            periodId,
+            totalguidance_advisor1: form_bimbingan1,
+            totalguidance_advisor2: form_bimbingan2,
+            peminatanId,
+            authToken: cookies["auth-token"],
+          })
+        );
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -201,36 +211,40 @@ const SidangCreate = () => {
 
         <div className="container-fluid">
           <div className="animated fadeIn">
-            {location.state?.error && (
-              // @include('coreui-templates::common.errors')
-              <div className="alert alert-danger" role="alert">
-                {location.state.error}
-              </div>
-            )}
-
+            {/* @include('coreui-templates::common.errors')
+            @if (Session::has('error'))
+            <div className="alert alert-danger" role="alert">
+              {{Session::get('error')}}
+            </div>
+            @endif
+            {/* @if(Request::is('sidangs/create')) */}
             <div className="alert alert-warning" role="alert">
               Pastikan data dibawah sudah benar, terutama status approval. Jika
               ada perbedaan data, silahkan hubungi admin sebelum submit
             </div>
-
+            {/* @endif */}
             <div className="row">
               <div className="col-lg-12">
                 <div className="card">
                   <div className="card-body">
-                    <form onSubmit={attend2}>
+                    <form>
                       {/* Credit Field */}
-                      <input
-                        type="text"
-                        name="credit_complete"
-                        value={dataStudent && dataStudent.credit_complete}
-                        hidden
-                      />
-                      <input
-                        type="text"
-                        name="credit_uncomplete"
-                        onChange={dataStudent && dataStudent.credit_uncomplete}
-                        hidden
-                      />
+                      {location.pathname == "/sidangs/create" && (
+                        <>
+                          <input
+                            type="text"
+                            name="credit_complete"
+                            value={dataStudent && dataStudent.credit_complete}
+                            hidden
+                          />
+                          <input
+                            type="text"
+                            name="credit_uncomplete"
+                            value={dataStudent && dataStudent.credit_uncomplete}
+                            hidden
+                          />
+                        </>
+                      )}
 
                       {/* <!-- Period Id Field --> */}
                       <div className="form-group col-sm-12">
@@ -243,8 +257,8 @@ const SidangCreate = () => {
                             name="period_id"
                             id="period_id"
                             className="select2 form-control"
-                            onChange={(e) => setPeriodId(e.target.value)}
                             value={periodId}
+                            onChange={(e) => setPeriodId(e.target.value)}
                           >
                             <option value="">Pilih Periode</option>
                             {periods &&
@@ -275,7 +289,10 @@ const SidangCreate = () => {
                             <input
                               type="hidden"
                               name="period_id"
-                              value={sidang && sidang.period_id}
+                              value={
+                                dataSidang.length > 0 &&
+                                dataSidang.data.data.period_id
+                              }
                             />
                             //? ini diambil dari database sidang walaupun
                             dicreate? API AFIF
@@ -320,19 +337,21 @@ const SidangCreate = () => {
                             <option value="">Pilih Pembimbing 1</option>
                             {dataLecturer &&
                               dataLecturer.map((data, index) =>
-                                sidang === null ? (
+                                dataSidang.length > 0 ? (
                                   <option key={index} value={data.id}>
                                     {data.code} - {data.user.nama}
                                   </option>
                                 ) : (
                                   <option
                                     key={index}
-                                    value={data.lecturercode}
+                                    value={data.id}
                                     selected={
-                                      sidang && data.id === sidang.peminatan_id
+                                      dataSidang.length > 0 &&
+                                      dataSidang.data.data.pembimbing1_id ===
+                                        data.id
                                     }
                                   >
-                                    {data.lecturercode} - {data.fullname}
+                                    {data.code} - {data.user.nama}
                                   </option>
                                   //? Ini Pake Lecturer ID kalau di SOFI LAmA
                                 )
@@ -361,19 +380,21 @@ const SidangCreate = () => {
                             <option value="">Pilih Pembimbing 2</option>
                             {dataLecturer &&
                               dataLecturer.map((data, index) =>
-                                sidang === null ? (
+                                dataSidang.length > 0 ? (
                                   <option key={index} value={data.id}>
                                     {data.code} - {data.user.nama}
                                   </option>
                                 ) : (
                                   <option
                                     key={index}
-                                    value={data.lecturercode}
+                                    value={data.id}
                                     selected={
-                                      sidang && data.id === sidang.peminatan_id
+                                      dataSidang.length > 0 &&
+                                      dataSidang.data.data.pembimbing2_id ===
+                                        data.id
                                     }
                                   >
-                                    {data.lecturercode} - {data.fullname}
+                                    {data.code} - {data.user.nama}
                                   </option>
                                   //? Ini Pake Lecturer ID kalau di SOFI LAmA
                                 )
@@ -394,10 +415,10 @@ const SidangCreate = () => {
                             id="judul"
                             cols="2"
                             rows="4"
+                            value={judul}
                             onChange={(e) => {
                               setJudul(e.target.value);
                             }}
-                            value={judul}
                             className="form-control"
                           />
                         )}
@@ -415,24 +436,14 @@ const SidangCreate = () => {
                             <input
                               type="text"
                               id="form_bimbingan1"
-                              value={
-                                dataStudent &&
-                                dataStudent.totalguidance_advisor1 === null
-                                  ? 0
-                                  : dataStudent.totalguidance_advisor1
-                              }
+                              value={form_bimbingan1}
                               className="form-control"
                               disabled
                             />
                             <input
                               type="text"
                               id="form_bimbingan2"
-                              value={
-                                dataStudent &&
-                                dataStudent.totalguidance_advisor2 === null
-                                  ? 0
-                                  : dataStudent.totalguidance_advisor2
-                              }
+                              value={form_bimbingan2}
                               className="form-control"
                               disabled
                             />
@@ -440,15 +451,7 @@ const SidangCreate = () => {
                         )}
                         <input
                           type="hidden"
-                          value={`${
-                            dataStudent.totalguidance_advisor1 === null
-                              ? 0
-                              : dataStudent.totalguidance_advisor1
-                          };${
-                            dataStudent.totalguidance_advisor2 === null
-                              ? 0
-                              : dataStudent.totalguidance_advisor2
-                          }`}
+                          value={`${form_bimbingan1};${form_bimbingan2}`}
                         />
                       </div>
 
@@ -605,7 +608,6 @@ const SidangCreate = () => {
                               <input
                                 type="file"
                                 name="dokumen_ta"
-                                // value={docTA}
                                 onChange={handleDocTAChange}
                                 className="form-control"
                               />
@@ -648,7 +650,6 @@ const SidangCreate = () => {
                               <input
                                 type="file"
                                 name="makalah"
-                                // value={makalah}
                                 onChange={handleMakalahChange}
                                 className="form-control"
                               />
@@ -715,7 +716,9 @@ const SidangCreate = () => {
 
                       {/* <!-- Submit Field --> */}
                       <div className="form-group col-sm-12">
-                        <button className="btn btn-primary">Simpan</button>
+                        <button className="btn btn-primary" onClick={attend2}>
+                          Simpan
+                        </button>
                         <Link to="/home" className="btn btn-secondary">
                           Batal
                         </Link>
