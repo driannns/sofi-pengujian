@@ -4,7 +4,7 @@ export const FETCH_SIDANG_SUCCESS = "FETCH_SIDANG_SUCCESS";
 export const FETCH_SIDANG_FAILURE = "FETCH_SIDANG_FAILURE";
 import { useNavigate } from "react-router-dom";
 
-const APIURL = "https://d875-36-65-247-251.ngrok-free.app/api";
+const APIURL = "https://a348-36-65-247-251.ngrok-free.app/api";
 
 const fetSidangRequest = () => {
   return {
@@ -44,6 +44,20 @@ export const createSidang = ({
   authToken,
 }) => {
   return async (dispatch) => {
+    console.log({
+      nim,
+      pembimbing1,
+      pembimbing2,
+      judul,
+      eprt,
+      docTA,
+      makalah,
+      tak,
+      periodId,
+      totalguidance_advisor1,
+      totalguidance_advisor2,
+      peminatanId,
+    });
     try {
       const formData = new FormData();
       formData.append("nim", nim);
