@@ -491,10 +491,10 @@ const Sidebar = () => {
                 </div>
                 <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
                   <li className="nav-item {{ Request::is('sidangs') ? 'active' : '' }}">
-                    <a className="nav-link" href="{{ route('sidangs.index') }}">
+                    <NavLink className="nav-link" to="/sidangs">
                       <i className="nav-icon icon-list"></i>
                       <span>Pengajuan</span>
-                    </a>
+                    </NavLink>
                   </li>
                   <li className="nav-item {{ Request::is('schedules') ? 'active' : '' }}">
                     <a
@@ -728,103 +728,62 @@ const Sidebar = () => {
               <i className="nav-icon fa fa-bookmark-o"></i>Guide Book
             </a>
             <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-              {userData.role?.find((roles) => ["RLADM"].includes(roles)) ? (
-                <>
-                  <li className="nav-item {{ Request::is('guide_book_admin') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('guide_book_admin') ? 'active' : '' }}"
-                      href="{{route('guide_book_admin')}}"
-                      style={{ fontSize: "14px", fontWeight: "bold" }}
-                    >
-                      <i className="nav-icon icon-notebook"></i>Admin
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('guide_book_PIC') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('guide_book_admin_PIC') ? 'active' : '' }}"
-                      href="{{route('guide_book_PIC')}}"
-                      style={{ fontSize: "14px", fontWeight: "bold" }}
-                    >
-                      <i className="nav-icon icon-notebook"></i>PIC
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('guide_book_pembimbing') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('guide_book_admin_pembimbing') ? 'active' : '' }}"
-                      href="{{route('guide_book_pembimbing')}}"
-                      style={{ fontSize: "14px", fontWeight: "bold" }}
-                    >
-                      <i className="nav-icon icon-notebook"></i>Dosen
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('guide_book_student') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('guide_book_admin_student') ? 'active' : '' }}"
-                      href="{{route('guide_book_student')}}"
-                      style={{ fontSize: "14px", fontWeight: "bold" }}
-                    >
-                      <i className="nav-icon icon-notebook"></i>Mahasiswa
-                    </a>
-                  </li>
-                </>
-              ) : userData.role?.find((roles) => ["RLPIC"].includes(roles)) ? (
-                <>
-                  <li className="nav-item {{ Request::is('guide_book_PIC') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('guide_book_admin_PIC') ? 'active' : '' }}"
-                      href="{{route('guide_book_PIC')}}"
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <i className="nav-icon icon-notebook"></i>PIC
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('guide_book_pembimbing') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('guide_book_admin_pembimbing') ? 'active' : '' }}"
-                      href="{{route('guide_book_pembimbing')}}"
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <i className="nav-icon icon-notebook"></i>Dosen
-                    </a>
-                  </li>
-                </>
-              ) : userData.role?.find((roles) =>
-                  ["RLPGJ", "RLPBB"].includes(roles)
-                ) ? (
+              {userData.role?.find((roles) => ["RLADM"].includes(roles)) && (
+                <li className="nav-item {{ Request::is('guide_book_admin') ? 'active' : '' }}">
+                  <NavLink
+                    to="/guide-book-admin"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                    style={{ fontSize: "14px", fontWeight: "bold" }}
+                  >
+                    <i className="nav-icon icon-notebook"></i>Admin
+                  </NavLink>
+                </li>
+              )}
+              {userData.role?.find((roles) =>
+                ["RLADM", "RLPIC"].includes(roles)
+              ) && (
+                <li className="nav-item {{ Request::is('guide_book_PIC') ? 'active' : '' }}">
+                  <NavLink
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                    to="/guide-book-PIC"
+                    style={{ fontSize: "14px", fontWeight: "bold" }}
+                  >
+                    <i className="nav-icon icon-notebook"></i>PIC
+                  </NavLink>
+                </li>
+              )}{" "}
+              {userData.role?.find((roles) =>
+                ["RLADM", "RLDSN"].includes(roles)
+              ) && (
                 <li className="nav-item {{ Request::is('guide_book_pembimbing') ? 'active' : '' }}">
-                  <a
-                    className="nav-link {{ Request::is('guide_book_admin_pembimbing') ? 'active' : '' }}"
-                    href="{{route('guide_book_pembimbing')}}"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
+                  <NavLink
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                    to="/guide-book-pembimbing"
+                    style={{ fontSize: "14px", fontWeight: "bold" }}
                   >
                     <i className="nav-icon icon-notebook"></i>Dosen
-                  </a>
+                  </NavLink>
                 </li>
-              ) : (
+              )}
+              {userData.role?.find((roles) =>
+                ["RLADM", "RLMHS"].includes(roles)
+              ) && (
                 <li className="nav-item {{ Request::is('guide_book_student') ? 'active' : '' }}">
-                  <a
-                    className="nav-link {{ Request::is('guide_book_admin_student') ? 'active' : '' }}"
-                    href="{{route('guide_book_student')}}"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
+                  <NavLink
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                    to="/guide-book-student"
+                    style={{ fontSize: "14px", fontWeight: "bold" }}
                   >
                     <i className="nav-icon icon-notebook"></i>Mahasiswa
-                  </a>
+                  </NavLink>
                 </li>
               )}
             </ul>
