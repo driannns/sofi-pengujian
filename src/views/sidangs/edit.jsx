@@ -14,6 +14,10 @@ import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
+const tokenAfif =
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MjA4LCJ1c2VybmFtZSI6IjExMDIxMzAyNDQiLCJuYW1hIjoiWUFaSUQiLCJuaW0iOjExMDIxMzAyNDQsIm5pcCI6bnVsbCwicm9sZSI6WyJSTE1IUyJdfQ.xmXkBtO-i71wlaLGwlc1hz53iqdOlxDvYH4eEe-JRLc";
+const testLocal = "http://127.0.0.1:8000/api";
+
 const SidangEdit = () => {
   const dispatch = useDispatch();
   const { data: dataLecturer } = useSelector((state) => state.lecturer);
@@ -24,16 +28,11 @@ const SidangEdit = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const sidang = null; //Sidang set to Null DUMMY
-
   const [cookies] = useCookies("");
   const [userInfo, setUserInfo] = useState({});
-  const [dataStudent, setDataStudent] = useState({});
-  const [statusLog, setStatusLog] = useState("");
   const [peminatans, setPeminatans] = useState("");
-  const [periods, setPeriods] = useState("");
+  const [periods, setPeriods] = useState();
   const languages = ["Indonesia", "English"];
-
   const statusList = {
     0: "--Pilihan Ubah Status--",
     "ditolak oleh admin": "Ditolak Oleh Admin",
@@ -44,24 +43,25 @@ const SidangEdit = () => {
   };
 
   const [periodId, setPeriodId] = useState("");
-  const [pembimbing1, setPembimbing1] = useState("");
-  const [pembimbing2, setPembimbing2] = useState("");
-  const [judul, setJudul] = useState("");
+  const [pembimbing1, setPembimbing1] = useState(
+    dataSidang.data ? dataSidang.data.data.pembimbing1_id : ""
+  );
+  const [pembimbing2, setPembimbing2] = useState(
+    dataSidang.data ? dataSidang.data.data.pembimbing2_id : ""
+  );
+  const [judul, setJudul] = useState(
+    dataSidang.data ? dataSidang.data.data.judul : ""
+  );
+  const form_bimbingan1 =
+    dataSidang.data && dataSidang.data.data.form_bimbingan1;
+  const form_bimbingan2 =
+    dataSidang.data && dataSidang.data.data.form_bimbingan2;
   const [isEnglish, setIsEnglish] = useState("");
   const [status, setStatus] = useState("");
   const [komentar, setKomentar] = useState("");
   const [docTA, setDocTA] = useState("");
   const [makalah, setMakalah] = useState("");
   const [peminatanId, setPeminatanId] = useState("");
-  const form_bimbingan1 =
-    dataStudent.totalguidance_advisor1 === null
-      ? 0
-      : dataStudent.totalguidance_advisor1;
-  const form_bimbingan2 =
-    dataStudent.totalguidance_advisor2 === null
-      ? 0
-      : dataStudent.totalguidance_advisor2;
-
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
 
   const handleDocTAChange = (e) => {
@@ -73,72 +73,54 @@ const SidangEdit = () => {
   };
 
   useEffect(() => {
+    const fetchSidang = async () => {
+      try {
+        setIsLoading(true);
+        await dispatch(checkSidang(cookies["auth-token"]));
+      } catch (err) {
+        console.error("Error fetching sidang data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSidang();
+  }, [dispatch]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-
         dispatch(fetchLecturerList());
 
         const resUserInfo = await axios.get(
           `${testLocal}/student/${jwtDecoded.id}`
         );
+
         setUserInfo(resUserInfo.data.data);
-        // Get Period Now
-
-        dispatch(checkSidang(cookies["auth-token"]));
-
-        console.log(dataSidang);
-        if (dataSidang.length > 0 && dataSidang.data.code === 200) {
-          if (
-            dataSidang.data.data.status === "pengajuan" ||
-            dataSidang.data.data.status === "ditolak oleh admin"
-          ) {
-            navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
-          } else {
-            navigate(`/sidang/show/${dataSidang.data.data.id}`);
-          }
-        }
-
-        // Parameter
-
-        const resStudentData = await axios.get(
-          // `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
-          `${getAllStudentAPI}/1202204011`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenSSO} `,
-            },
-          }
-        );
-        if (resStudentData.data.data.length === 0) {
-          // localStorage.setItem(
-          //   "error",
-          //   "Anda tidak terdaftar di periode akademik ini"
-          // );
-          navigate("/home", {
-            state: {
-              error: "Anda tidak terdaftar di periode akademik ini",
-            },
-          });
-        }
-        setDataStudent(resStudentData.data.data[0]);
-
-        const resStatusLog = await axios.get(
-          // `${getStatusLog}/${resUserInfo.data.data.nim}`,
-          `${getStatusLog}/"1202204011"`,
-          {
-            headers: { Authorization: `Bearer ${tokenSSO}` },
-          }
-        );
-        setStatusLog(resStatusLog.data.data[0]);
 
         const resPeminatans = await axios.post(`${testLocal}/peminatans`, {
           kk: resUserInfo.data.data.kk,
         });
         setPeminatans(resPeminatans.data.data);
 
-        const resALlPeriods = await axios.get(`${testLocal}/allPeriod`);
-        setPeriods(resALlPeriods.data.data);
+        //* STATUS LOG
+
+        // Parameter
+        const resAllPeriods = await axios.get(
+          "https://fdc9-36-65-247-251.ngrok-free.app/api/period/get",
+          {
+            headers: {
+              Authorization: "Bearer " + tokenAfif,
+              "ngrok-skip-browser-warning": true,
+            },
+          }
+        );
+
+        if (!dataSidang.data) {
+          navigate("/sidangs");
+        }
+
+        setPeriods(resAllPeriods.data.data);
       } catch (e) {
         console.error("Erorr fetching data:", e);
       } finally {
@@ -194,8 +176,8 @@ const SidangEdit = () => {
           <h6 className="mb-3">
             <Link to="/home" className="text-dark">
               BERANDA
-            </Link>
-            /
+            </Link>{" "}
+            /{" "}
             <a href="{!! route('sidangs.index') !!}" className="text-dark">
               SIDANG
             </a>
@@ -205,45 +187,22 @@ const SidangEdit = () => {
 
       <div className="container-fluid">
         <div className="animated fadeIn">
-          {/* @include('coreui-templates::common.errors') @if
-          (Session::has('error')) */}
-          <div className="alert alert-danger" role="alert">
-            {/*{{Session::get('error')}}*/}
-          </div>
+          {/* @include('coreui-templates::common.errors') */}
+          {location.state &&
+            location.state.error(
+              <div className="alert alert-danger" role="alert">
+                {location.state.error}
+              </div>
+            )}
           {/* @endif */}
           <div className="row">
             <div className="col-12 col-md-6">
               <div className="card">
-                {/*{{-- */}{" "}
-                <div className="card-header">
-                  <i className="fa fa-edit fa-lg"></i>
-                  <strong>Edit Data Sidang</strong>
-                </div>
                 <div className="card-body">
                   <form onSubmit={attend2}>
-                    {/* Credit Field */}
-                    {location.pathname == "/sidangs/create" && (
-                      <>
-                        <input
-                          type="text"
-                          name="credit_complete"
-                          value={dataStudent && dataStudent.credit_complete}
-                          hidden
-                        />
-                        <input
-                          type="text"
-                          name="credit_uncomplete"
-                          onChange={
-                            dataStudent && dataStudent.credit_uncomplete
-                          }
-                          hidden
-                        />
-                      </>
-                    )}
-
                     {/* <!-- Period Id Field --> */}
                     <div className="form-group col-sm-12">
-                      <label htmlFor="period_id">Peiod Sidang: </label>
+                      <label htmlFor="period_id">Period Sidang: </label>
                       {isLoading ? (
                         <Skeleton height={30} />
                       ) : roles &&
@@ -257,9 +216,9 @@ const SidangEdit = () => {
                         >
                           <option value="">Pilih Periode</option>
                           {periods &&
-                            Object.entries(periods).map(([key, value]) => (
-                              <option value={key} key={key}>
-                                {value}
+                            periods.map((data, index) => (
+                              <option value={data.id} key={index}>
+                                {data.name}
                               </option>
                             ))}
                         </select>
@@ -275,19 +234,17 @@ const SidangEdit = () => {
                             {/* <option value=""></option> */}
                             //? bingung ini kenapa disabled
                             {periods &&
-                              Object.entries(periods).map(([key, value]) => (
-                                <option value={key} key={key}>
-                                  {value}
+                              periods.map((data, index) => (
+                                <option value={data.id} key={index}>
+                                  {data.name}
                                 </option>
                               ))}
                           </select>
                           <input
                             type="hidden"
                             name="period_id"
-                            value={sidang && sidang.period_id}
+                            // value={dataSidang && dataSidang.data.data.period_id}
                           />
-                          //? ini diambil dari database sidang walaupun
-                          dicreate? API AFIF
                         </>
                       )}
                     </div>
@@ -329,24 +286,23 @@ const SidangEdit = () => {
                           <option value="">Pilih Pembimbing 1</option>
                           {dataLecturer &&
                             dataLecturer.map((data, index) =>
-                              sidang === null ? (
-                                <option key={index} value={data.lecturercode}>
-                                  {data.lecturercode} - {data.fullname}
-                                </option>
-                              ) : (
+                              dataSidang ? (
                                 <option
                                   key={index}
-                                  value={data.lecturercode}
+                                  value={data.id}
                                   selected={
-                                    sidang && data.id === sidang.peminatan_id
+                                    data.id ===
+                                    dataSidang.data.data.pembimbing1_id
                                   }
                                 >
-                                  {data.lecturercode} - {data.fullname}
+                                  {data.code} - {data.user.nama}
                                 </option>
-                                //? Ini Pake Lecturer ID kalau di SOFI LAmA
+                              ) : (
+                                <option key={index} value={data.id}>
+                                  {data.code} - {data.user.nama}
+                                </option>
                               )
                             )}
-                          //? Perkondisian jika sidang == null belum
                         </select>
                       )}
                     </div>
@@ -370,24 +326,27 @@ const SidangEdit = () => {
                           <option value="">Pilih Pembimbing 2</option>
                           {dataLecturer &&
                             dataLecturer.map((data, index) =>
-                              sidang === null ? (
-                                <option key={index} value={data.lecturercode}>
-                                  {data.lecturercode} - {data.fullname}
+                              dataSidang ? (
+                                <option key={index} value={data.id}>
+                                  {data.code} - {data.user.nama}
                                 </option>
                               ) : (
-                                <option
-                                  key={index}
-                                  value={data.lecturercode}
-                                  selected={
-                                    sidang && data.id === sidang.peminatan_id
-                                  }
-                                >
-                                  {data.lecturercode} - {data.fullname}
-                                </option>
-                                //? Ini Pake Lecturer ID kalau di SOFI LAmA
+                                <>
+                                  <option
+                                    key={index}
+                                    value={data.code}
+                                    selected={
+                                      dataSidang &&
+                                      data.id ===
+                                        dataSidang.data.data.pembimbing2_id
+                                    }
+                                  >
+                                    {data.code} - {data.fullname}
+                                  </option>
+                                  test
+                                </>
                               )
                             )}
-                          //? Perkondisian jika sidang == null belum
                         </select>
                       )}
                     </div>
@@ -422,24 +381,14 @@ const SidangEdit = () => {
                           <input
                             type="text"
                             id="form_bimbingan1"
-                            value={
-                              dataStudent &&
-                              dataStudent.totalguidance_advisor1 === null
-                                ? 0
-                                : dataStudent.totalguidance_advisor1
-                            }
+                            value={`Pembimbing 1:${form_bimbingan1}`}
                             className="form-control"
                             disabled
                           />
                           <input
                             type="text"
                             id="form_bimbingan2"
-                            value={
-                              dataStudent &&
-                              dataStudent.totalguidance_advisor2 === null
-                                ? 0
-                                : dataStudent.totalguidance_advisor2
-                            }
+                            value={`Pembimbing 2:${form_bimbingan2}`}
                             className="form-control"
                             disabled
                           />
@@ -447,42 +396,9 @@ const SidangEdit = () => {
                       )}
                       <input
                         type="hidden"
-                        value={`${
-                          dataStudent.totalguidance_advisor1 === null
-                            ? 0
-                            : dataStudent.totalguidance_advisor1
-                        };${
-                          dataStudent.totalguidance_advisor2 === null
-                            ? 0
-                            : dataStudent.totalguidance_advisor2
-                        }`}
+                        value={`${form_bimbingan1};${form_bimbingan2}`}
                       />
                     </div>
-
-                    {/* <!-- Status Form Field --> */}
-                    {location.pathname === "/sidangs/create" && (
-                      <div className="form-group col-sm-12">
-                        <label htmlFor="lecturer_status">
-                          Status Igracias:
-                        </label>
-                        {isLoading ? (
-                          <Skeleton height={30} />
-                        ) : (
-                          <input
-                            type="text"
-                            name="lecturer_status"
-                            className="form-control"
-                            value={
-                              statusLog &&
-                              statusLog.lecturerstatus == "APPROVED"
-                                ? statusLog.lecturerstatus
-                                : "BELUM APPROVED"
-                            }
-                            readOnly
-                          />
-                        )}
-                      </div>
-                    )}
 
                     {/* <!-- KK Field --> */}
                     <div className="form-group col-sm-12 col-lg-12">
@@ -517,7 +433,7 @@ const SidangEdit = () => {
                           old('$peminatan') ? 'selected' : '' //?
                           {peminatans &&
                             peminatans.map((data, index) =>
-                              sidang === null ? (
+                              dataSidang ? (
                                 <option value={data.id} key={index}>
                                   {data.nama}
                                 </option>
@@ -580,7 +496,7 @@ const SidangEdit = () => {
                               <br />
                               <Skeleton height={30} width={90} />
                             </>
-                          ) : sidang && sidang.dokumen_ta ? (
+                          ) : dataSidang && dataSidang.data.data.doc_ta ? (
                             <p>
                               <a
                                 href="/{{$dokumen_ta->file_url}}"
@@ -622,7 +538,7 @@ const SidangEdit = () => {
                               <br />
                               <Skeleton height={30} width={90} />
                             </>
-                          ) : sidang && sidang.makalah ? (
+                          ) : dataSidang.data.data.makalah ? (
                             <p>
                               <a
                                 href="/{{$makalah->file_url}}"
@@ -724,6 +640,7 @@ const SidangEdit = () => {
                 </div>
               </div>
             </div>
+
             <div className="col-12 col-md-6">
               <div className="card">
                 <div className="card-body">

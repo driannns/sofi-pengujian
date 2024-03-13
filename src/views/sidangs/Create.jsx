@@ -26,13 +26,10 @@ const SidangCreate = () => {
   const dispatch = useDispatch();
   const { data: dataLecturer } = useSelector((state) => state.lecturer);
   const { data: dataSidang } = useSelector((state) => state.sidang);
-
   const { roles } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
-  const sidang = null; //Sidang set to Null DUMMY
 
   const [cookies] = useCookies("");
   const [userInfo, setUserInfo] = useState({});
@@ -81,10 +78,36 @@ const SidangCreate = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSidangData = async () => {
       try {
         setIsLoading(true);
+        await dispatch(checkSidang(cookies["auth-token"]));
+      } catch (err) {
+        console.error("Error fetching sidang data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSidangData();
+  }, [dispatch]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // if (dataSidang.data && dataSidang.data.code === 200) {
+        //   console.log;
+        //   if (dataSidang.data.code === 200) {
+        //     if (
+        //       dataSidang.data.data.status === "pengajuan" ||
+        //       dataSidang.data.data.status === "ditolak oleh admin"
+        //     ) {
+        //       navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
+        //     } else {
+        //       navigate(`/sidangs/${dataSidang.data.data.id}`);
+        //     }
+        //   }
+        // }
+        setIsLoading(true);
         dispatch(fetchLecturerList());
 
         const resUserInfo = await axios.get(
@@ -92,21 +115,6 @@ const SidangCreate = () => {
         );
         setUserInfo(resUserInfo.data.data);
         // Get Period Now
-
-        dispatch(checkSidang(cookies["auth-token"]));
-
-        console.log(dataSidang);
-        if (dataSidang.length > 0 && dataSidang.data.code === 200) {
-          if (
-            dataSidang.data.data.status === "pengajuan" ||
-            dataSidang.data.data.status === "ditolak oleh admin"
-          ) {
-            navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
-          } else {
-            navigate(`/sidang/show/${dataSidang.data.data.id}`);
-          }
-        }
-
         // Parameter
 
         const resStudentData = await axios.get(
@@ -118,11 +126,7 @@ const SidangCreate = () => {
             },
           }
         );
-        if (resStudentData.data.data.length === 0) {
-          // localStorage.setItem(
-          //   "error",
-          //   "Anda tidak terdaftar di periode akademik ini"
-          // );
+        if (true) {
           navigate("/home", {
             state: {
               error: "Anda tidak terdaftar di periode akademik ini",
@@ -153,8 +157,9 @@ const SidangCreate = () => {
         setIsLoading(false);
       }
     };
+
     fetchData();
-  }, []);
+  }, [dataSidang]);
 
   function attend2(e) {
     e.preventDefault();
@@ -512,16 +517,16 @@ const SidangCreate = () => {
                             old('$peminatan') ? 'selected' : '' //?
                             {peminatans &&
                               peminatans.map((data, index) =>
-                                sidang === null ? (
-                                  <option value={data.id} key={index}>
-                                    {data.nama}
-                                  </option>
-                                ) : (
+                                dataSidang.data ? (
                                   <option
                                     value={data.id}
                                     key={index}
                                     selected={data.id === userInfo.peminatan_id}
                                   >
+                                    {data.nama}
+                                  </option>
+                                ) : (
+                                  <option value={data.id} key={index}>
                                     {data.nama}
                                   </option>
                                 )
@@ -581,7 +586,8 @@ const SidangCreate = () => {
                                 <br />
                                 <Skeleton height={30} width={90} />
                               </>
-                            ) : sidang && sidang.dokumen_ta ? (
+                            ) : dataSidang.data &&
+                              dataSidang.data.data.doc_ta ? (
                               <p>
                                 <a
                                   href="/{{$dokumen_ta->file_url}}"
@@ -622,7 +628,8 @@ const SidangCreate = () => {
                                 <br />
                                 <Skeleton height={30} width={90} />
                               </>
-                            ) : sidang && sidang.makalah ? (
+                            ) : dataSidang.data &&
+                              dataSidang.data.data.makalah ? (
                               <p>
                                 <a
                                   href="/{{$makalah->file_url}}"
