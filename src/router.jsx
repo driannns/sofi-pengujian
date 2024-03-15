@@ -6,7 +6,7 @@ import Home from "./views/Home";
 import Login from "./views/auth/Login";
 import LoginSSO from "./views/auth/LoginSSO";
 
-import SidangIndex from "./views/sidangs/Index";
+import SidangShow from "./views/sidangs/Show";
 import SidangCreate from "./views/sidangs/Create";
 import SidangEdit from "./views/sidangs/Edit";
 
@@ -49,8 +49,10 @@ const router = (
       <Route path="/teams" element={<Teams />} />
     </Route>
 
-    <Route element={<PrivateRoutes role={["RLPBM", "RLPIC", "RLADM"]} />}>
-      <Route path="/sidangs" element={<SidangIndex />} />
+    <Route
+      element={<PrivateRoutes role={["RLPBM", "RLPIC", "RLADM", "RLMHS"]} />}
+    >
+      <Route path="/sidangs/:id" element={<SidangShow />} />
     </Route>
 
     {/* RLADM Routes */}
