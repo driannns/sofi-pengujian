@@ -1,8 +1,9 @@
 import { MainLayout } from "./layouts/MainLayout";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
-import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Alert from "../components/Alert";
+import { useEffect } from "react";
 
 const Home = () => {
   const [cookies] = useCookies();
@@ -11,17 +12,16 @@ const Home = () => {
   const statusSidang = null;
   const kaurAkademik = "Edi Sutoyo, S.Kom., M.CompSc.";
   const no_laa = "+6281311997199";
-  const location = useLocation();
   const [error, setError] = useState(null);
 
   const clearLocalStorage = () => {
-    localStorage.removeItem("error");
+    localStorage.removeItem("errorMessage");
   };
 
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
+    const handleBeforeUnload = () => {
       if (error) {
-        localStorage.setItem("error", error);
+        localStorage.setItem("errorMessage", error);
       } else {
         clearLocalStorage();
       }
@@ -43,11 +43,10 @@ const Home = () => {
         <div className="animated fadeIn">
           <div className="row mt-3">
             <div className="col-12">
-              {localStorage.getItem("message") && (
-                <div className="alert alert-danger" role="alert">
-                  {localStorage.getItem("message")}
-                </div>
-              )}
+              <Alert
+                message={localStorage.getItem("errorMessage")}
+                type="danger"
+              />
             </div>
           </div>
           <div className="row">
@@ -77,7 +76,6 @@ const Home = () => {
                 <h3>TATA TERTIB PELAKSAAN SIDANG TUGAS AKHIR</h3>
                 {/* <!-- update notif lulus --> */}
                 {userData.role?.find((roles) => "RLMHS".includes(roles)) &&
-                  // @if($statussidang)
                   statusSidang &&
                   statusSidang.status === "lulus" && (
                     <div className="alert alert-success" role="alert">
