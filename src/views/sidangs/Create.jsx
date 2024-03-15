@@ -8,6 +8,7 @@ import { useAuth } from "../../middleware/AuthContext";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturerList } from "../../store/modules/lecturer/action";
 import { createSidang, checkSidang } from "../../store/modules/sidang/action";
+import Alert from "../../components/Alert";
 
 import "sweetalert2/dist/sweetalert2.min.css";
 import Swal from "sweetalert2";
@@ -57,7 +58,9 @@ const SidangCreate = () => {
   const [komentar, setKomentar] = useState("");
   const [docTA, setDocTA] = useState("");
   const [makalah, setMakalah] = useState("");
-  const [peminatanId, setPeminatanId] = useState("");
+  const [peminatanId, setPeminatanId] = useState(
+    userInfo.peminatan_id ? userInfo.peminatan_id : ""
+  );
   const form_bimbingan1 =
     dataStudent.totalguidance_advisor1 === null
       ? 0
@@ -77,36 +80,37 @@ const SidangCreate = () => {
     setMakalah(e.target.files[0]);
   };
 
+  const fetchSidangData = async () => {
+    try {
+      setIsLoading(true);
+      await dispatch(checkSidang(cookies["auth-token"]));
+    } catch (err) {
+      console.error("Error fetching sidang data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSidangData = async () => {
-      try {
-        setIsLoading(true);
-        await dispatch(checkSidang(cookies["auth-token"]));
-      } catch (err) {
-        console.error("Error fetching sidang data:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchSidangData();
   }, [dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // if (dataSidang.data && dataSidang.data.code === 200) {
-        //   console.log;
-        //   if (dataSidang.data.code === 200) {
-        //     if (
-        //       dataSidang.data.data.status === "pengajuan" ||
-        //       dataSidang.data.data.status === "ditolak oleh admin"
-        //     ) {
-        //       navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
-        //     } else {
-        //       navigate(`/sidangs/${dataSidang.data.data.id}`);
-        //     }
-        //   }
-        // }
+        if (dataSidang.data && dataSidang.data.code === 200) {
+          console.log;
+          if (dataSidang.data.code === 200) {
+            if (
+              dataSidang.data.data.status === "pengajuan" ||
+              dataSidang.data.data.status === "ditolak oleh admin"
+            ) {
+              navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
+            } else {
+              navigate(`/sidangs/${dataSidang.data.data.id}`);
+            }
+          }
+        }
         setIsLoading(true);
         dispatch(fetchLecturerList());
 
@@ -115,6 +119,12 @@ const SidangCreate = () => {
         );
         setUserInfo(resUserInfo.data.data);
         // Get Period Now
+        //? const periodNow = await axios.get(`${apiSOFI}/period/check-period`, {
+        //?   headers: {
+        //?     Authorization: "Bearer " + cookies["auth-token"],
+        //?  },
+        //? });
+
         // Parameter
 
         const resStudentData = await axios.get(
@@ -126,12 +136,13 @@ const SidangCreate = () => {
             },
           }
         );
-        if (true) {
-          navigate("/home", {
-            state: {
-              error: "Anda tidak terdaftar di periode akademik ini",
-            },
-          });
+
+        if (!resStudentData) {
+          localStorage.setItem(
+            "errorMessage",
+            "Anda tidak terdaftar di periode akademik ini"
+          );
+          navigate("/home");
         }
         setDataStudent(resStudentData.data.data[0]);
 
@@ -192,6 +203,7 @@ const SidangCreate = () => {
             authToken: cookies["auth-token"],
           })
         );
+        fetchSidangData();
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -216,18 +228,18 @@ const SidangCreate = () => {
 
         <div className="container-fluid">
           <div className="animated fadeIn">
-            {/* @include('coreui-templates::common.errors')
-            @if (Session::has('error'))
-            <div className="alert alert-danger" role="alert">
-              {{Session::get('error')}}
-            </div>
-            @endif
-            {/* @if(Request::is('sidangs/create')) */}
-            <div className="alert alert-warning" role="alert">
-              Pastikan data dibawah sudah benar, terutama status approval. Jika
-              ada perbedaan data, silahkan hubungi admin sebelum submit
-            </div>
-            {/* @endif */}
+            {/* @include('coreui-templates::common.errors') */}
+            {sessionStorage.getItem("errorMessage") && (
+              <Alert
+                message={sessionStorage.getItem("errorMessage")}
+                type="danger"
+              />
+            )}
+            <Alert
+              type="warning"
+              message=" Pastikan data dibawah sudah benar, terutama status approval. Jika
+              ada perbedaan data, silahkan hubungi admin sebelum submit"
+            />
             <div className="row">
               <div className="col-lg-12">
                 <div className="card">
@@ -518,11 +530,7 @@ const SidangCreate = () => {
                             {peminatans &&
                               peminatans.map((data, index) =>
                                 dataSidang.data ? (
-                                  <option
-                                    value={data.id}
-                                    key={index}
-                                    selected={data.id === userInfo.peminatan_id}
-                                  >
+                                  <option value={data.id} key={index}>
                                     {data.nama}
                                   </option>
                                 ) : (
