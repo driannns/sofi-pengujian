@@ -16,19 +16,19 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const tokenSSO =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiM2M4MWNmNTZiZTg3ZTY4MThjMDhlMjkyNDdkMjBhM2E0Mjc1OWJkNWMyMDNlNGU5Y2Y0ZDk1ZDNhODUxYzI5MzI0MTRkNmI4OTdjMjk1NjkiLCJpYXQiOjE3MTAxNjc3MjYsIm5iZiI6MTcxMDE2NzcyNiwiZXhwIjoxNzEwMjU0MTI2LCJzdWIiOiJla2t5bm92cml6YWxhbSIsInNjb3BlcyI6WyJjZWxvZS1kYXNoYm9hcmQiLCJvbGQtZG9zZW4iLCJvbGQtZG9zZW4td2FsaSIsImFkbWlzc2lvbi1hZG1pbiIsImFkbWlzc2lvbi1kYXNoYm9hcmQtdXNlcnMiLCJhdHRlbmRhbmNlLWVtcGxveWVlIiwiZGFzaGJvYXJkLXVzZXIiLCJuZXctc3NvIiwib2xkLXBlZ2F3YWkiLCJzc28tb3BlbmxpYiIsInN0YWZmX3Rlc3Rfc3BzIiwib2xkLWtlbG9tcG9rLWtlYWhsaWFuIiwiZW1wbG95ZWUtc3RydWN0dXJhbCIsIm9sZC1hZG1pbi1yZWdpc3RyYXNpLWZha3VsdGFzIl19.UkjYitwG_c4hk4__7AHL01gsEYcbsfbxlUEjQiXjAgW0IYmfV0ZpL4WZnrffrO3yYGFLeaoINQWUaD-mS3z9OR6jB0adQ9y9EQxsxY0raTLuuhwU-tXq9-DVOo1sN7ZpQWPAXywHKnm1WvIJ-9hWuhY0s7EtHXCVCSSN628wMJp6srcnwLvykHSasE2iXDlwoEjhRaD_lWOClf1WFIoYfTy8o0eSHZ8jRGTmrCyXhB2n3-MTFz7AHiJH3agSNk_lGS4iHVTJdE2Byk6KQdUDyQYuOOp1toEsoCB9iei8tdX1Ua6Nu-DO6nSX_yQXUK5qF5tML5v2dhAjiD1b8FmdMsRekWM6WnmPtx-j3n4FMLN5_H-VGukxrPYEM_oVzkYcGTTJrtdFTAJ7Emeizu0gYxWLoRYIox6uQ_OI79N35_9w9kmKU3bUI1E8xF0eJY1NhlPot6xIC6Xt2p2Zgu94S7zkH3f4z_mpd1pK7cck9qWnefYDBkvbd4agfXry4JIJ1Xqkmy666qJvyR-_1QYcY46mt1VRpWRUNfPsEDr_1woPAmabyYZyDf4gWAvb26yUDDw6mq4F2hV8KoREDUF_R1fwqIQBGoojC4lU3BW9BGYv-TM5GNIHpkiRyW6gBWbeSjAUkd0CGbZUlygFQ5Xr7HpVj_E1a2Hz-ix5jOvXObs";
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiOWY3ZDMxZTZhMzhmYmFmOTI5NjljMDNlMzJhOTc4MjFkNjY0MGJiZWQ4NzU0Y2Y0MzY4NWVjM2EyZTdkOGU5NTBkYWUzYWJjOGFiZWNhMDAiLCJpYXQiOjE3MTAyMzQ4MjMsIm5iZiI6MTcxMDIzNDgyMywiZXhwIjoxNzEwMzIxMjIzLCJzdWIiOiJla2t5bm92cml6YWxhbSIsInNjb3BlcyI6WyJjZWxvZS1kYXNoYm9hcmQiLCJvbGQtZG9zZW4iLCJvbGQtZG9zZW4td2FsaSIsImFkbWlzc2lvbi1hZG1pbiIsImFkbWlzc2lvbi1kYXNoYm9hcmQtdXNlcnMiLCJhdHRlbmRhbmNlLWVtcGxveWVlIiwiZGFzaGJvYXJkLXVzZXIiLCJuZXctc3NvIiwib2xkLXBlZ2F3YWkiLCJzc28tb3BlbmxpYiIsInN0YWZmX3Rlc3Rfc3BzIiwib2xkLWtlbG9tcG9rLWtlYWhsaWFuIiwiZW1wbG95ZWUtc3RydWN0dXJhbCIsIm9sZC1hZG1pbi1yZWdpc3RyYXNpLWZha3VsdGFzIl19.PDA6tjeuPNeaqi3KORQR7H-MD4qZc7dEzSFVKbilas4Q4T8MRtSVeHLmRUAaM4WiiqIrf486hnEw0RvV9YkXIYtU1zVVN456Zyano66pW9FfLHbptxC59zc_MM560XT7fokxATYZGPKn5Ds8AHyOB4Z3Mfak82FAJHFp9O_eEG_JDvX8OVGxTS5mJDhLnsnOUs6DTiJlyLM4nMlfn1WBwvpv6hn3U_q9g0CNflaULd6jYfvvFf63ybShOvxQeevZDdk1wpVrYB26fjVo5TJuHGg7fuPaO1jrJLiCXQWZN0u51ZGvt1PMLoxNVhpWMio6EMiEiECbAZsQ99JmCv_mJhWBT-g2_udJZcPFSmaABTKAV3glrImbIf--17UC7lqllYthXyVD03JWQIpLf9Bycab4jH4Bl7aFSdFyzTvCOfEBEbq3jqL9IqBToOc6FEV0Sfzxx9VlKHE3t-AQ4a9twPYZw1xhxoiaeFwH_g6Fh9ii2ALZJLwozy7GaR5qgnOWTEO5dnjaDIiA2nAcfPcSGAcL5hzP8HqLvPAV-ya4hqB9HlRgaajhiWMxeTdE3L1vQ2Qpku7c1GHkHABahS3zqVyGQTvoT8pMX2oBw2rvrB0NQbaga7lxCNbeqgJWSYhJD-tNn46dHKqyq9XbumDOghfcRBIwdgkZhXJpCBAE5tw";
 const getAllStudentAPI =
   "https://dev-gateway.telkomuniversity.ac.id/bf7b719639cf0e2ef94a1cf212e00ce6/2324-2"; //2324-2
 const getStatusLog =
   "https://dev-gateway.telkomuniversity.ac.id/d650182722315309a25aa5a43a033303/2324-2"; //2324-2
 const testLocal = "http://127.0.0.1:8000/api";
+const APISOFI = "https://57b4-36-72-207-87.ngrok-free.app/api";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
   const { data: dataLecturer } = useSelector((state) => state.lecturer);
   const { data: dataSidang } = useSelector((state) => state.sidang);
   const { roles } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +39,6 @@ const SidangCreate = () => {
   const [peminatans, setPeminatans] = useState("");
   const [periods, setPeriods] = useState("");
   const languages = ["Indonesia", "English"];
-
   const statusList = {
     0: "--Pilihan Ubah Status--",
     "ditolak oleh admin": "Ditolak Oleh Admin",
@@ -53,14 +52,6 @@ const SidangCreate = () => {
   const [pembimbing1, setPembimbing1] = useState("");
   const [pembimbing2, setPembimbing2] = useState("");
   const [judul, setJudul] = useState("");
-  const [isEnglish, setIsEnglish] = useState("");
-  const [status, setStatus] = useState("");
-  const [komentar, setKomentar] = useState("");
-  const [docTA, setDocTA] = useState("");
-  const [makalah, setMakalah] = useState("");
-  const [peminatanId, setPeminatanId] = useState(
-    userInfo.peminatan_id ? userInfo.peminatan_id : ""
-  );
   const form_bimbingan1 =
     dataStudent.totalguidance_advisor1 === null
       ? 0
@@ -69,6 +60,14 @@ const SidangCreate = () => {
     dataStudent.totalguidance_advisor2 === null
       ? 0
       : dataStudent.totalguidance_advisor2;
+  const [peminatanId, setPeminatanId] = useState(
+    userInfo.peminatan_id ? userInfo.peminatan_id : ""
+  );
+  const [docTA, setDocTA] = useState("");
+  const [makalah, setMakalah] = useState("");
+  const [isEnglish, setIsEnglish] = useState("");
+  const [status, setStatus] = useState("");
+  const [komentar, setKomentar] = useState("");
 
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
 
@@ -80,38 +79,12 @@ const SidangCreate = () => {
     setMakalah(e.target.files[0]);
   };
 
-  const fetchSidangData = async () => {
-    try {
-      setIsLoading(true);
-      await dispatch(checkSidang(cookies["auth-token"]));
-    } catch (err) {
-      console.error("Error fetching sidang data:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchSidangData();
-  }, [dispatch]);
-
-  useEffect(() => {
-    const fetchData = async () => {
+    const fetchSidangData = async () => {
       try {
-        if (dataSidang.data && dataSidang.data.code === 200) {
-          console.log;
-          if (dataSidang.data.code === 200) {
-            if (
-              dataSidang.data.data.status === "pengajuan" ||
-              dataSidang.data.data.status === "ditolak oleh admin"
-            ) {
-              navigate(`/sidangs/${dataSidang.data.data.id}/edit`);
-            } else {
-              navigate(`/sidangs/${dataSidang.data.data.id}`);
-            }
-          }
-        }
         setIsLoading(true);
+        await dispatch(checkSidang(cookies["auth-token"]));
+
         dispatch(fetchLecturerList());
 
         const resUserInfo = await axios.get(
@@ -148,24 +121,54 @@ const SidangCreate = () => {
 
         const resStatusLog = await axios.get(
           // `${getStatusLog}/${resUserInfo.data.data.nim}`,
-          `${getStatusLog}/"1202204011"`,
+          `${getStatusLog}/1202204011`,
           {
             headers: { Authorization: `Bearer ${tokenSSO}` },
           }
         );
+
         setStatusLog(resStatusLog.data.data[0]);
 
         const resPeminatans = await axios.post(`${testLocal}/peminatans`, {
           kk: resUserInfo.data.data.kk,
         });
+
         setPeminatans(resPeminatans.data.data);
 
-        const resALlPeriods = await axios.get(`${testLocal}/allPeriod`);
+        const resALlPeriods = await axios.get(`${APISOFI}/period/get`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        });
+
         setPeriods(resALlPeriods.data.data);
       } catch (e) {
         console.error("Erorr fetching data:", e);
       } finally {
         setIsLoading(false);
+      }
+    };
+
+    fetchSidangData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (dataSidang.data) {
+          if (
+            dataSidang.data.status === "pengajuan" ||
+            dataSidang.data.status === "ditolak oleh admin"
+          ) {
+            console.log(dataSidang.data.id);
+            navigate(`/sidangs/${dataSidang.data.id}/edit`);
+          } else {
+            navigate(`/sidangs/${dataSidang.data.id}`);
+          }
+        }
+      } catch (e) {
+        console.error("Erorr fetching data:", e);
       }
     };
 
@@ -203,7 +206,6 @@ const SidangCreate = () => {
             authToken: cookies["auth-token"],
           })
         );
-        fetchSidangData();
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -246,22 +248,22 @@ const SidangCreate = () => {
                   <div className="card-body">
                     <form>
                       {/* Credit Field */}
-                      {location.pathname == "/sidangs/create" && (
-                        <>
-                          <input
-                            type="text"
-                            name="credit_complete"
-                            value={dataStudent && dataStudent.credit_complete}
-                            hidden
-                          />
-                          <input
-                            type="text"
-                            name="credit_uncomplete"
-                            value={dataStudent && dataStudent.credit_uncomplete}
-                            hidden
-                          />
-                        </>
-                      )}
+                      <input
+                        type="text"
+                        name="credit_complete"
+                        defaultValue={
+                          dataStudent && dataStudent.credit_complete
+                        }
+                        hidden
+                      />
+                      <input
+                        type="text"
+                        name="credit_uncomplete"
+                        defaultValue={
+                          dataStudent && dataStudent.credit_uncomplete
+                        }
+                        hidden
+                      />
 
                       {/* <!-- Period Id Field --> */}
                       <div className="form-group col-sm-12">
@@ -279,9 +281,9 @@ const SidangCreate = () => {
                           >
                             <option value="">Pilih Periode</option>
                             {periods &&
-                              Object.entries(periods).map(([key, value]) => (
-                                <option value={key} key={key}>
-                                  {value}
+                              periods.map((data, key) => (
+                                <option key={key} value={data.id}>
+                                  {data.name}
                                 </option>
                               ))}
                           </select>
@@ -291,28 +293,24 @@ const SidangCreate = () => {
                               name="period_id"
                               id="period_id"
                               className="select2 form-control"
-                              value={periodId}
+                              defaultValue={periodId}
                               disabled
                             >
-                              {/* <option value=""></option> */}
-                              //? bingung ini kenapa disabled
                               {periods &&
-                                Object.entries(periods).map(([key, value]) => (
-                                  <option value={key} key={key}>
-                                    {value}
+                                periods.map((data, key) => (
+                                  <option index={key} value={data.id}>
+                                    {data.name}
                                   </option>
                                 ))}
                             </select>
                             <input
                               type="hidden"
                               name="period_id"
-                              value={
+                              defaultValute={
                                 dataSidang.length > 0 &&
                                 dataSidang.data.data.period_id
                               }
                             />
-                            //? ini diambil dari database sidang walaupun
-                            dicreate? API AFIF
                           </>
                         )}
                       </div>
@@ -325,7 +323,7 @@ const SidangCreate = () => {
                         ) : (
                           <input
                             type="number"
-                            value={userInfo.nim}
+                            defaultValue={userInfo.nim}
                             className="form-control"
                             disabled
                           />
@@ -333,7 +331,7 @@ const SidangCreate = () => {
                         <input
                           type="hidden"
                           name="mahasiswa_id"
-                          value={userInfo.nim}
+                          defaultValue={userInfo.nim}
                         />
                       </div>
 
@@ -353,27 +351,11 @@ const SidangCreate = () => {
                           >
                             <option value="">Pilih Pembimbing 1</option>
                             {dataLecturer &&
-                              dataLecturer.map((data, index) =>
-                                dataSidang.length > 0 ? (
-                                  <option key={index} value={data.id}>
-                                    {data.code} - {data.user.nama}
-                                  </option>
-                                ) : (
-                                  <option
-                                    key={index}
-                                    value={data.id}
-                                    selected={
-                                      dataSidang.length > 0 &&
-                                      dataSidang.data.data.pembimbing1_id ===
-                                        data.id
-                                    }
-                                  >
-                                    {data.code} - {data.user.nama}
-                                  </option>
-                                  //? Ini Pake Lecturer ID kalau di SOFI LAmA
-                                )
-                              )}
-                            //? Perkondisian jika sidang == null belum
+                              dataLecturer.map((data, index) => (
+                                <option key={index} value={data.id}>
+                                  {data.code} - {data.user.nama}
+                                </option>
+                              ))}
                           </select>
                         )}
                       </div>
@@ -396,27 +378,11 @@ const SidangCreate = () => {
                           >
                             <option value="">Pilih Pembimbing 2</option>
                             {dataLecturer &&
-                              dataLecturer.map((data, index) =>
-                                dataSidang.length > 0 ? (
-                                  <option key={index} value={data.id}>
-                                    {data.code} - {data.user.nama}
-                                  </option>
-                                ) : (
-                                  <option
-                                    key={index}
-                                    value={data.id}
-                                    selected={
-                                      dataSidang.length > 0 &&
-                                      dataSidang.data.data.pembimbing2_id ===
-                                        data.id
-                                    }
-                                  >
-                                    {data.code} - {data.user.nama}
-                                  </option>
-                                  //? Ini Pake Lecturer ID kalau di SOFI LAmA
-                                )
-                              )}
-                            //? Perkondisian jika sidang == null belum
+                              dataLecturer.map((data, index) => (
+                                <option key={index} value={data.id}>
+                                  {data.code} - {data.user.nama}
+                                </option>
+                              ))}
                           </select>
                         )}
                       </div>
@@ -453,14 +419,14 @@ const SidangCreate = () => {
                             <input
                               type="text"
                               id="form_bimbingan1"
-                              value={form_bimbingan1}
+                              defaultValue={form_bimbingan1}
                               className="form-control"
                               disabled
                             />
                             <input
                               type="text"
                               id="form_bimbingan2"
-                              value={form_bimbingan2}
+                              defaultValue={form_bimbingan2}
                               className="form-control"
                               disabled
                             />
@@ -468,7 +434,7 @@ const SidangCreate = () => {
                         )}
                         <input
                           type="hidden"
-                          value={`${form_bimbingan1};${form_bimbingan2}`}
+                          defaultValue={`${form_bimbingan1};${form_bimbingan2}`}
                         />
                       </div>
 
@@ -506,13 +472,13 @@ const SidangCreate = () => {
                             type="text"
                             name="form_bimbingan1"
                             className="form-control"
-                            value={userInfo.kk}
+                            defaultValue={userInfo.kk}
                             disabled
                           />
                         )}
                       </div>
 
-                      {/* <!-- peminatans Field --> */}
+                      {/* <!-- Peminatans Field --> */}
                       <div className="form-group col-sm-12">
                         <label htmlFor="peminatans">Peminatan:</label>
                         {isLoading ? (
@@ -525,20 +491,12 @@ const SidangCreate = () => {
                             onChange={(e) => setPeminatanId(e.target.value)}
                           >
                             <option value="">Pilih Peminatan</option>
-                            //? perkondisian jika sidang == null dan
-                            old('$peminatan') ? 'selected' : '' //?
                             {peminatans &&
-                              peminatans.map((data, index) =>
-                                dataSidang.data ? (
-                                  <option value={data.id} key={index}>
-                                    {data.nama}
-                                  </option>
-                                ) : (
-                                  <option value={data.id} key={index}>
-                                    {data.nama}
-                                  </option>
-                                )
-                              )}
+                              peminatans.map((data, index) => (
+                                <option value={data.id} key={index}>
+                                  {data.nama}
+                                </option>
+                              ))}
                           </select>
                         )}
                       </div>
@@ -553,14 +511,14 @@ const SidangCreate = () => {
                             type="text"
                             name="eprt"
                             className="form-control"
-                            value={userInfo.eprt}
+                            defaultValue={userInfo.eprt}
                             disabled
                           />
                         )}
                         <input
                           type="hidden"
                           name="eprt"
-                          value={userInfo.eprt}
+                          defaultValue={userInfo.eprt}
                         />
                       </div>
 
@@ -574,11 +532,15 @@ const SidangCreate = () => {
                             type="text"
                             className="form-control"
                             name="tak"
-                            value={userInfo.tak}
+                            defaultValue={userInfo.tak}
                             disabled
                           />
                         )}
-                        <input type="hidden" name="tak" value={userInfo.tak} />
+                        <input
+                          type="hidden"
+                          name="tak"
+                          defaultValue={userInfo.tak}
+                        />
                       </div>
 
                       {roles &&
@@ -589,33 +551,6 @@ const SidangCreate = () => {
                             <label htmlFor="dokumen_ta">
                               Draft Dokumen TA:
                             </label>
-                            {isLoading ? (
-                              <>
-                                <br />
-                                <Skeleton height={30} width={90} />
-                              </>
-                            ) : dataSidang.data &&
-                              dataSidang.data.data.doc_ta ? (
-                              <p>
-                                <a
-                                  href="/{{$dokumen_ta->file_url}}"
-                                  className="btn btn-primary"
-                                  download
-                                >
-                                  Download
-                                </a>
-                              </p>
-                            ) : (
-                              <p>
-                                <a
-                                  href="#"
-                                  target="_blank"
-                                  className="btn btn-primary disabled"
-                                >
-                                  Data tidak ditemukan
-                                </a>
-                              </p>
-                            )}
                             {isLoading ? (
                               <Skeleton height={30} />
                             ) : (
@@ -631,34 +566,6 @@ const SidangCreate = () => {
                           {/* <!-- Makalah Field -/-> */}
                           <div className="form-group col-sm-12">
                             <label htmlFor="makalah">Jurnal:</label>
-                            {isLoading ? (
-                              <>
-                                <br />
-                                <Skeleton height={30} width={90} />
-                              </>
-                            ) : dataSidang.data &&
-                              dataSidang.data.data.makalah ? (
-                              <p>
-                                <a
-                                  href="/{{$makalah->file_url}}"
-                                  className="btn btn-primary"
-                                  download
-                                >
-                                  Download
-                                </a>
-                              </p>
-                            ) : (
-                              <p>
-                                <a
-                                  href="#"
-                                  target="_blank"
-                                  className="btn btn-primary disabled"
-                                >
-                                  Data tidak ditemukan
-                                </a>
-                              </p>
-                            )}
-
                             {isLoading ? (
                               <Skeleton height={30} />
                             ) : (
