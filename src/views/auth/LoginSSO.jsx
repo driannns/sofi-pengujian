@@ -3,9 +3,10 @@ import { NavLink } from "react-router-dom";
 import telkomLogo from "../../assets/images/telkom.png";
 import { useState } from "react";
 import { useAuth } from "../../middleware/AuthContext";
+import ReactLoading from "react-loading";
 
 const LoginSSO = () => {
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -65,7 +66,16 @@ const LoginSSO = () => {
             <div className="row">
               <div className="col-6">
                 <button className="btn btn-primary px-4" type="submit">
-                  Login
+                  {isLoading === true ? (
+                    <ReactLoading
+                      type="spin"
+                      color="#fff"
+                      height="20px"
+                      width="20px"
+                    />
+                  ) : (
+                    "Login"
+                  )}
                 </button>
               </div>
               <div className="col-6 text-right">
@@ -81,12 +91,12 @@ const LoginSSO = () => {
             <br></br>
             <div className="row">
               <div className="col-12">
-                Kontak LAAK FRI :{" "}
+                Kontak LAAK FRI : {/* Kontak LAA dari database */}
                 <a
                   className="btn btn-primary active mt-3"
-                  href="<?php echo 'http://wa.me/'.$no_laa ?>"
+                  href="+6281311997199"
                 >
-                  no_laa
+                  +6281311997199
                 </a>
               </div>
             </div>

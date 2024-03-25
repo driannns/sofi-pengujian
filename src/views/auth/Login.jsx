@@ -83,13 +83,11 @@ const Login = () => {
           <div>
             <h2>Sign up</h2>
             <p>belum memiliki akun ? silahkan menghubungi admin akademik FRI</p>
-            Kontak LAAK FRI :{" "}
-            <a
-              className="btn btn-primary active mt-3"
-              href="<?php echo 'http://wa.me/'.$no_laa ?>"
-            >
-              no_laa
+            Kontak LAAK FRI : {/* //? Kontak LAA dri database */}
+            <a className="btn btn-primary active mt-3" href="+6281311997199">
+              +6281311997199
             </a>{" "}
+            {/* //? */}
           </div>
         </div>
       </div>
