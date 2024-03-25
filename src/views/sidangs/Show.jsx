@@ -1,27 +1,104 @@
 import { MainLayout } from "../layouts/MainLayout";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { jwtDecode } from "jwt-decode";
 import { useSelector, useDispatch } from "react-redux";
 import { checkSidang } from "../../store/modules/sidang/action";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import Alert from "../../components/Alert";
 
 const SidangShow = () => {
   const { data: dataSidang } = useSelector((state) => state.sidang);
+
   const dispatch = useDispatch();
+  const [cookies] = useCookies();
 
-  const [cookies, setCookies] = useCookies();
-  const location = useLocation();
-  const jwtDecoded = jwtDecode(cookies["auth-token"]);
-  const roles = jwtDecoded.role;
+  const [pembimbing1, setPembimbing1] = useState("");
+  const [pembimbing2, setPembimbing2] = useState("");
+  const [period, setPeriod] = useState("");
+  const [statusLog, setStatusLog] = useState("");
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const dayOfWeek = days[date.getDay()];
+    const dayOfMonth = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+
+    return `${dayOfWeek}, ${dayOfMonth} ${month} ${year} - ${hour}:${minute}`;
+  };
+
   useEffect(() => {
-    console.log("awal:", dataSidang);
     dispatch(checkSidang(cookies["auth-token"]));
-    console.log("akhir:", dataSidang);
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    console.log("diluar useEffect:", dataSidang);
+    const fetchingData = async () => {
+      if (dataSidang.data) {
+        const resPembimbing1 = await axios.get(
+          `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing1_id}`
+        );
+        setPembimbing1(
+          `${resPembimbing1.data.data.code} - ${resPembimbing1.data.data.user.nama}`
+        );
+
+        const resPembimbing2 = await axios.get(
+          `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing2_id}`
+        );
+        setPembimbing2(
+          `${resPembimbing2.data.data.code} - ${resPembimbing2.data.data.user.nama}`
+        );
+
+        const resPeriod = await axios.get(
+          `https://ca07-182-2-46-163.ngrok-free.app/api/period/get/${dataSidang.data.period_id}`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": true,
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+            },
+          }
+        );
+        setPeriod(resPeriod.data.data.name);
+
+        const resStatusLog = await axios.get(
+          "https://ca07-182-2-46-163.ngrok-free.app/api/status-log/get",
+          {
+            headers: {
+              "ngrok-skip-browser-warning": true,
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+            },
+          }
+        );
+        setStatusLog(resStatusLog.data.data);
+      }
+    };
+
+    fetchingData();
   }, [dataSidang]);
 
   return (
@@ -41,25 +118,229 @@ const SidangShow = () => {
       <div className="container-fluid">
         <div className="animated fadeIn">
           {/* @include('coreui-templates::common.errors') */}
-          {location.state &&
-            location.state.error(
-              <div className="alert alert-danger" role="alert">
-                {location.state.error}
-              </div>
-            )}
-          {/* @if ($sidang->status == 'tidak lulus' OR $sidang->status == 'tidak lulus (sudah update dokumen)') */}
-          <div className="alert alert-warning" role="alert">
-            Sidang anda tidak lulus, anda diwajibkan untuk mengupload PPT dan
-            membuat team baru. silahkan menuju menu 'Materi Presentasi'.
-          </div>
-          {/* @endif */}
+          <Alert type="danger" />
+          {dataSidang.data.status === "tidak lulus" ||
+            (dataSidang.data.status ===
+              "tidak lulus (sudah update dokumen)" && (
+              <Alert
+                type="warning"
+                message="Sidang anda tidak lulus, anda diwajibkan untuk mengupload PPT dan membuat team baru. silahkan menuju menu 'Materi Presentasi'."
+              />
+            ))}
           <div className="row">
             <div className="col-12 col-md-6">
               <div className="card">
                 <div className="card-header">
                   <strong>Detail</strong>
                 </div>
-                <div className="card-body">@include('sidangs.show_fields')</div>
+                <div className="card-body">
+                  <div className="table-responsive-sm">
+                    <table className="table table-striped table-borderless">
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          NIM
+                        </td>
+                        <td>:</td>
+                        <td>{dataSidang.data.nim}</td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Pembimbing 1
+                        </td>
+                        <td>:</td>
+                        <td>{pembimbing1}</td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Pembimbing 2
+                        </td>
+                        <td>:</td>
+                        <td>{pembimbing2}</td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Judul TA
+                        </td>
+                        <td>:</td>
+                        {dataSidang.data.judul}
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Jumlah Bimbingan
+                        </td>
+                        <td>:</td>
+                        <td>
+                          <p>
+                            Pembimbing 1: {dataSidang.data.form_bimbingan1}{" "}
+                            Pertemuan
+                          </p>
+                          <p>
+                            Pembimbing 2: {dataSidang.data.form_bimbingan2}{" "}
+                            Pertemuan
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          TAK
+                        </td>
+                        <td>:</td>
+                        {dataSidang.data.tak}
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          EPRT
+                        </td>
+                        <td>:</td>
+                        {dataSidang.data.eprt}
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Dokumen TA
+                        </td>
+                        <td>:</td>
+                        <td>
+                          {dataSidang.data.doc_ta ? (
+                            <a
+                              href="/{{$dokumen_ta->file_url}}"
+                              className="btn btn-outline-primary"
+                              download
+                            >
+                              Download
+                            </a>
+                          ) : (
+                            <a
+                              href="#"
+                              target="_blank"
+                              className="btn btn-primary disabled"
+                            >
+                              Data tidak ditemukan
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Jurnal
+                        </td>
+                        <td>:</td>
+                        <td>
+                          {dataSidang.data.makalah ? (
+                            <a
+                              href="/{{$makalah->file_url}}"
+                              className="btn btn-outline-primary"
+                              download
+                            >
+                              Download
+                            </a>
+                          ) : (
+                            <a
+                              href="#"
+                              target="_blank"
+                              className="btn btn-primary disabled"
+                            >
+                              Data tidak ditemukan
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Status
+                        </td>
+                        <td>:</td>
+                        <td>
+                          {dataSidang.data.status === "lulus" ? (
+                            <span className="badge badge-success">Lulus</span>
+                          ) : dataSidang.data.status === "belum dijadwalkan" ? (
+                            <span className="badge badge-secondary">
+                              Belum Dijadwakan
+                            </span>
+                          ) : dataSidang.data.status === "sudah dijadwalkan" ? (
+                            <span className="badge badge-info">Dijadwakan</span>
+                          ) : dataSidang.data.status === "tidak lulus" ? (
+                            <span className="badge badge-danger">
+                              Tidak Lulus
+                            </span>
+                          ) : dataSidang.data.status ===
+                            "ditolak oleh admin" ? (
+                            <span className="badge badge-danger">
+                              Ditolak Oleh Admin
+                            </span>
+                          ) : dataSidang.data.status === "pengajuan" ? (
+                            <span className="badge badge-warning">
+                              Pengajuan
+                            </span>
+                          ) : dataSidang.data.status ===
+                            "disetujui oleh pembimbing2" ? (
+                            <span className="badge badge-primary">
+                              Disetujui Oleh Pembimbing 2
+                            </span>
+                          ) : dataSidang.data.status ===
+                            "disetujui oleh pembimbing1" ? (
+                            <span className="badge badge-primary">
+                              Disetujui Oleh Pembimbing 1
+                            </span>
+                          ) : (
+                            dataSidang.data.status
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Bahasa
+                        </td>
+                        <td>:</td>
+                        <td>
+                          {dataSidang.data.is_english ? "English" : "Indonesia"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          className="font-weight-bold"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          Periode
+                        </td>
+                        <td>:</td>
+                        <td>{period}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="col-12 col-md-6">
