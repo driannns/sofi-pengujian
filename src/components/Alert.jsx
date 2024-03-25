@@ -1,16 +1,45 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
-const Alert = ({ message, type }) => {
+const Alert = ({ type, message }) => {
+  const [error, setError] = useState(null);
+
+  const clearLocalStorage = () => {
+    localStorage.removeItem("errorMessage");
+    localStorage.removeItem("warningMessage");
+    localStorage.removeItem("successMessage");
+  };
+
   useEffect(() => {
-    const errorMessage = sessionStorage.getItem("errorMessage");
-    if (errorMessage) {
-      sessionStorage.removeItem("errorMessage");
-    }
-  }, []);
+    const handleBeforeUnload = () => {
+      if (error) {
+        localStorage.setItem("errorMessage", error);
+        localStorage.setItem("warningMessage", error);
+        localStorage.setItem("successMessage", error);
+      } else {
+        clearLocalStorage();
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [error]);
 
-  return type === "danger" && message ? (
+  return message ? (
     <div className={`alert alert-${type}`} role="alert">
       {message}
+    </div>
+  ) : type === "danger" && localStorage.getItem("errorMessage") ? (
+    <div className={`alert alert-${type}`} role="alert">
+      {localStorage.getItem("errorMessage")}
+    </div>
+  ) : type === "warning" && localStorage.getItem("warningMessage") ? (
+    <div className={`alert alert-${type}`} role="alert">
+      {localStorage.getItem("warningMessage")}
+    </div>
+  ) : type === "success" && localStorage.getItem("successMessage") ? (
+    <div className={`alert alert-${type}`} role="alert">
+      {localStorage.getItem("successMessage")}
     </div>
   ) : null;
 };
