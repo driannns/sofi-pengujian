@@ -16,9 +16,17 @@
     <!-- Icons -->
     <link
       rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@icon/coreui-icons-free@1.0.1-alpha.1/coreui-icons-free.css"
     />
-
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
     <link
       rel="stylesheet"
       href="https://unpkg.com/@coreui/icons@1.0.0/css/brand.min.css"
@@ -27,9 +35,19 @@
       rel="stylesheet"
       href="https://unpkg.com/@coreui/icons@1.0.0/css/flag.min.css"
     />
+    <!-- <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    /> -->
     <link
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
       rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"
     />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.css"
@@ -39,10 +57,76 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.3.0/css/flag-icon.min.css"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
     <!-- End of Icons -->
+    <style>
+      .select2-container--default
+        .select2-selection--single
+        .select2-selection__rendered {
+        line-height: 33px;
+      }
+      .select2-container .select2-selection--single {
+        height: 36px;
+      }
+
+      .table thead {
+        background-color: #20a8d8 !important;
+        color: white;
+      }
+
+      .table thead tr {
+        white-space: nowrap;
+      }
+
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #20a8d8 !important;
+        color: white !important;
+        border: 1px solid white !important;
+        margin: 10px 0px 10px 0px;
+      }
+
+      .card-header,
+      .breadcrumb {
+        font-weight: bold;
+      }
+
+      .search {
+        display: inline;
+        width: 75%;
+      }
+
+      .custom-file-label {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .nav-link {
+        font-size: 12px;
+      }
+
+      td {
+        font-size: 12px;
+      }
+
+      .active {
+        color: black;
+      }
+    </style>
   </head>
   <body class="header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
     <div id="root" class="app"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+    ></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
