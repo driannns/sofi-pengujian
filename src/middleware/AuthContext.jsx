@@ -9,19 +9,23 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-const loginUrl = "http://127.0.0.1:8000";
+import { persistStore } from "redux-persist";
+import { store } from "../store/store";
+
+const loginUrl = "https://sofi.my.id";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState();
   const [roles, setRoles] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const [cookies, setCookies, removeCookie] = useCookies();
   const navigate = useNavigate();
-  const expirationDate = new Date(new Date().getTime() + 60 * 60 * 1000);
+  const expirationDate = new Date(new Date().getTime() + 120 * 60 * 1000);
 
   const login = async (username, password) => {
     try {
+      setIsLoading(true);
       const res = await axios.post(`${loginUrl}/api/login`, {
         username,
         password,
@@ -32,7 +36,6 @@ export const AuthProvider = ({ children }) => {
           expires: expirationDate,
           path: "/",
         });
-        setIsLoggedIn(true);
         navigate("/home");
         window.location.reload();
       } else {
@@ -40,12 +43,14 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error during login:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = () => {
+    persistStore(store).purge();
     removeCookie("auth-token");
-    setIsLoggedIn(false);
     navigate("/loginsso");
   };
 
@@ -55,17 +60,15 @@ export const AuthProvider = ({ children }) => {
       const jwtDecoded = jwtDecode(cookies["auth-token"]);
       setRoles(jwtDecoded.role);
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-      setIsLoggedIn(true);
     } else {
       delete axios.defaults.headers.common["Authorization"];
       removeCookie("auth-token");
-      setIsLoggedIn(false);
     }
   }, [cookies["auth-token"]]);
 
   const contextValue = useMemo(() => ({
     roles,
-    isLoggedIn,
+    isLoading,
     login,
     logout,
   }));
