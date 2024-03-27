@@ -11,18 +11,22 @@ const Alert = ({ type, message }) => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (error) {
-        localStorage.setItem("errorMessage", error);
-        localStorage.setItem("warningMessage", error);
-        localStorage.setItem("successMessage", error);
-      } else {
-        clearLocalStorage();
-      }
+      clearLocalStorage();
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      localStorage.setItem("errorMessage", error);
+      localStorage.setItem("warningMessage", error);
+      localStorage.setItem("successMessage", error);
+    } else {
+      clearLocalStorage();
+    }
   }, [error]);
 
   return message ? (
@@ -43,5 +47,5 @@ const Alert = ({ type, message }) => {
     </div>
   ) : null;
 };
-//? Baru untuk danger message
+
 export default Alert;

@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
 import Alert from "../components/Alert";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Home = () => {
   const [cookies] = useCookies();
@@ -12,30 +12,30 @@ const Home = () => {
   const statusSidang = null;
   const kaurAkademik = "Edi Sutoyo, S.Kom., M.CompSc.";
   const no_laa = "+6281311997199";
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
 
-  const clearLocalStorage = () => {
-    localStorage.removeItem("errorMessage");
-  };
+  // const clearLocalStorage = () => {
+  //   localStorage.removeItem("errorMessage");
+  // };
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (error) {
-        localStorage.setItem("errorMessage", error);
-      } else {
-        clearLocalStorage();
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  // useEffect(() => {
+  //   const handleBeforeUnload = () => {
+  //     if (error) {
+  //       localStorage.setItem("errorMessage", error);
+  //     } else {
+  //       clearLocalStorage();
+  //     }
+  //   };
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [error]);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [error]);
 
-  useEffect(() => {
-    clearLocalStorage();
-  }, []);
+  // useEffect(() => {
+  //   clearLocalStorage();
+  // }, []);
 
   return (
     <MainLayout>
@@ -43,10 +43,8 @@ const Home = () => {
         <div className="animated fadeIn">
           <div className="row mt-3">
             <div className="col-12">
-              <Alert
-                message={localStorage.getItem("errorMessage")}
-                type="danger"
-              />
+              <Alert type="danger" />
+              <Alert type="warning" />
             </div>
           </div>
           <div className="row">
