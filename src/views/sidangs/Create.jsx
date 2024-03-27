@@ -6,8 +6,8 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../middleware/AuthContext";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchLecturerList } from "../../store/modules/lecturer/action";
-import { createSidang, checkSidang } from "../../store/modules/sidang/action";
+import { fetchLecturer } from "../../store/lecturerSlicer";
+import { createSidang, checkSidang } from "../../store/sidangSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
 
@@ -21,12 +21,12 @@ const getAllStudentAPI =
 const getStatusLog =
   "https://dev-gateway.telkomuniversity.ac.id/d650182722315309a25aa5a43a033303/2324-2"; //2324-2
 const testLocal = "http://127.0.0.1:8000/api";
-const APISOFI = "https://ca07-182-2-46-163.ngrok-free.app/api";
+const APISOFI = "https://a107-182-2-45-149.ngrok-free.app/api";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
-  const { data: dataLecturer } = useSelector((state) => state.lecturer);
-  const { data: dataSidang } = useSelector((state) => state.sidang);
+  const dataLecturer = useSelector((state) => state.lecturer);
+  const dataSidang = useSelector((state) => state.sidang);
 
   const { roles } = useAuth();
   const navigate = useNavigate();
@@ -53,11 +53,11 @@ const SidangCreate = () => {
   const [pembimbing2, setPembimbing2] = useState("");
   const [judul, setJudul] = useState("");
   const form_bimbingan1 =
-    dataStudent.totalguidance_advisor1 === null
+    dataStudent && !dataStudent.totalguidance_advisor1
       ? 0
       : dataStudent.totalguidance_advisor1;
   const form_bimbingan2 =
-    dataStudent.totalguidance_advisor2 === null
+    dataStudent && !dataStudent.totalguidance_advisor2
       ? 0
       : dataStudent.totalguidance_advisor2;
   const [peminatanId, setPeminatanId] = useState(
@@ -83,23 +83,26 @@ const SidangCreate = () => {
     const fetchSidangData = async () => {
       try {
         setIsLoading(true);
-        await dispatch(checkSidang(cookies["auth-token"]));
-
-        dispatch(fetchLecturerList());
+        dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
           `${testLocal}/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
-        // Get Period Now
-        //? const periodNow = await axios.get(`${apiSOFI}/period/check-period`, {
-        //?   headers: {
-        //?     Authorization: "Bearer " + cookies["auth-token"],
-        //?  },
-        //? });
 
+        const resALlPeriods = await axios.get(`${APISOFI}/period/get`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        });
+        setPeriods(resALlPeriods.data.data);
+
+        const dataSidangStudent = await dispatch(
+          checkSidang(cookies["auth-token"])
+        );
+        console.log(dataSidangStudent);
         // Parameter
-
         const resStudentData = await axios.get(
           // `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
           `${getAllStudentAPI}/1202204011`,
@@ -110,7 +113,7 @@ const SidangCreate = () => {
           }
         );
 
-        if (!resStudentData) {
+        if (resStudentData.data.data.length === 0) {
           localStorage.setItem(
             "errorMessage",
             "Anda tidak terdaftar di periode akademik ini"
@@ -126,23 +129,19 @@ const SidangCreate = () => {
             headers: { Authorization: `Bearer ${tokenSSO}` },
           }
         );
-
+        if (resStatusLog.data.data.length === 0) {
+          localStorage.setItem(
+            "errorMessage",
+            "Data anda tidak ditemukan. Silahkan hubungi admin"
+          );
+          navigate("/home");
+        }
         setStatusLog(resStatusLog.data.data[0]);
 
         const resPeminatans = await axios.post(`${testLocal}/peminatans`, {
           kk: resUserInfo.data.data.kk,
         });
-
         setPeminatans(resPeminatans.data.data);
-
-        const resALlPeriods = await axios.get(`${APISOFI}/period/get`, {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        });
-
-        setPeriods(resALlPeriods.data.data);
       } catch (e) {
         localStorage.setItem("errorMessage", "Network Error");
         navigate("/home");
@@ -153,28 +152,20 @@ const SidangCreate = () => {
     };
 
     fetchSidangData();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (dataSidang.data) {
-          if (
-            dataSidang.data.status === "pengajuan" ||
-            dataSidang.data.status === "ditolak oleh admin" ||
-            dataSidang.data.status === "pending"
-          ) {
-            navigate(`/sidangs/${dataSidang.data.id}/edit`);
-          } else {
-            navigate(`/sidangs/${dataSidang.data.id}`);
-          }
-        }
-      } catch (e) {
-        console.error("Erorr fetching data:", e);
+    if (dataSidang.data) {
+      if (
+        dataSidang.data.status === "pengajuan" ||
+        dataSidang.data.status === "ditolak oleh admin" ||
+        dataSidang.data.status === "pending"
+      ) {
+        navigate(`/sidangs/${dataSidang.data.id}/edit`);
+      } else {
+        navigate(`/sidangs/${dataSidang.data.id}`);
       }
-    };
-
-    fetchData();
+    }
   }, [dataSidang]);
 
   function attend2(e) {
@@ -191,7 +182,6 @@ const SidangCreate = () => {
       reverseButtons: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        setIsLoading(true);
         dispatch(
           createSidang({
             nim: jwtDecoded.nim,
@@ -209,7 +199,6 @@ const SidangCreate = () => {
             authToken: cookies["auth-token"],
           })
         );
-        setIsLoading(false);
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -218,7 +207,7 @@ const SidangCreate = () => {
 
   return (
     <MainLayout>
-      {isLoading ? (
+      {isLoading || dataSidang.loading ? (
         <Loading />
       ) : (
         <div>
@@ -347,8 +336,8 @@ const SidangCreate = () => {
                             onChange={(e) => setPembimbing1(e.target.value)}
                           >
                             <option value="">Pilih Pembimbing 1</option>
-                            {dataLecturer &&
-                              dataLecturer.map((data, index) => (
+                            {dataLecturer.data &&
+                              dataLecturer.data.map((data, index) => (
                                 <option key={index} value={data.id}>
                                   {data.code} - {data.user.nama}
                                 </option>
@@ -370,8 +359,8 @@ const SidangCreate = () => {
                             }}
                           >
                             <option value="">Pilih Pembimbing 2</option>
-                            {dataLecturer &&
-                              dataLecturer.map((data, index) => (
+                            {dataLecturer.data &&
+                              dataLecturer.data.map((data, index) => (
                                 <option key={index} value={data.id}>
                                   {data.code} - {data.user.nama}
                                 </option>
@@ -591,7 +580,10 @@ const SidangCreate = () => {
                         )}
 
                         {/* <!-- Submit Field --> */}
-                        <div className="form-group col-sm-12">
+                        <div
+                          className="form-group col-sm-12"
+                          style={{ display: "flex" }}
+                        >
                           <button className="btn btn-primary" onClick={attend2}>
                             Simpan
                           </button>
