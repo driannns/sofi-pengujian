@@ -21,7 +21,8 @@ import { GuidePIC } from "./views/guideBook/PIC";
 import { GuideStudent } from "./views/guideBook/Student";
 
 import PowerPoint from "./views/sidangs/PowerPoint";
-import Teams from "./views/sidangs/Teams";
+import Teams from "./views/sidangs/team/Teams";
+import TeamCreate from "./views/sidangs/team/Create";
 
 const router = (
   <Routes>

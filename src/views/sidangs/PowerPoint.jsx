@@ -1,10 +1,80 @@
 import { MainLayout } from "../layouts/MainLayout";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { checkSidang } from "../../store/sidangSlicer";
+import { useCookies } from "react-cookie";
+const APISOFI = "https://ca07-182-2-46-163.ngrok-free.app/api";
 
 const MateriPresentasi = () => {
+  const { data: dataSidang } = useSelector((state) => state.sidang);
+
   const location = useLocation();
-  const sidang = null;
-  const slide = null;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [cookies] = useCookies();
+  const [docTA, setDocTA] = useState();
+  const [makalah, setMakalah] = useState();
+
+  const handleDocTAChange = (e) => {
+    setDocTA(e.target.files[0]);
+  };
+
+  const handleMakalahChange = (e) => {
+    setDocTA(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await dispatch(checkSidang(cookies["auth-token"]));
+        const res = await axios.get(`${APISOFI}/slide/get-latest-slide`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-warning-browser": true,
+          },
+        });
+      } catch (err) {
+        console.error(err);
+        localStorage.setItem("errorMessage", "Network error");
+        navigate("/home");
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (!dataSidang.data) {
+      localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
+      navigate("/sidangs/create");
+    }
+
+    if (
+      dataSidang.data?.status === "sudah dijadwalkan" ||
+      dataSidang.data?.status === "tidak lulus (sudah dijadwalkan)"
+    ) {
+      localStorage.setItem("warningMessage", "Anda belum mendaftar sidang!");
+      navigate("schedule/mahasiswa");
+    }
+
+    if (
+      dataSidang.data &&
+      !dataSidang.data.status.includes([
+        "telah disetujui admin",
+        "belum dijadwalkan",
+        "tidak lulus",
+        "tidak lulus (sudah update dokumen)",
+        "tidak lulus (belum dijadwalkan)",
+      ])
+    ) {
+      localStorage.setItem(
+        "errorMessage",
+        "Sidang anda belum di approve dosen pembimbing dan admin"
+      );
+      navigate(-1);
+    }
+  }, [dataSidang]);
 
   return (
     <MainLayout>
@@ -30,9 +100,10 @@ const MateriPresentasi = () => {
             </div>
           )}
 
-          {(sidang && sidang?.status === "tidak lulus") ||
-            sidang?.status === "titak lulus (sudah update dokumen)" ||
-            (sidang?.status === "tidak lulus (belum dijadwalkan)" && (
+          {dataSidang.data &&
+            (dataSidang.data.status === "tidak lulus" ||
+              dataSidang.data.status === "titak lulus (sudah update dokumen)" ||
+              dataSidang.data.status === "tidak lulus (belum dijadwalkan)") && (
               <div className="row">
                 <div className="col-lg-12">
                   <div className="card">
@@ -47,7 +118,7 @@ const MateriPresentasi = () => {
                         <input
                           type="text"
                           name="sidang_id"
-                          value="{{ $sidang->id }}"
+                          defaultValue={dataSidang.data && dataSidang.data.id}
                           hidden
                         />
                         <div className="form-group col-sm-6">
@@ -56,17 +127,18 @@ const MateriPresentasi = () => {
                             revisi
                           </p>
                           <div className="form-group">
-                            <label for="">Periode Sidang Ulang</label>
+                            <label htmlFor="">Periode Sidang Ulang</label>
                             {/*{!! Form::select('period_id', $periods, $oldPeriod, ['className' => 'select2
                                     form-control'])!!}*/}
                           </div>
                           <div className="form-group">
-                            <label for="">Dokumen TA Sidang Ulang</label>
+                            <label htmlFor="">Dokumen TA Sidang Ulang</label>
                             <div className="custom-file">
                               <input
                                 type="file"
                                 className="custom-file-input forminput"
                                 name="dokumen_ta"
+                                onChange={handleDocTAChange}
                               />
                               <label className="custom-file-label">
                                 Choose file
@@ -74,12 +146,13 @@ const MateriPresentasi = () => {
                             </div>
                           </div>
                           <div className="form-group">
-                            <label for="">Jurnal Sidang Ulang</label>
+                            <label htmlFor="">Jurnal Sidang Ulang</label>
                             <div className="custom-file">
                               <input
                                 type="file"
                                 className="custom-file-input forminput"
                                 name="makalah"
+                                onChange={handleMakalahChange}
                               />
                               <label className="custom-file-label">
                                 Choose file
@@ -99,7 +172,7 @@ const MateriPresentasi = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            )}
           <div className="row">
             <div className="col-lg-12">
               <div className="card">
@@ -126,12 +199,12 @@ const MateriPresentasi = () => {
                         <input
                           type="text"
                           name="sidang_id"
-                          value="{{ $sidang->id }}"
+                          defaultValue={dataSidang.data && dataSidang.data.id}
                           hidden
                         />
                         <div className="input-group mb-3">
                           <div className="custom-file">
-                            {slide ? (
+                            {true ? (
                               <>
                                 <input
                                   type="file"
@@ -139,7 +212,7 @@ const MateriPresentasi = () => {
                                   name="slide"
                                 />
                                 <label className="custom-file-label">
-                                  {slide.url}
+                                  {/* {slide.url} */}
                                 </label>
                               </>
                             ) : (
@@ -157,7 +230,7 @@ const MateriPresentasi = () => {
                             )}
                           </div>
                         </div>
-                        {slide ? (
+                        {true ? (
                           <div className="row ml-0">
                             <a
                               href="/{{ $slide->file_url }}"
