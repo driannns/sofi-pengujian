@@ -2,7 +2,7 @@ import { MainLayout } from "../layouts/MainLayout";
 import { NavLink } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useSelector, useDispatch } from "react-redux";
-import { checkSidang } from "../../store/modules/sidang/action";
+import { checkSidang } from "../../store/sidangSlicer";
 import { useState, useEffect } from "react";
 import Alert from "../../components/Alert";
 
@@ -59,7 +59,10 @@ const SidangShow = () => {
 
   useEffect(() => {
     const fetchingData = async () => {
-      if (dataSidang.data) {
+      if (!dataSidang.data) {
+        localStorage.setItem("errorMessage", "Sidang Tidak Ada");
+        navigate("/sidangs");
+      } else {
         const resPembimbing1 = await axios.get(
           `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing1_id}`
         );
@@ -75,7 +78,7 @@ const SidangShow = () => {
         );
 
         const resPeriod = await axios.get(
-          `https://ca07-182-2-46-163.ngrok-free.app/api/period/get/${dataSidang.data.period_id}`,
+          `https://a107-182-2-45-149.ngrok-free.app/api/period/get/${dataSidang.data.period_id}`,
           {
             headers: {
               "ngrok-skip-browser-warning": true,
@@ -86,7 +89,7 @@ const SidangShow = () => {
         setPeriod(resPeriod.data.data.name);
 
         const resStatusLog = await axios.get(
-          "https://ca07-182-2-46-163.ngrok-free.app/api/status-log/get",
+          "https://a107-182-2-45-149.ngrok-free.app/api/status-log/get",
           {
             headers: {
               "ngrok-skip-browser-warning": true,
@@ -364,53 +367,82 @@ const SidangShow = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach($status_logs as $log)
-                        <tr>
-                          {/* <td>{{ date('l, d F Y - d:m', strtotime($log->created_at)) }}</td> */}
-                          <td className="text-center">
-                            {/* {{-- {{$log->name}} --}} */}
-
-                            {/* @if ($log->name == 'belum dijadwalkan')
-                                            <span className="badge badge-secondary">Belum Dijadwalkan</span>
-                                          @elseif ($log->name == 'belum dilaksanakan')
-                                            <span className="badge badge-secondary">Belum Dilaksanakan</span>
-                                          @elseif ($log->name == 'belum disetujui admin')
-                                            <span className="badge badge-secondary">Belum Disetujui Admin</span>
-                                          @elseif ($log->name == 'dikembalikan')
-                                            <span className="badge badge-secondary">Dikembalikan</span>
-
-                                          @elseif ($log->name == 'disetujui')
-                                            <span className="badge badge-success">Disetujui</span>
-                                          @elseif ($log->name == 'disetujui oleh pembimbing1')
-                                            <span className="badge badge-success">Disetujui Pembimbing 1</span>
-                                          @elseif ($log->name == 'disetujui oleh pembimbing2')
-                                            <span className="badge badge-success">Disetujui Pembimbing 2</span>
-                                          @elseif ($log->name == 'sudah dijadwalkan')
-                                            <span className="badge badge-success">Dijadwalkan</span>
-                                          @elseif ($log->name == 'telah disetujui admin')
-                                            <span className="badge badge-success">Disetujui Admin</span>
-
-                                          @elseif ($log->name == 'pengajuan')
-                                            <span className="badge badge-warning">Pengajuan</span>
-                                          @elseif ($log->name == 'perbaikan berkas ke admin')
-                                            <span className="badge badge-warning">Perbaikan Berkas Ke Admin</span>
-                                          @elseif ($log->name == 'sedang dikerjakan')
-                                            <span className="badge badge-warning">Sedang Dikerjakan</span>
-                                          @elseif ($log->name == 'sedang dilaksanakan')
-                                            <span className="badge badge-warning">Sedang Dilaksanakan</span>
-
-                                          @elseif ($log->name == 'lulus')
-                                            <span className="badge badge-primary">Lulus</span>
-
-                                          @elseif ($log->name == 'ditolak oleh admin')
-                                            <span className="badge danger">Ditolak Admin</span>
-
-                                          @endif */}
-                          </td>
-                          {/* <td>{{$log->feedback}}</td> */}
-                          {/* <td>{{$log->user->username}}</td> */}
-                        </tr>
-                        @endforeach
+                        {statusLog &&
+                          statusLog.map((value, index) => (
+                            <tr key={index}>
+                              <td>{formatDate(value.created_at)}</td>
+                              <td className="text-center">
+                                {value.name === "belum dijadwalkan" ? (
+                                  <span className="badge badge-secondary">
+                                    Belum Dijadwalkan
+                                  </span>
+                                ) : value.name === "belum dilaksanakan" ? (
+                                  <span className="badge badge-secondary">
+                                    Belum Dilaksanakan
+                                  </span>
+                                ) : value.name === "belum disetujui admin" ? (
+                                  <span className="badge badge-secondary">
+                                    Belum Disetujui Admin
+                                  </span>
+                                ) : value.name === "dikembalikan" ? (
+                                  <span className="badge badge-secondary">
+                                    Dikembalikan
+                                  </span>
+                                ) : value.name === "disetujui" ? (
+                                  <span className="badge badge-success">
+                                    Disetujui
+                                  </span>
+                                ) : value.name ===
+                                  "disetujui oleh pembimbing1" ? (
+                                  <span className="badge badge-success">
+                                    Disetujui Pembimbing 1
+                                  </span>
+                                ) : value.name ===
+                                  "disetujui oleh pembimbing2" ? (
+                                  <span className="badge badge-success">
+                                    Disetujui Pembimbing 2
+                                  </span>
+                                ) : value.name === "sudah dijadwalkan" ? (
+                                  <span className="badge badge-success">
+                                    Dijadwalkan
+                                  </span>
+                                ) : value.name === "telah disetujui admin" ? (
+                                  <span className="badge badge-success">
+                                    Disetujui Admin
+                                  </span>
+                                ) : value.name === "pengajuan" ? (
+                                  <span className="badge badge-warning">
+                                    Pengajuan
+                                  </span>
+                                ) : value.name ===
+                                  "perbaikan berkas ke admin" ? (
+                                  <span className="badge badge-warning">
+                                    Perbaikan Berkas Ke Admin
+                                  </span>
+                                ) : value.name === "sedang dikerjakan" ? (
+                                  <span className="badge badge-warning">
+                                    Sedang Dikerjakan
+                                  </span>
+                                ) : value.name === "sedang dilaksanakan" ? (
+                                  <span className="badge badge-warning">
+                                    Sedang Dilaksanakan
+                                  </span>
+                                ) : value.name === "lulus" ? (
+                                  <span className="badge badge-primary">
+                                    Lulus
+                                  </span>
+                                ) : value.name === "ditolak oleh admin" ? (
+                                  <span className="badge danger">
+                                    Ditolak Admin
+                                  </span>
+                                ) : (
+                                  value.name
+                                )}
+                              </td>
+                              <td>{value.feedback}</td>
+                              <td>{value.username}</td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
