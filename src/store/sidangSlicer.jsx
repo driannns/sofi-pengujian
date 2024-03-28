@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-const APIURL = "https://a107-182-2-45-149.ngrok-free.app/api";
+const APIURL = "https://6f73-180-253-71-196.ngrok-free.app/api";
 
 export const getAllSidang = createAsyncThunk("getAllSidang", async () => {
   try {
@@ -56,9 +56,14 @@ export const createSidang = createAsyncThunk(
           "ngrok-skip-browser-warning": true,
         },
       });
+      localStorage.setItem("successMessage", "Sidang Berhasil Disimpan.");
       return res.data.data;
     } catch (error) {
-      throw error.response.data.message;
+      if (error.response.data.message) {
+        localStorage.setItem("errorMessage", error.response.data.message);
+        throw error.response.data.message;
+      }
+      console.log(error.response);
     }
   }
 );
@@ -108,9 +113,14 @@ export const updateSidang = createAsyncThunk(
           },
         }
       );
+      localStorage.setItem("successMessage", "Sidang berhasil diedit");
       return res.data.data;
     } catch (error) {
-      throw error;
+      if (error.response.data.message) {
+        localStorage.setItem("errorMessage", error.response.data.message);
+        throw error.response.data.message;
+      }
+      console.log(error.response);
     }
   }
 );
@@ -160,6 +170,7 @@ const sidangSlice = createSlice({
     builder.addCase(createSidang.fulfilled, (state, action) => {
       state.loading = false;
       state.data = action.payload;
+      state.error = null;
     });
     builder.addCase(createSidang.rejected, (state, action) => {
       state.loading = false;
@@ -172,6 +183,7 @@ const sidangSlice = createSlice({
     builder.addCase(updateSidang.fulfilled, (state, action) => {
       state.loading = false;
       state.data = action.payload;
+      state.error = null;
     });
     builder.addCase(updateSidang.rejected, (state, action) => {
       state.loading = false;
