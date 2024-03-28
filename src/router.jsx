@@ -64,10 +64,20 @@ const router = (
       <Route path="/studyPrograms/:id" element={<StudyProgramShow />} />
     </Route>
 
+    {/* Guide Book */}
     <Route element={<PrivateRoutes role={["RLADM"]} />}>
       <Route path="/guide-book-admin" element={<GuideAdmin />} />
       <Route path="/guide-book-PIC" element={<GuidePIC />} />
       <Route path="/guide-book-pembimbing" element={<GuideDosen />} />
+      <Route path="/guide-book-student" element={<GuideStudent />} />
+    </Route>
+    <Route element={<PrivateRoutes role={["RLPIC"]} />}>
+      <Route path="/guide-book-PIC" element={<GuidePIC />} />
+    </Route>
+    <Route element={<PrivateRoutes role={["RLDSN"]} />}>
+      <Route path="/guide-book-pembimbing" element={<GuideDosen />} />
+    </Route>
+    <Route element={<PrivateRoutes role={["RLMHS"]} />}>
       <Route path="/guide-book-student" element={<GuideStudent />} />
     </Route>
     <Route path="*" element={<p>404 Error - Nothing here...</p>} />
