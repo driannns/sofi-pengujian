@@ -6,8 +6,10 @@ import { checkSidang } from "../../../store/sidangSlicer";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 
+const APISOFI = "https://6f73-180-253-71-196.ngrok-free.app/api";
+
 const Teams = () => {
-  const { data: dataSidang } = useSelector((state) => state.sidang);
+  const dataSidang = useSelector((state) => state.sidang);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [cookies] = useCookies();
@@ -18,26 +20,29 @@ const Teams = () => {
   useEffect(() => {
     const fetchSidangData = async () => {
       try {
-        await dispatch(checkSidang(cookies["auth-token"]));
-        if (!dataSidang.data) {
+        const dataSidangStudent = await dispatch(
+          checkSidang(cookies["auth-token"])
+        );
+        if (!dataSidangStudent.payload) {
           localStorage.setItem(
             "errorMessage",
             "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
           );
+          navigate(-1);
         }
 
         if (
-          dataSidang.data.status === "sudah dijadwalkan" ||
-          dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
+          dataSidangStudent.payload.status === "sudah dijadwalkan" ||
+          dataSidangStudent.payload.status === "tidak lulus (sudah dijadwalkan)"
         ) {
           localStorage.setItem(
             "errorMessage",
             "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
           );
-          navigate("/schedule/mahasiswa");
+          navigate("/schedule/mahasiswa"); //?Belum dibuat
         }
 
-        if (dataSidang.data.status === "tidak lulus") {
+        if (dataSidangStudent.payload.status === "tidak lulus") {
           localStorage.setItem(
             "errorMessage",
             "Silahkan update berkas sidang ulang dan slide!"
@@ -46,7 +51,7 @@ const Teams = () => {
         }
 
         if (
-          !dataSidang.data.status.includes([
+          !dataSidangStudent.payload.status.includes([
             "telah disetujui admin",
             "belum dijadwalkan",
             "tidak lulus (sudah update dokumen)",
@@ -56,18 +61,15 @@ const Teams = () => {
           localStorage.setItem(
             "Sidang anda belum di approve dosen pembimbing dan admin"
           );
-          navigate(`/sidangs/edit/${dataSidang.data.id}`);
+          navigate(`/sidangs/edit/${dataSidangStudent.payload.id}`);
         }
 
-        const resSlide = axios.get(
-          "{{sofi_golang}}/api/slide/get-latest-slide",
-          {
-            headers: {
-              "ngrok-skip-browser-warning": true,
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
+        const resSlide = axios.get(`${APISOFI}/slide/get-latest-slide`, {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        });
         console.log(resSlide.data);
 
         if (!resSlide.data) {
@@ -84,22 +86,26 @@ const Teams = () => {
         setUserInfo(resUserInfo.data.data);
 
         if (userInfo.team_id !== 0) {
-          if (dataSidang.data.status === "tidak lulus (sudah update dokumen)") {
+          if (
+            dataSidangStudent.payload.status ===
+            "tidak lulus (sudah update dokumen)"
+          ) {
             navigate("/teams/create");
           }
         } else {
           navigate("/teams/create");
         }
 
-        const resTeam = axios.get("{{sofi_golang}}/api/team/get-team", {
+        const resTeam = axios.get(`${APISOFI}/team/get-team`, {
           headers: {
             "ngrok-skip-browser-warning": true,
             Authorization: `Bearer ${cookies["auth-token"]}`,
           },
         });
-        console.log(resTeam);
+        console.log(resTeam.data);
 
         const resMembers = axios.get(
+          //?Masih bingung disini
           `http://127.0.0.1:8000/api/team/get-member/${userInfo.team_id}`
         );
 
@@ -108,7 +114,7 @@ const Teams = () => {
         );
 
         console.log(resMembers);
-        console.log(resNonMembers);
+        console.log(resNonMembers); //?Masih bingung disini
       } catch (err) {
         console.error(err);
       }
@@ -130,14 +136,6 @@ const Teams = () => {
                 BERANDA
               </Link>{" "}
               / TIM
-              {/* {{-- @if(!$isIndividu && !$isSudahDijadwalkan)
-              <a className="ml-2" href="{{ url('/teams/'.$team->id.'/edit') }}">
-                <i className="fa fa-edit fa-lg"></i>
-              </a>
-              <a className="ml-2" href="{{ url('/create-member') }}">
-                <i className="fa fa-plus-square fa-lg"></i>
-              </a>
-              @endif --}} */}
             </h6>
           </div>
         </ol>
@@ -156,7 +154,6 @@ const Teams = () => {
                       {/* {{ strtoupper($team->name) }} */}
                     </span>
                     {/* @if(!$isIndividu && !$isSudahDijadwalkan)
-
                         <button className="pull-right btn btn-primary btn-sm" data-toggle="modal"
                             data-target="#modaltambah">TAMBAH ANGGOTA</button>
                         <button className="pull-right mr-2 btn btn-primary btn-sm" data-toggle="modal"
@@ -192,10 +189,10 @@ const Teams = () => {
                   {/* <!-- Name Field --> */}
                   <div className="form-group col-8">
                     {/* {!! Form::label('nim', 'NIM Anggota Tim:') !!} */}
+                    <label htmlFor="nim">NIM Anggota Tim:</label>
                     <select className="form-control select2" name="nim">
                       <option value="" readonly>
-                        {" "}
-                        -- Silahkan pilih nama anggota --{" "}
+                        -- Silahkan pilih nama anggota --
                       </option>
                       {/* @foreach($students as $student) */}
                       <option value="{{ $student->nim }}">
@@ -207,7 +204,9 @@ const Teams = () => {
                 </div>
                 {/* <!-- Modal footer --> */}
                 <div className="modal-footer">
-                  {/* {!! Form::submit('Tambah', ['class' => 'btn btn-primary']) !!} */}
+                  <button type="submit" className="btn btn-primary">
+                    Tambah
+                  </button>
                   <button data-dismiss="modal" className="btn btn-secondary">
                     Batal
                   </button>
@@ -229,22 +228,32 @@ const Teams = () => {
                 </button>
               </div>
               {/* {!! Form::model($team, ['route' => ['teams.update', $team->id], 'method' => 'patch']) !!} */}
-              {/* <!-- Modal body --> */}
-              <div className="modal-body">
-                {/* <!-- Name Field --> */}
-                <div className="form-group">
-                  {/* {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => 'Masukan Nama Kelompok']) */}
-                  {/* !!} */}
+              <form>
+                {/* <!-- Modal body --> */}
+                <div className="modal-body">
+                  {/* <!-- Name Field --> */}
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      className="form-control"
+                      placeholder="Masukkan Nama Kelompok"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* <!-- Modal footer --> */}
-              <div className="modal-footer">
-                {/* {!! Form::submit('Simpan', ['class' => 'btn btn-primary']) !!} */}
-                <button data-dismiss="modal" className="btn btn-secondary">
-                  Batal
-                </button>
-              </div>
+                {/* <!-- Modal footer --> */}
+                <div className="modal-footer">
+                  {/* {!! Form::submit('Simpan', ['class' => 'btn btn-primary']) !!} */}
+                  <button type="submit" className="btn btn-primary">
+                    Simpan
+                  </button>
+                  <button data-dismiss="modal" className="btn btn-secondary">
+                    Batal
+                  </button>
+                </div>
+              </form>
               {/* {!! Form::close() !!} */}
             </div>
           </div>

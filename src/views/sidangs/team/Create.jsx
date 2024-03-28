@@ -16,11 +16,6 @@ const TeamCreate = () => {
         </div>
       </ol>
       {/* @include('flash::message') */}
-
-      {/* {{-- <li className="breadcrumb-item">
-         <a href="{!! route('teams.index') !!}">Team</a>
-      </li>
-      <li className="breadcrumb-item active">Create</li> --}} */}
       <div className="container-fluid">
         <div className="animated fadeIn">
           {/* {{-- @include('flash::message') --}} */}
@@ -84,11 +79,9 @@ const TeamCreate = () => {
                         </div>
                         <div className="modal-body text-center">
                           <form
-                            className=""
-                            action="{{ route('teams.individu') }}"
-                            method="post"
+                          // action="{{ route('teams.individu') }}"
+                          // method="post"
                           >
-                            {/* @csrf */}
                             <h5>
                               Apa anda yakin untuk memilih Sidang Individu?
                             </h5>
@@ -123,9 +116,31 @@ const TeamCreate = () => {
                     className="fa fa-users mb-4 mt-3"
                     style="font-size: 80px"
                   ></i>
-                  {/* {!! Form::open(['route' => 'teams.store']) !!}
+                  <form>
+                    {/* {!! Form::open(['route' => 'teams.store']) !!}
                         @include('teams.fields')
-                        {!! Form::close() !!} */}
+                      {!! Form::close() !!} */}
+                    {/* <!-- Name Field --> */}
+                    <div className="form-group">
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Masukkan Nama Kelompok"
+                        className="form-control"
+                      />
+                    </div>
+
+                    {/* <!-- Submit Field --> */}
+                    <div className="form-group col-sm-12">
+                      <button type="submit" className="btn btn-primary">
+                        Simpan
+                      </button>
+                      <Link to="/teams" className="btn btn-secondary">
+                        Batal
+                      </Link>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
