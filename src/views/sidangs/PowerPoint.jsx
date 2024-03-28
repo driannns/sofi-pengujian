@@ -6,7 +6,7 @@ import { checkSidang } from "../../store/sidangSlicer";
 import { useCookies } from "react-cookie";
 import Alert from "../../components/Alert";
 
-const APISOFI = "https://6f73-180-253-71-196.ngrok-free.app";
+const APISOFI = "https://5490-180-253-71-196.ngrok-free.app";
 
 const MateriPresentasi = () => {
   const dataSidang = useSelector((state) => state.sidang);
@@ -34,15 +34,16 @@ const MateriPresentasi = () => {
         const dataSidangStudent = await dispatch(
           checkSidang(cookies["auth-token"])
         );
-
-        if (!dataSidangStudent.payload) {
-          localStorage.setItem("errorMessae", "Anda belum mendaftar sidang!");
+        console.log(dataSidangStudent.payload);
+        console.log(dataSidang.data);
+        if (!dataSidang.data) {
+          localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
           navigate(-1);
         }
 
         if (
-          dataSidangStudent.payload.status === "sudah dijadwalkan" ||
-          dataSidangStudent.payload.status === "tidak lulus (sudah dijadwalkan)"
+          dataSidang.data.status === "sudah dijadwalkan" ||
+          dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
         ) {
           localStorage.setItem(
             "warningMessage",
@@ -52,7 +53,7 @@ const MateriPresentasi = () => {
         }
 
         if (
-          !dataSidangStudent.payload.status.includes([
+          !dataSidang.data.status.includes([
             "telah disetujui admin",
             "belum dijadwalkan",
             "tidak lulus",
@@ -70,17 +71,17 @@ const MateriPresentasi = () => {
         const res = await axios.get(`${APISOFI}/api/slide/get-latest-slide`, {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-warning-browser": true,
+            "ngrok-skip-browser-warning": true,
           },
         });
 
-        console.log(res);
+        console.log(res.data);
         setSlide(res.data);
 
-        if (dataSidangStudent.payload.status === "tidak lulus") {
-          setOldPeriod(dataSidangStudent.payload.period_id);
+        if (dataSidang.data.status === "tidak lulus") {
+          setOldPeriod(dataSidang.data.period_id);
           const resPeriodNow = await axios.get(
-            `${APISOFI}/api/period/get/${dataSidangStudent.payload.period_id}`,
+            `${APISOFI}/api/period/get/${dataSidang.data.period_id}`,
             {
               headers: {
                 Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -90,10 +91,11 @@ const MateriPresentasi = () => {
           );
           setPeriodNow(resPeriodNow.data);
         }
-      } catch (err) {
-        localStorage.setItem("errorMessage", "Network error");
-        // navigate("/home");
-        navigate(-1);
+      } catch (error) {
+        if (!error.response && error.response.status === 404) {
+          localStorage.setItem("errorMessage", "Network error");
+          navigate(-1);
+        }
       }
     };
 

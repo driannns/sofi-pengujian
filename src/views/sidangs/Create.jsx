@@ -21,14 +21,13 @@ const getAllStudentAPI =
 const getStatusLog =
   "https://dev-gateway.telkomuniversity.ac.id/d650182722315309a25aa5a43a033303/2324-2"; //2324-2
 const testLocal = "http://127.0.0.1:8000/api";
-const APISOFI = "https://6f73-180-253-71-196.ngrok-free.app/api";
+const APISOFI = "https://5490-180-253-71-196.ngrok-free.app/api";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
 
-  const { roles } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,14 +100,12 @@ const SidangCreate = () => {
         const dataSidangStudent = await dispatch(
           checkSidang(cookies["auth-token"])
         );
-        console.log(dataSidangStudent);
+
         if (dataSidangStudent.payload) {
           if (
-            dataSidangStudent.payload.status.include([
-              "pengajuan",
-              "ditolak oleh admin",
-              "pending",
-            ])
+            dataSidangStudent.payload.status === "pengajuan" ||
+            dataSidangStudent.payload.status === "ditolak oleh admin" ||
+            dataSidangStudent.payload.status === "pending"
           ) {
             navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
           } else {
@@ -274,9 +271,11 @@ const SidangCreate = () => {
 
                         {/* <!-- Period Id Field --> */}
                         <div className="form-group col-sm-12">
-                          <label htmlFor="period_id">Peiod Sidang: </label>
-                          {roles &&
-                          roles.find((role) => !["RLADM"].includes(role)) ? (
+                          <label htmlFor="period_id">Period Sidang: </label>
+                          {jwtDecoded.role &&
+                          jwtDecoded.role.find(
+                            (role) => !["RLADM"].includes(role)
+                          ) ? (
                             <select
                               name="period_id"
                               id="period_id"
@@ -505,8 +504,10 @@ const SidangCreate = () => {
                           />
                         </div>
 
-                        {roles &&
-                        roles.find((role) => !["RLADM"].includes(role)) ? (
+                        {jwtDecoded.role &&
+                        jwtDecoded.role.find(
+                          (role) => !["RLADM"].includes(role)
+                        ) ? (
                           <>
                             {/* <!-- Dokumen Ta Field --> */}
                             <div className="form-group col-sm-12">

@@ -16,13 +16,11 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const testLocal = "http://127.0.0.1:8000/api";
-const APISOFI = "https://6f73-180-253-71-196.ngrok-free.app";
+const APISOFI = "https://5490-180-253-71-196.ngrok-free.app";
 const SidangEdit = () => {
   const dispatch = useDispatch();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-
-  const { roles } = useAuth();
   const navigate = useNavigate();
   const params = useParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +38,7 @@ const SidangEdit = () => {
     "tidak lulus": "Tidak Lulus",
     "reset status": "Reset Status",
   };
-  console.log(dataSidang.data);
+
   // console.log(dataSidang.data);
   const [periodId, setPeriodId] = useState(
     dataSidang.data && dataSidang.data.period_id
@@ -116,7 +114,7 @@ const SidangEdit = () => {
         const dataSidangStudent = await dispatch(
           checkSidang(cookies["auth-token"])
         );
-        dispatch(fetchLecturer());
+        await dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
           `${testLocal}/student/${jwtDecoded.id}`
@@ -129,9 +127,9 @@ const SidangEdit = () => {
         });
         setPeminatans(resPeminatans.data.data);
 
-        if (!roles.find((role) => !["RLADM"].includes(role))) {
+        if (jwtDecoded.role.find((role) => !["RLADM"].includes(role))) {
           const resStatusLog = await axios.get(
-            "https://6f73-180-253-71-196.ngrok-free.app/api/status-log/get",
+            "https://5490-180-253-71-196.ngrok-free.app/api/status-log/get",
             {
               headers: {
                 "ngrok-skip-browser-warning": true,
@@ -142,7 +140,7 @@ const SidangEdit = () => {
           setStatusLog(resStatusLog.data.data);
         } else {
           const resStatusLog = await axios.get(
-            "https://6f73-180-253-71-196.ngrok-free.app/api/status-log/get",
+            "https://5490-180-253-71-196.ngrok-free.app/api/status-log/get",
             {
               headers: {
                 "ngrok-skip-browser-warning": true,
@@ -161,7 +159,9 @@ const SidangEdit = () => {
           },
         });
         setPeriods(resALlPeriods.data.data);
-
+        console.log(dataSidangStudent.payload);
+        console.log(dataSidang.data);
+        return null;
         if (!dataSidangStudent.payload) {
           localStorage.setItem("errorMessage", "Sidang Tidak Ada");
           navigate("/sidangs");
@@ -170,6 +170,7 @@ const SidangEdit = () => {
         if (params.id != dataSidangStudent.payload.id) {
           navigate("/home"); //? dicek lgi
         }
+
         if (
           !["pengajuan", "ditolak oleh admin", "pending"].includes(
             dataSidangStudent.payload.status
@@ -282,8 +283,10 @@ const SidangEdit = () => {
                       <label htmlFor="period_id">Period Sidang: </label>
                       {isLoading ? (
                         <Skeleton height={30} />
-                      ) : roles &&
-                        roles.find((role) => !["RLADM"].includes(role)) ? (
+                      ) : jwtDecoded.role &&
+                        jwtDecoded.role.find(
+                          (role) => !["RLADM"].includes(role)
+                        ) ? (
                         <select
                           name="period_id"
                           id="period_id"
@@ -361,8 +364,8 @@ const SidangEdit = () => {
                           onChange={(e) => setPembimbing1(e.target.value)}
                         >
                           <option value="">Pilih Pembimbing 1</option>
-                          {dataLecturer.data &&
-                            dataLecturer.data.map((data, index) => (
+                          {dataLecturer.payload &&
+                            dataLecturer.payload.map((data, index) => (
                               <option key={index} value={data.id}>
                                 {data.code} - {data.user.nama}
                               </option>
@@ -388,8 +391,8 @@ const SidangEdit = () => {
                           }}
                         >
                           <option value="">Pilih Pembimbing 2</option>
-                          {dataLecturer.data &&
-                            dataLecturer.data.map((data, index) => (
+                          {dataLecturer.payload &&
+                            dataLecturer.payload.map((data, index) => (
                               <option key={index} value={data.id}>
                                 {data.code} - {data.user.nama}
                               </option>
@@ -528,8 +531,10 @@ const SidangEdit = () => {
                       />
                     </div>
 
-                    {roles &&
-                    roles.find((role) => !["RLADM"].includes(role)) ? (
+                    {jwtDecoded.role &&
+                    jwtDecoded.role.find(
+                      (role) => !["RLADM"].includes(role)
+                    ) ? (
                       <>
                         {/* <!-- Dokumen Ta Field --> */}
                         <div className="form-group col-sm-12">

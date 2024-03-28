@@ -6,8 +6,8 @@ import { checkSidang } from "../../../store/sidangSlicer";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 
-const APISOFI = "https://6f73-180-253-71-196.ngrok-free.app/api";
-
+const APISOFI = "https://5490-180-253-71-196.ngrok-free.app/api";
+const testLocal = "http://127.0.0.1:8000/api";
 const Teams = () => {
   const dataSidang = useSelector((state) => state.sidang);
   const dispatch = useDispatch();
@@ -23,12 +23,13 @@ const Teams = () => {
         const dataSidangStudent = await dispatch(
           checkSidang(cookies["auth-token"])
         );
+
         if (!dataSidangStudent.payload) {
           localStorage.setItem(
             "errorMessage",
             "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
           );
-          navigate(-1);
+          // navigate(-1);
         }
 
         if (
@@ -39,7 +40,7 @@ const Teams = () => {
             "errorMessage",
             "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
           );
-          navigate("/schedule/mahasiswa"); //?Belum dibuat
+          // navigate("/schedule/mahasiswa"); //?Belum dibuat
         }
 
         if (dataSidangStudent.payload.status === "tidak lulus") {
@@ -47,7 +48,7 @@ const Teams = () => {
             "errorMessage",
             "Silahkan update berkas sidang ulang dan slide!"
           );
-          navigate("/slides");
+          // navigate("/slides");
         }
 
         if (
@@ -59,9 +60,10 @@ const Teams = () => {
           ])
         ) {
           localStorage.setItem(
+            "errorMessage",
             "Sidang anda belum di approve dosen pembimbing dan admin"
           );
-          navigate(`/sidangs/edit/${dataSidangStudent.payload.id}`);
+          // navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
         }
 
         const resSlide = axios.get(`${APISOFI}/slide/get-latest-slide`, {
@@ -70,59 +72,60 @@ const Teams = () => {
             Authorization: `Bearer ${cookies["auth-token"]}`,
           },
         });
-        console.log(resSlide.data);
 
         if (!resSlide.data) {
           localStorage.setItem(
             "errorMessage",
             "Anda harus mengupload berkas presentasi terlebih dahulu!"
           );
-          navigate("/slides");
+          // navigate("/slides");
         }
 
         const resUserInfo = await axios.get(
           `${testLocal}/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
+        console.log(resUserInfo.data.data.team_id !== 0);
 
-        if (userInfo.team_id !== 0) {
+        if (resUserInfo.data.data.team_id !== 0) {
           if (
             dataSidangStudent.payload.status ===
             "tidak lulus (sudah update dokumen)"
           ) {
-            navigate("/teams/create");
+            // navigate("/teams/create");
           }
         } else {
-          navigate("/teams/create");
+          // navigate("/teams/create");
         }
 
-        const resTeam = axios.get(`${APISOFI}/team/get-team`, {
+        const resTeam = await axios.get(`${APISOFI}/team/get-team`, {
           headers: {
             "ngrok-skip-browser-warning": true,
             Authorization: `Bearer ${cookies["auth-token"]}`,
           },
         });
-        console.log(resTeam.data);
-
-        const resMembers = axios.get(
-          //?Masih bingung disini
-          `http://127.0.0.1:8000/api/team/get-member/${userInfo.team_id}`
+        console.log(resTeam);
+        console.log("jalan");
+        const resMembers = await axios.get(
+          `http://127.0.0.1:8000/api/team/get-member/3`
         );
 
-        const resNonMembers = axios.get(
-          `http://127.0.0.1:8000/api/team/get-nonmember`
+        const resNonMembers = await axios.get(
+          "http://127.0.0.1:8000/api/team/get-nonmember"
         );
 
         console.log(resMembers);
         console.log(resNonMembers); //?Masih bingung disini
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        if (!error.response && error.response.status === 404) {
+          localStorage.setItem("errorMessage", "Network error");
+          navigate(-1);
+        }
+        console.error(error);
       }
     };
     fetchSidangData();
   }, []);
-
-  useEffect(() => {}, [dataSidang]);
 
   return (
     <MainLayout>
@@ -191,7 +194,7 @@ const Teams = () => {
                     {/* {!! Form::label('nim', 'NIM Anggota Tim:') !!} */}
                     <label htmlFor="nim">NIM Anggota Tim:</label>
                     <select className="form-control select2" name="nim">
-                      <option value="" readonly>
+                      <option value="" readOnly>
                         -- Silahkan pilih nama anggota --
                       </option>
                       {/* @foreach($students as $student) */}
