@@ -9,8 +9,6 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { persistStore } from "redux-persist";
-import { store } from "../store/store";
 
 const loginUrl = "https://sofi.my.id";
 
@@ -49,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    persistStore(store).purge();
+    localStorage.removeItem("persist:root");
     removeCookie("auth-token");
     navigate("/loginsso");
   };
@@ -62,6 +60,7 @@ export const AuthProvider = ({ children }) => {
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
     } else {
       delete axios.defaults.headers.common["Authorization"];
+      localStorage.removeItem("persist:root");
       removeCookie("auth-token");
     }
   }, [cookies["auth-token"]]);
