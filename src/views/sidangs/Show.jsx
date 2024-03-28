@@ -54,51 +54,54 @@ const SidangShow = () => {
   };
 
   useEffect(() => {
-    dispatch(checkSidang(cookies["auth-token"]));
+    const fetchDataSidang = async () => {
+      const dataSidangStudent = await dispatch(
+        checkSidang(cookies["auth-token"])
+      );
+      if (!dataSidangStudent.payload) {
+        localStorage.setItem("errorMessage", "Sidang Tidak Ada");
+        navigate("/sidangs");
+      }
+    };
   }, []);
 
   useEffect(() => {
     const fetchingData = async () => {
-      if (!dataSidang.data) {
-        localStorage.setItem("errorMessage", "Sidang Tidak Ada");
-        navigate("/sidangs");
-      } else {
-        const resPembimbing1 = await axios.get(
-          `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing1_id}`
-        );
-        setPembimbing1(
-          `${resPembimbing1.data.data.code} - ${resPembimbing1.data.data.user.nama}`
-        );
+      const resPembimbing1 = await axios.get(
+        `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing1_id}`
+      );
+      setPembimbing1(
+        `${resPembimbing1.data.data.code} - ${resPembimbing1.data.data.user.nama}`
+      );
 
-        const resPembimbing2 = await axios.get(
-          `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing2_id}`
-        );
-        setPembimbing2(
-          `${resPembimbing2.data.data.code} - ${resPembimbing2.data.data.user.nama}`
-        );
+      const resPembimbing2 = await axios.get(
+        `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing2_id}`
+      );
+      setPembimbing2(
+        `${resPembimbing2.data.data.code} - ${resPembimbing2.data.data.user.nama}`
+      );
 
-        const resPeriod = await axios.get(
-          `https://a107-182-2-45-149.ngrok-free.app/api/period/get/${dataSidang.data.period_id}`,
-          {
-            headers: {
-              "ngrok-skip-browser-warning": true,
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
-        setPeriod(resPeriod.data.data.name);
+      const resPeriod = await axios.get(
+        `https://6f73-180-253-71-196.ngrok-free.app/api/period/get/${dataSidang.data.period_id}`,
+        {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        }
+      );
+      setPeriod(resPeriod.data.data.name);
 
-        const resStatusLog = await axios.get(
-          "https://a107-182-2-45-149.ngrok-free.app/api/status-log/get",
-          {
-            headers: {
-              "ngrok-skip-browser-warning": true,
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
-        setStatusLog(resStatusLog.data.data);
-      }
+      const resStatusLog = await axios.get(
+        "https://6f73-180-253-71-196.ngrok-free.app/api/status-log/get",
+        {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        }
+      );
+      setStatusLog(resStatusLog.data.data);
     };
 
     fetchingData();

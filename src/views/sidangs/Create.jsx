@@ -21,7 +21,7 @@ const getAllStudentAPI =
 const getStatusLog =
   "https://dev-gateway.telkomuniversity.ac.id/d650182722315309a25aa5a43a033303/2324-2"; //2324-2
 const testLocal = "http://127.0.0.1:8000/api";
-const APISOFI = "https://a107-182-2-45-149.ngrok-free.app/api";
+const APISOFI = "https://6f73-180-253-71-196.ngrok-free.app/api";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
@@ -102,7 +102,22 @@ const SidangCreate = () => {
           checkSidang(cookies["auth-token"])
         );
         console.log(dataSidangStudent);
-        // Parameter
+        if (dataSidangStudent.payload) {
+          if (
+            dataSidangStudent.payload.status.include([
+              "pengajuan",
+              "ditolak oleh admin",
+              "pending",
+            ])
+          ) {
+            navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
+          } else {
+            navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+          }
+        }
+
+        //? Parameter
+
         const resStudentData = await axios.get(
           // `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
           `${getAllStudentAPI}/1202204011`,
@@ -129,6 +144,7 @@ const SidangCreate = () => {
             headers: { Authorization: `Bearer ${tokenSSO}` },
           }
         );
+
         if (resStatusLog.data.data.length === 0) {
           localStorage.setItem(
             "errorMessage",
@@ -227,12 +243,7 @@ const SidangCreate = () => {
           <div className="container-fluid">
             <div className="animated fadeIn">
               {/* @include('coreui-templates::common.errors') */}
-              {sessionStorage.getItem("errorMessage") && (
-                <Alert
-                  message={sessionStorage.getItem("errorMessage")}
-                  type="danger"
-                />
-              )}
+              <Alert type="danger" />
               <Alert
                 type="warning"
                 message=" Pastikan data dibawah sudah benar, terutama status approval. Jika
