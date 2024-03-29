@@ -6,6 +6,7 @@ import Home from "./views/Home";
 import Login from "./views/auth/Login";
 import LoginSSO from "./views/auth/LoginSSO";
 
+import SidangIndex from "./views/sidangs/Index";
 import SidangShow from "./views/sidangs/Show";
 import SidangCreate from "./views/sidangs/Create";
 import SidangEdit from "./views/sidangs/Edit";
@@ -28,10 +29,12 @@ const router = (
   <Routes>
     {/* Public Routes */}
     <Route path="/" element={<Welcome />} />
-    <Route path="/login" element={<Login />} />
-    <Route path="/loginsso" element={<LoginSSO />} />
 
     {/* Auth Routes */}
+    <Route path="/login" element={<Login />} />
+    <Route path="/loginsso" element={<LoginSSO />} />
+    <Route element={<PrivateRoutes />}></Route>
+
     <Route
       element={
         <PrivateRoutes
@@ -44,6 +47,7 @@ const router = (
 
     {/* RLMHS Routes */}
     <Route element={<PrivateRoutes role={["RLMHS", "RLADM"]} />}>
+      <Route path="/sidangs" element={<SidangIndex />} />
       <Route path="/sidangs/create" element={<SidangCreate />} />
       <Route path="/sidangs/:id/edit" element={<SidangEdit />} />
       <Route path="/slides" element={<PowerPoint />} />
@@ -67,17 +71,14 @@ const router = (
     {/* Guide Book */}
     <Route element={<PrivateRoutes role={["RLADM"]} />}>
       <Route path="/guide-book-admin" element={<GuideAdmin />} />
-      <Route path="/guide-book-PIC" element={<GuidePIC />} />
-      <Route path="/guide-book-pembimbing" element={<GuideDosen />} />
-      <Route path="/guide-book-student" element={<GuideStudent />} />
     </Route>
-    <Route element={<PrivateRoutes role={["RLPIC"]} />}>
+    <Route element={<PrivateRoutes role={["RLADM", "RLPIC"]} />}>
       <Route path="/guide-book-PIC" element={<GuidePIC />} />
     </Route>
-    <Route element={<PrivateRoutes role={["RLDSN"]} />}>
+    <Route element={<PrivateRoutes role={["RLADM", "RLDSN"]} />}>
       <Route path="/guide-book-pembimbing" element={<GuideDosen />} />
     </Route>
-    <Route element={<PrivateRoutes role={["RLMHS"]} />}>
+    <Route element={<PrivateRoutes role={["RLADM", "RLMHS"]} />}>
       <Route path="/guide-book-student" element={<GuideStudent />} />
     </Route>
     <Route path="*" element={<p>404 Error - Nothing here...</p>} />
