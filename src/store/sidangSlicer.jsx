@@ -1,16 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-const APIURL = "https://6f73-180-253-71-196.ngrok-free.app/api";
 
 export const getAllSidang = createAsyncThunk("getAllSidang", async () => {
   try {
-    const res = await axios.get(APIURL, {
+    const res = await axios.get(process.env.SOFI_APP_API_URL, {
       headers: {
         Authorization: `Bearer ${authToken}`,
         "ngrok-skip-browser-warning": true,
       },
     });
-    return res.data.data;
+    if (res.data.code === 200) {
+      return res.data.data;
+    }
   } catch (error) {
     throw error;
   }
@@ -49,13 +50,17 @@ export const createSidang = createAsyncThunk(
         peminatan: peminatanId,
       };
 
-      const res = await axios.post(`${APIURL}/pengajuan/create`, data, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "multipart/form-data",
-          "ngrok-skip-browser-warning": true,
-        },
-      });
+      const res = await axios.post(
+        `${process.env.SOFI_APP_API_URL}/pengajuan/create`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "multipart/form-data",
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
       localStorage.setItem("successMessage", "Sidang Berhasil Disimpan.");
       return res.data.data;
     } catch (error) {
@@ -103,7 +108,7 @@ export const updateSidang = createAsyncThunk(
       };
 
       const res = await axios.patch(
-        `${APIURL}/pengajuan/update/${sidangId}`,
+        `${process.env.SOFI_APP_API_URL}/pengajuan/update/${sidangId}`,
         data,
         {
           headers: {
@@ -129,15 +134,22 @@ export const checkSidang = createAsyncThunk(
   "checkSidang",
   async (authToken) => {
     try {
-      const res = await axios.get(`${APIURL}/pengajuan/check-user`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "ngrok-skip-browser-warning": true,
-        },
-      });
-      return res.data.data;
+      const res = await axios.get(
+        `${process.env.SOFI_APP_API_URL}/pengajuan/check-user`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+
+      if (res.data.code === 200) {
+        return res.data.data;
+      }
     } catch (error) {
-      throw error;
+      console.log(error.response.data);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
@@ -193,7 +205,8 @@ const sidangSlice = createSlice({
       state.data = action.payload;
     });
     builder.addCase(checkSidang.rejected, (state, action) => {
-      state.error = action.payload;
+      console.log(action);
+      state.error = true;
     });
   },
 });

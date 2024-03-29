@@ -3,10 +3,12 @@ import axios from "axios";
 
 export const fetchLecturer = createAsyncThunk("fetchLecturer", async () => {
   try {
-    const res = await axios.get("http://127.0.0.1:8000/api/lecturer");
-    return res.data.data;
+    const res = await axios.get(`${process.env.SOFIOLD_API_URL}/lecturer`);
+    if (res.data.status === 200) {
+      return res.data.data;
+    }
   } catch (error) {
-    return error;
+    throw error;
   }
 });
 
