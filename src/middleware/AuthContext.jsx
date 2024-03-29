@@ -15,6 +15,7 @@ const loginUrl = "https://sofi.my.id";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [roles, setRoles] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [cookies, setCookies, removeCookie] = useCookies();
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }) => {
           expires: expirationDate,
           path: "/",
         });
+        setIsLoggedIn(true);
         navigate("/home");
         window.location.reload();
       } else {
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    setIsLoggedIn(false);
     localStorage.removeItem("persist:root");
     removeCookie("auth-token");
     navigate("/loginsso");
@@ -55,10 +58,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = cookies["auth-token"];
     if (token) {
+      setIsLoggedIn(true);
       const jwtDecoded = jwtDecode(cookies["auth-token"]);
       setRoles(jwtDecoded.role);
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
     } else {
+      setIsLoggedIn(false);
       delete axios.defaults.headers.common["Authorization"];
       localStorage.removeItem("persist:root");
       removeCookie("auth-token");
@@ -66,6 +71,7 @@ export const AuthProvider = ({ children }) => {
   }, [cookies["auth-token"]]);
 
   const contextValue = useMemo(() => ({
+    isLoggedIn,
     roles,
     isLoading,
     login,
