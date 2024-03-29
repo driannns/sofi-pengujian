@@ -6,11 +6,8 @@ import { checkSidang } from "../../store/sidangSlicer";
 import { useCookies } from "react-cookie";
 import Alert from "../../components/Alert";
 
-const APISOFI = "https://5490-180-253-71-196.ngrok-free.app";
-
 const MateriPresentasi = () => {
   const dataSidang = useSelector((state) => state.sidang);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [cookies] = useCookies();
@@ -18,27 +15,54 @@ const MateriPresentasi = () => {
   const [periodNow, setPeriodNow] = useState(null);
   const [oldPeriod, setOldPeriod] = useState(null);
   const [slide, setSlide] = useState(null);
-  const [makalah, setMakalah] = useState();
 
-  const handleDocTAChange = (e) => {
-    setDocTA(e.target.files[0]);
-  };
+  const fetchSlide = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.SOFI_APP_API_URL}/api/slide/get-latest-slide`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
 
-  const handleMakalahChange = (e) => {
-    setDocTA(e.target.files[0]);
+      console.log(res.data);
+      if (res.data.code === 200) {
+        setSlide(res.data.data);
+      }
+    } catch (error) {
+      if (!error.response.data.code === 404) {
+        localStorage.setItem("errorMessage", "Network Error");
+        navigate("/home");
+        return;
+      }
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const dataSidangStudent = await dispatch(
-          checkSidang(cookies["auth-token"])
+        const resPeriodNow = await axios.get(
+          `${process.env.SOFI_APP_API_URL}/api/period/check-period`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+              "ngrok-skip-browser-warning": true,
+            },
+          }
         );
-        console.log(dataSidangStudent.payload);
-        console.log(dataSidang.data);
+        if (resPeriodNow.data.code === 200) {
+          setPeriodNow(resPeriodNow.data.data);
+        }
+
+        dispatch(checkSidang(cookies["auth-token"]));
+
         if (!dataSidang.data) {
           localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
           navigate(-1);
+          return;
         }
 
         if (
@@ -50,6 +74,7 @@ const MateriPresentasi = () => {
             "Sidang anda sudah dijadwalkan, tidak dapat merubah file presentasi"
           );
           navigate("/schedule/mahasiswa"); //?Belum dibuat
+          return;
         }
 
         if (
@@ -66,22 +91,15 @@ const MateriPresentasi = () => {
             "Sidang anda belum di approve dosen pembimbing dan admin"
           );
           navigate(-1);
+          return;
         }
 
-        const res = await axios.get(`${APISOFI}/api/slide/get-latest-slide`, {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        });
-
-        console.log(res.data);
-        setSlide(res.data);
+        fetchSlide();
 
         if (dataSidang.data.status === "tidak lulus") {
           setOldPeriod(dataSidang.data.period_id);
           const resPeriodNow = await axios.get(
-            `${APISOFI}/api/period/get/${dataSidang.data.period_id}`,
+            `${process.env.SOFI_APP_API_URL}/api/period/get/${dataSidang.data.period_id}`,
             {
               headers: {
                 Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -89,12 +107,15 @@ const MateriPresentasi = () => {
               },
             }
           );
-          setPeriodNow(resPeriodNow.data);
+          if (resPeriodNow.data.code === 200) {
+            setPeriodNow(resPeriodNow.data.data);
+          }
         }
       } catch (error) {
-        if (!error.response && error.response.status === 404) {
+        if (!error.response.status === 404) {
           localStorage.setItem("errorMessage", "Network error");
           navigate(-1);
+          return;
         }
       }
     };
@@ -106,6 +127,7 @@ const MateriPresentasi = () => {
     if (!dataSidang.data) {
       localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
       navigate("/sidangs/create");
+      return;
     }
 
     if (
@@ -114,6 +136,7 @@ const MateriPresentasi = () => {
     ) {
       localStorage.setItem("warningMessage", "Anda belum mendaftar sidang!");
       navigate("schedule/mahasiswa");
+      return;
     }
 
     if (
@@ -131,6 +154,7 @@ const MateriPresentasi = () => {
         "Sidang anda belum di approve dosen pembimbing dan admin"
       );
       navigate(-1);
+      return;
     }
   }, [dataSidang]);
 
@@ -288,7 +312,7 @@ const MateriPresentasi = () => {
                         {slide ? (
                           <div className="row ml-0">
                             <a
-                              href={`${APISOFI}/public/slides/${slide.url}`}
+                              href={`${process.env.SOFI_APP_API_URL}/public/slides/${slide.url}`}
                               className="btn btn-danger mr-2"
                             >
                               Download

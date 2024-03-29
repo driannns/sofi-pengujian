@@ -4,7 +4,6 @@ import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../middleware/AuthContext";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { createSidang, checkSidang } from "../../store/sidangSlicer";
@@ -16,19 +15,13 @@ import Swal from "sweetalert2";
 
 const tokenSSO =
   "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiOWY3ZDMxZTZhMzhmYmFmOTI5NjljMDNlMzJhOTc4MjFkNjY0MGJiZWQ4NzU0Y2Y0MzY4NWVjM2EyZTdkOGU5NTBkYWUzYWJjOGFiZWNhMDAiLCJpYXQiOjE3MTAyMzQ4MjMsIm5iZiI6MTcxMDIzNDgyMywiZXhwIjoxNzEwMzIxMjIzLCJzdWIiOiJla2t5bm92cml6YWxhbSIsInNjb3BlcyI6WyJjZWxvZS1kYXNoYm9hcmQiLCJvbGQtZG9zZW4iLCJvbGQtZG9zZW4td2FsaSIsImFkbWlzc2lvbi1hZG1pbiIsImFkbWlzc2lvbi1kYXNoYm9hcmQtdXNlcnMiLCJhdHRlbmRhbmNlLWVtcGxveWVlIiwiZGFzaGJvYXJkLXVzZXIiLCJuZXctc3NvIiwib2xkLXBlZ2F3YWkiLCJzc28tb3BlbmxpYiIsInN0YWZmX3Rlc3Rfc3BzIiwib2xkLWtlbG9tcG9rLWtlYWhsaWFuIiwiZW1wbG95ZWUtc3RydWN0dXJhbCIsIm9sZC1hZG1pbi1yZWdpc3RyYXNpLWZha3VsdGFzIl19.PDA6tjeuPNeaqi3KORQR7H-MD4qZc7dEzSFVKbilas4Q4T8MRtSVeHLmRUAaM4WiiqIrf486hnEw0RvV9YkXIYtU1zVVN456Zyano66pW9FfLHbptxC59zc_MM560XT7fokxATYZGPKn5Ds8AHyOB4Z3Mfak82FAJHFp9O_eEG_JDvX8OVGxTS5mJDhLnsnOUs6DTiJlyLM4nMlfn1WBwvpv6hn3U_q9g0CNflaULd6jYfvvFf63ybShOvxQeevZDdk1wpVrYB26fjVo5TJuHGg7fuPaO1jrJLiCXQWZN0u51ZGvt1PMLoxNVhpWMio6EMiEiECbAZsQ99JmCv_mJhWBT-g2_udJZcPFSmaABTKAV3glrImbIf--17UC7lqllYthXyVD03JWQIpLf9Bycab4jH4Bl7aFSdFyzTvCOfEBEbq3jqL9IqBToOc6FEV0Sfzxx9VlKHE3t-AQ4a9twPYZw1xhxoiaeFwH_g6Fh9ii2ALZJLwozy7GaR5qgnOWTEO5dnjaDIiA2nAcfPcSGAcL5hzP8HqLvPAV-ya4hqB9HlRgaajhiWMxeTdE3L1vQ2Qpku7c1GHkHABahS3zqVyGQTvoT8pMX2oBw2rvrB0NQbaga7lxCNbeqgJWSYhJD-tNn46dHKqyq9XbumDOghfcRBIwdgkZhXJpCBAE5tw";
-const getAllStudentAPI =
-  "https://dev-gateway.telkomuniversity.ac.id/bf7b719639cf0e2ef94a1cf212e00ce6/2324-2"; //2324-2
-const getStatusLog =
-  "https://dev-gateway.telkomuniversity.ac.id/d650182722315309a25aa5a43a033303/2324-2"; //2324-2
-const testLocal = "http://127.0.0.1:8000/api";
-const APISOFI = "https://5490-180-253-71-196.ngrok-free.app/api";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
 
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const [cookies] = useCookies("");
@@ -85,16 +78,19 @@ const SidangCreate = () => {
         dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
-          `${testLocal}/student/${jwtDecoded.id}`
+          `${process.env.OLD_SOFI_API_URL}/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
 
-        const resALlPeriods = await axios.get(`${APISOFI}/period/get`, {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        });
+        const resALlPeriods = await axios.get(
+          `${process.env.SOFI_APP_API_URL}/api/period/get`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+              "ngrok-skip-browser-warning": true,
+            },
+          }
+        );
         setPeriods(resALlPeriods.data.data);
 
         const dataSidangStudent = await dispatch(
@@ -108,16 +104,18 @@ const SidangCreate = () => {
             dataSidangStudent.payload.status === "pending"
           ) {
             navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
+            return;
           } else {
             navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+            return;
           }
         }
 
         //? Parameter
 
         const resStudentData = await axios.get(
-          // `${getAllStudentAPI}/${resUserInfo.data.data.nim}`,
-          `${getAllStudentAPI}/1202204011`,
+          // `${process.env.getAllStudents_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+          `${process.env.getAllStudents_API_URL}/2324-2/1202204011`,
           {
             headers: {
               Authorization: `Bearer ${tokenSSO} `,
@@ -131,12 +129,13 @@ const SidangCreate = () => {
             "Anda tidak terdaftar di periode akademik ini"
           );
           navigate("/home");
+          return;
         }
         setDataStudent(resStudentData.data.data[0]);
 
         const resStatusLog = await axios.get(
-          // `${getStatusLog}/${resUserInfo.data.data.nim}`,
-          `${getStatusLog}/1202204011`,
+          // `${process.env.getStatusLog_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+          `${process.env.getStatusLog_API_URL}/2324-2/1202204011`,
           {
             headers: { Authorization: `Bearer ${tokenSSO}` },
           }
@@ -148,17 +147,23 @@ const SidangCreate = () => {
             "Data anda tidak ditemukan. Silahkan hubungi admin"
           );
           navigate("/home");
+          return;
         }
         setStatusLog(resStatusLog.data.data[0]);
 
-        const resPeminatans = await axios.post(`${testLocal}/peminatans`, {
-          kk: resUserInfo.data.data.kk,
-        });
+        const resPeminatans = await axios.post(
+          `${process.env.OLD_SOFI_API_URL}/peminatans`,
+          {
+            kk: resUserInfo.data.data.kk,
+          }
+        );
         setPeminatans(resPeminatans.data.data);
-      } catch (e) {
-        localStorage.setItem("errorMessage", "Network Error");
-        navigate("/home");
-        console.error("Erorr fetching data:", e);
+      } catch (error) {
+        console.error("Erorr fetching data:", error);
+        if (!error.response.status === 404) {
+          localStorage.setItem("errorMessage", "Network Error");
+          navigate("/home");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -175,8 +180,10 @@ const SidangCreate = () => {
         dataSidang.data.status === "pending"
       ) {
         navigate(`/sidangs/${dataSidang.data.id}/edit`);
+        return;
       } else {
         navigate(`/sidangs/${dataSidang.data.id}`);
+        return;
       }
     }
   }, [dataSidang]);

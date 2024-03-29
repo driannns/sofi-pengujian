@@ -6,8 +6,6 @@ import { checkSidang } from "../../../store/sidangSlicer";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 
-const APISOFI = "https://5490-180-253-71-196.ngrok-free.app/api";
-const testLocal = "http://127.0.0.1:8000/api";
 const Teams = () => {
   const dataSidang = useSelector((state) => state.sidang);
   const dispatch = useDispatch();
@@ -17,42 +15,78 @@ const Teams = () => {
   const [userInfo, setUserInfo] = useState({});
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
 
+  const fetchSlide = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.SOFI_APP_API_URL}/slide/get-latest-slide`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+
+      console.log(res.data);
+      if (res.data.code === 200) {
+        setSlide(res.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response.data.code === 404) {
+        localStorage.setItem(
+          "errorMessage",
+          "Anda harus mengupload berkas presentasi terlebih dahulu!"
+        );
+        console.log("/slides");
+        navigate("/slides");
+        return;
+      } else {
+        console.log("/home");
+        localStorage.setItem("errorMessage", "Network Error");
+        navigate("/home");
+        return;
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchSidangData = async () => {
       try {
-        const dataSidangStudent = await dispatch(
-          checkSidang(cookies["auth-token"])
-        );
+        dispatch(checkSidang(cookies["auth-token"]));
 
-        if (!dataSidangStudent.payload) {
+        if (!dataSidang.data) {
           localStorage.setItem(
             "errorMessage",
             "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
           );
-          // navigate(-1);
+          navigate(-1);
+          return;
         }
 
         if (
-          dataSidangStudent.payload.status === "sudah dijadwalkan" ||
-          dataSidangStudent.payload.status === "tidak lulus (sudah dijadwalkan)"
+          dataSidang.data.status === "sudah dijadwalkan" ||
+          dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
         ) {
           localStorage.setItem(
             "errorMessage",
             "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
           );
-          // navigate("/schedule/mahasiswa"); //?Belum dibuat
+          navigate("/schedule/mahasiswa"); //?Belum dibuat
+          return;
         }
 
-        if (dataSidangStudent.payload.status === "tidak lulus") {
+        if (dataSidang.data.status === "tidak lulus") {
           localStorage.setItem(
             "errorMessage",
             "Silahkan update berkas sidang ulang dan slide!"
           );
-          // navigate("/slides");
+          navigate("/slides");
+          return;
         }
 
         if (
-          !dataSidangStudent.payload.status.includes([
+          !dataSidang.data.status.includes([
             "telah disetujui admin",
             "belum dijadwalkan",
             "tidak lulus (sudah update dokumen)",
@@ -63,49 +97,37 @@ const Teams = () => {
             "errorMessage",
             "Sidang anda belum di approve dosen pembimbing dan admin"
           );
-          // navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
-        }
-
-        const resSlide = axios.get(`${APISOFI}/slide/get-latest-slide`, {
-          headers: {
-            "ngrok-skip-browser-warning": true,
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-          },
-        });
-
-        if (!resSlide.data) {
-          localStorage.setItem(
-            "errorMessage",
-            "Anda harus mengupload berkas presentasi terlebih dahulu!"
-          );
-          // navigate("/slides");
+          navigate(`/sidangs/${dataSidang.data.id}/edit`);
+          return;
         }
 
         const resUserInfo = await axios.get(
-          `${testLocal}/student/${jwtDecoded.id}`
+          `${process.env.SOFIOLD_API_URL}/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
-        console.log(resUserInfo.data.data.team_id !== 0);
+
+        fetchSlide();
 
         if (resUserInfo.data.data.team_id !== 0) {
-          if (
-            dataSidangStudent.payload.status ===
-            "tidak lulus (sudah update dokumen)"
-          ) {
-            // navigate("/teams/create");
+          if (dataSidang.data.status === "tidak lulus (sudah update dokumen)") {
+            navigate("/teams/create");
+            return;
           }
         } else {
-          // navigate("/teams/create");
+          navigate("/teams/create");
+          return;
         }
 
-        const resTeam = await axios.get(`${APISOFI}/team/get-team`, {
-          headers: {
-            "ngrok-skip-browser-warning": true,
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-          },
-        });
-        console.log(resTeam);
-        console.log("jalan");
+        const resTeam = await axios.get(
+          `${process.env.SOFI_APP_API_URL}/team/get-team`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": true,
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+            },
+          }
+        );
+
         const resMembers = await axios.get(
           `http://127.0.0.1:8000/api/team/get-member/3`
         );
@@ -120,6 +142,7 @@ const Teams = () => {
         if (!error.response && error.response.status === 404) {
           localStorage.setItem("errorMessage", "Network error");
           navigate(-1);
+          return;
         }
         console.error(error);
       }

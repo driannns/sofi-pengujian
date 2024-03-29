@@ -3,29 +3,25 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../middleware/AuthContext";
+import { Link, redirect, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { updateSidang, checkSidang } from "../../store/sidangSlicer";
 import Alert from "../../components/Alert";
+import Loading from "../../components/Loading";
 
 import "sweetalert2/dist/sweetalert2.min.css";
 import Swal from "sweetalert2";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 
-const testLocal = "http://127.0.0.1:8000/api";
-const APISOFI = "https://5490-180-253-71-196.ngrok-free.app";
 const SidangEdit = () => {
   const dispatch = useDispatch();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-  const navigate = useNavigate();
+
   const params = useParams();
   const [isLoading, setIsLoading] = useState(false);
-
   const [cookies] = useCookies("");
+
   const [userInfo, setUserInfo] = useState({});
   const [peminatans, setPeminatans] = useState("");
   const [periods, setPeriods] = useState();
@@ -39,7 +35,6 @@ const SidangEdit = () => {
     "reset status": "Reset Status",
   };
 
-  // console.log(dataSidang.data);
   const [periodId, setPeriodId] = useState(
     dataSidang.data && dataSidang.data.period_id
   );
@@ -117,19 +112,22 @@ const SidangEdit = () => {
         await dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
-          `${testLocal}/student/${jwtDecoded.id}`
+          `${process.env.SOFIOLD_API_URL}/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
         setPeminatanId(resUserInfo.data.data.peminatan_id);
 
-        const resPeminatans = await axios.post(`${testLocal}/peminatans`, {
-          kk: resUserInfo.data.data.kk,
-        });
+        const resPeminatans = await axios.post(
+          `${process.env.SOFIOLD_API_URL}/peminatans`,
+          {
+            kk: resUserInfo.data.data.kk,
+          }
+        );
         setPeminatans(resPeminatans.data.data);
 
         if (jwtDecoded.role.find((role) => !["RLADM"].includes(role))) {
           const resStatusLog = await axios.get(
-            "https://5490-180-253-71-196.ngrok-free.app/api/status-log/get",
+            `${process.env.SOFI_APP_API_URL}/api/status-log/get`,
             {
               headers: {
                 "ngrok-skip-browser-warning": true,
@@ -140,7 +138,7 @@ const SidangEdit = () => {
           setStatusLog(resStatusLog.data.data);
         } else {
           const resStatusLog = await axios.get(
-            "https://5490-180-253-71-196.ngrok-free.app/api/status-log/get",
+            `${process.env.SOFI_APP_API_URL}/api/status-log/get`,
             {
               headers: {
                 "ngrok-skip-browser-warning": true,
@@ -152,23 +150,24 @@ const SidangEdit = () => {
         }
 
         // Parameter
-        const resALlPeriods = await axios.get(`${APISOFI}/api/period/get`, {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        });
+        const resALlPeriods = await axios.get(
+          `${process.env.SOFI_APP_API_URL}/api/period/get`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+              "ngrok-skip-browser-warning": true,
+            },
+          }
+        );
         setPeriods(resALlPeriods.data.data);
-        console.log(dataSidangStudent.payload);
-        console.log(dataSidang.data);
-        return null;
+
         if (!dataSidangStudent.payload) {
           localStorage.setItem("errorMessage", "Sidang Tidak Ada");
-          navigate("/sidangs");
+          return redirect("/sidangs");
         }
-        console.log(params.id);
+
         if (params.id != dataSidangStudent.payload.id) {
-          navigate("/home"); //? dicek lgi
+          return redirect("/home"); //? dicek lgi
         }
 
         if (
@@ -177,10 +176,14 @@ const SidangEdit = () => {
           ) &&
           !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
         ) {
-          navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+          return redirect(`/sidangs/${dataSidangStudent.payload.id}`);
         }
-      } catch (e) {
-        console.error("Erorr fetching data:", e);
+      } catch (error) {
+        if (error.response.status === 404) {
+          localStorage.setItem("errorMessage", "Network Error");
+          return redirect("/home");
+          console.error("Erorr fetching data:", e);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -192,7 +195,7 @@ const SidangEdit = () => {
     const fetchData = async () => {
       try {
         if (params.id != dataSidang.data.id) {
-          navigate("/home"); //? dicek lgi
+          return redirect("/home"); //? dicek lgi
         }
         if (
           !["pengajuan", "ditolak oleh admin", "pending"].includes(
@@ -200,7 +203,7 @@ const SidangEdit = () => {
           ) &&
           !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
         ) {
-          navigate(`/sidangs/${dataSidang.data.id}`);
+          return redirect(`/sidangs/${dataSidang.data.id}`);
         }
       } catch (e) {
         console.error("Erorr fetching data:", e);
@@ -242,7 +245,7 @@ const SidangEdit = () => {
           })
         );
         localStorage.setItem("successMessage", "Sidang berhasil diedit");
-        // navigate("/sidangs/create");
+        return redirect("/sidangs/create");
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -251,183 +254,169 @@ const SidangEdit = () => {
 
   return (
     <MainLayout>
-      <ol className="breadcrumb mb-0">
-        <div className="col-12">
-          <h3>SIDANG</h3>
-          <hr className="mt-0" />
-          <h6 className="mb-3">
-            <Link to="/home" className="text-dark">
-              BERANDA
-            </Link>{" "}
-            /{" "}
-            <a href="{!! route('sidangs.index') !!}" className="text-dark">
-              SIDANG
-            </a>
-          </h6>
-        </div>
-      </ol>
+      {isLoading || dataSidang.loading ? (
+        <Loading />
+      ) : (
+        <>
+          <ol className="breadcrumb mb-0">
+            <div className="col-12">
+              <h3>SIDANG</h3>
+              <hr className="mt-0" />
+              <h6 className="mb-3">
+                <Link to="/home" className="text-dark">
+                  BERANDA
+                </Link>{" "}
+                /{" "}
+                <a href="{!! route('sidangs.index') !!}" className="text-dark">
+                  SIDANG
+                </a>
+              </h6>
+            </div>
+          </ol>
 
-      <div className="container-fluid">
-        <div className="animated fadeIn">
-          {/* @include('coreui-templates::common.errors') */}
-          <Alert type="danger" />
-          <Alert type="warning" />
-          <Alert type="success" />
-          <div className="row">
-            <div className="col-12 col-md-6">
-              <div className="card">
-                <div className="card-body">
-                  <form onSubmit={attend2}>
-                    {/* <!-- Period Id Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="period_id">Period Sidang: </label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : jwtDecoded.role &&
-                        jwtDecoded.role.find(
-                          (role) => !["RLADM"].includes(role)
-                        ) ? (
-                        <select
-                          name="period_id"
-                          id="period_id"
-                          className="select2 form-control"
-                          value={periodId}
-                          onChange={(e) => setPeriodId(e.target.value)}
-                        >
-                          <option value="">Pilih Periode</option>
-                          {periods &&
-                            periods.map((data, index) => (
-                              <option value={data.id} key={index}>
-                                {data.name}
-                              </option>
-                            ))}
-                        </select>
-                      ) : (
-                        <>
-                          <select
-                            name="period_id"
-                            id="period_id"
-                            className="select2 form-control"
-                            value={periodId}
+          <div className="container-fluid">
+            <div className="animated fadeIn">
+              {/* @include('coreui-templates::common.errors') */}
+              <Alert type="danger" />
+              <Alert type="warning" />
+              <Alert type="success" />
+              <div className="row">
+                <div className="col-12 col-md-6">
+                  <div className="card">
+                    <div className="card-body">
+                      <form onSubmit={attend2}>
+                        {/* <!-- Period Id Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="period_id">Period Sidang: </label>
+                          {jwtDecoded.role &&
+                          jwtDecoded.role.find(
+                            (role) => !["RLADM"].includes(role)
+                          ) ? (
+                            <select
+                              name="period_id"
+                              id="period_id"
+                              className="select2 form-control"
+                              value={periodId}
+                              onChange={(e) => setPeriodId(e.target.value)}
+                            >
+                              <option value="">Pilih Periode</option>
+                              {periods &&
+                                periods.map((data, index) => (
+                                  <option value={data.id} key={index}>
+                                    {data.name}
+                                  </option>
+                                ))}
+                            </select>
+                          ) : (
+                            <>
+                              <select
+                                name="period_id"
+                                id="period_id"
+                                className="select2 form-control"
+                                value={periodId}
+                                disabled
+                              >
+                                {periods &&
+                                  periods.map((data, index) => (
+                                    <option value={data.id} key={index}>
+                                      {data.name}
+                                    </option>
+                                  ))}
+                              </select>
+                              <input
+                                type="hidden"
+                                name="period_id"
+                                defaultValue={
+                                  dataSidang.data && dataSidang.data.period_id
+                                }
+                              />
+                            </>
+                          )}
+                        </div>
+
+                        {/* } <!-- Mahasiswa Id Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="mahasiswa_id">NIM Mahasiswa:</label>
+
+                          <input
+                            type="number"
+                            defaultValue={userInfo.nim}
+                            className="form-control"
                             disabled
+                          />
+
+                          <input
+                            type="hidden"
+                            name="mahasiswa_id"
+                            defaultValue={userInfo.nim}
+                          />
+                        </div>
+
+                        {/* <!-- Pembimbing1 Id Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="pembinbing1_id">
+                            Kode Dosen Pembimbing 1:
+                          </label>
+                          <select
+                            className="form-control select2"
+                            name="pembimbing1_id"
+                            value={pembimbing1}
+                            onChange={(e) => setPembimbing1(e.target.value)}
                           >
-                            {periods &&
-                              periods.map((data, index) => (
-                                <option value={data.id} key={index}>
-                                  {data.name}
+                            <option value="">Pilih Pembimbing 1</option>
+                            {dataLecturer.data &&
+                              dataLecturer.data.map((data, index) => (
+                                <option key={index} value={data.id}>
+                                  {data.code} - {data.user.nama}
                                 </option>
                               ))}
                           </select>
-                          <input
-                            type="hidden"
-                            name="period_id"
-                            defaultValue={
-                              dataSidang.data && dataSidang.data.period_id
-                            }
+                        </div>
+
+                        {/* <!-- Pembimbing2 Id Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="pembimbing2_id">
+                            Kode Dosen Pembimbing 2:
+                          </label>
+                          <select
+                            className="form-control select2"
+                            name="pembimbing2_id"
+                            value={pembimbing2}
+                            onChange={(e) => {
+                              setPembimbing2(e.target.value);
+                            }}
+                          >
+                            <option value="">Pilih Pembimbing 2</option>
+                            {dataLecturer.data &&
+                              dataLecturer.data.map((data, index) => (
+                                <option key={index} value={data.id}>
+                                  {data.code} - {data.user.nama}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+
+                        {/* <!-- Judul Field --> */}
+                        <div className="form-group col-sm-12 col-lg-12">
+                          <label htmlFor="judul">Judul Tugas Akhir:</label>
+                          <textarea
+                            name="judul"
+                            id="judul"
+                            cols="2"
+                            rows="4"
+                            value={judul}
+                            onChange={(e) => {
+                              setJudul(e.target.value);
+                            }}
+                            className="form-control"
                           />
-                        </>
-                      )}
-                    </div>
+                        </div>
 
-                    {/* } <!-- Mahasiswa Id Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="mahasiswa_id">NIM Mahasiswa:</label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <input
-                          type="number"
-                          defaultValue={userInfo.nim}
-                          className="form-control"
-                          disabled
-                        />
-                      )}
-                      <input
-                        type="hidden"
-                        name="mahasiswa_id"
-                        defaultValue={userInfo.nim}
-                      />
-                    </div>
-
-                    {/* <!-- Pembimbing1 Id Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="pembinbing1_id">
-                        Kode Dosen Pembimbing 1:
-                      </label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <select
-                          className="form-control select2"
-                          name="pembimbing1_id"
-                          value={pembimbing1}
-                          onChange={(e) => setPembimbing1(e.target.value)}
-                        >
-                          <option value="">Pilih Pembimbing 1</option>
-                          {dataLecturer.payload &&
-                            dataLecturer.payload.map((data, index) => (
-                              <option key={index} value={data.id}>
-                                {data.code} - {data.user.nama}
-                              </option>
-                            ))}
-                        </select>
-                      )}
-                    </div>
-
-                    {/* <!-- Pembimbing2 Id Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="pembimbing2_id">
-                        Kode Dosen Pembimbing 2:
-                      </label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <select
-                          className="form-control select2"
-                          name="pembimbing2_id"
-                          value={pembimbing2}
-                          onChange={(e) => {
-                            setPembimbing2(e.target.value);
-                          }}
-                        >
-                          <option value="">Pilih Pembimbing 2</option>
-                          {dataLecturer.payload &&
-                            dataLecturer.payload.map((data, index) => (
-                              <option key={index} value={data.id}>
-                                {data.code} - {data.user.nama}
-                              </option>
-                            ))}
-                        </select>
-                      )}
-                    </div>
-
-                    {/* <!-- Judul Field --> */}
-                    <div className="form-group col-sm-12 col-lg-12">
-                      <label htmlFor="judul">Judul Tugas Akhir:</label>
-                      {isLoading ? (
-                        <Skeleton height={85} />
-                      ) : (
-                        <textarea
-                          name="judul"
-                          id="judul"
-                          cols="2"
-                          rows="4"
-                          value={judul}
-                          onChange={(e) => {
-                            setJudul(e.target.value);
-                          }}
-                          className="form-control"
-                        />
-                      )}
-                    </div>
-
-                    {/* <!-- Form Bimbingan Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="form_bimbingan">Jumlah Bimbingan:</label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <>
+                        {/* <!-- Form Bimbingan Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="form_bimbingan">
+                            Jumlah Bimbingan:
+                          </label>
                           <input
                             type="text"
                             id="form_bimbingan1"
@@ -442,286 +431,260 @@ const SidangEdit = () => {
                             className="form-control"
                             disabled
                           />
-                        </>
-                      )}
-                      <input
-                        type="hidden"
-                        defaultValue={`${form_bimbingan1};${form_bimbingan2}`}
-                      />
-                    </div>
-
-                    {/* <!-- KK Field --> */}
-                    <div className="form-group col-sm-12 col-lg-12">
-                      <label htmlFor="kk">Kelompok Keahlian:</label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <input
-                          type="text"
-                          name="form_bimbingan1"
-                          className="form-control"
-                          defaultValue={userInfo.kk}
-                          disabled
-                        />
-                      )}
-                    </div>
-
-                    {/* <!-- peminatans Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="peminatans">Peminatan:</label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <select
-                          className="form-control select2"
-                          name="peminatan"
-                          value={peminatanId}
-                          onChange={(e) => setPeminatanId(e.target.value)}
-                        >
-                          <option value="">Pilih Peminatan</option>
-                          {peminatans &&
-                            peminatans.map((data, index) => (
-                              <option value={data.id} key={index}>
-                                {data.nama}
-                              </option>
-                            ))}
-                        </select>
-                      )}
-                    </div>
-
-                    {/* <!-- Eprt Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="eprt">EPRT:</label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <input
-                          type="text"
-                          name="eprt"
-                          className="form-control"
-                          defaultValue={userInfo.eprt}
-                          disabled
-                        />
-                      )}
-                      <input
-                        type="hidden"
-                        name="eprt"
-                        defaultValue={userInfo.eprt}
-                      />
-                    </div>
-
-                    {/* <!-- Tak Field --> */}
-                    <div className="form-group col-sm-12">
-                      <label htmlFor="tak">TAK:</label>
-                      {isLoading ? (
-                        <Skeleton height={30} />
-                      ) : (
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="tak"
-                          defaultValue={userInfo.tak}
-                          disabled
-                        />
-                      )}
-                      <input
-                        type="hidden"
-                        name="tak"
-                        defaultValue={userInfo.tak}
-                      />
-                    </div>
-
-                    {jwtDecoded.role &&
-                    jwtDecoded.role.find(
-                      (role) => !["RLADM"].includes(role)
-                    ) ? (
-                      <>
-                        {/* <!-- Dokumen Ta Field --> */}
-                        <div className="form-group col-sm-12">
-                          <label htmlFor="dokumen_ta">Draft Dokumen TA:</label>
-                          {isLoading ? (
-                            <>
-                              <br />
-                              <Skeleton height={30} width={90} />
-                            </>
-                          ) : dataSidang && dataSidang.data.doc_ta ? (
-                            <p>
-                              <a
-                                href={`${APISOFI}/public/doc_ta/${dataSidang.data.doc_ta}`}
-                                className="btn btn-primary"
-                                download
-                              >
-                                Download
-                              </a>
-                            </p>
-                          ) : (
-                            <p>
-                              <a
-                                href="#"
-                                target="_blank"
-                                className="btn btn-primary disabled"
-                              >
-                                Data tidak ditemukan
-                              </a>
-                            </p>
-                          )}
-                          {isLoading ? (
-                            <Skeleton height={30} />
-                          ) : (
-                            <input
-                              type="file"
-                              name="dokumen_ta"
-                              onChange={handleDocTAChange}
-                              className="form-control"
-                            />
-                          )}
-                        </div>
-
-                        {/* <!-- Makalah Field -/-> */}
-                        <div className="form-group col-sm-12">
-                          <label htmlFor="makalah">Jurnal:</label>
-                          {isLoading ? (
-                            <>
-                              <br />
-                              <Skeleton height={30} width={90} />
-                            </>
-                          ) : dataSidang.data.makalah ? (
-                            <p>
-                              <a
-                                href={`${APISOFI}/public/doc_ta/${dataSidang.data.makalah}`}
-                                className="btn btn-primary"
-                                download
-                              >
-                                Download
-                              </a>
-                            </p>
-                          ) : (
-                            <p>
-                              <a
-                                href="#"
-                                target="_blank"
-                                className="btn btn-primary disabled"
-                              >
-                                Data tidak ditemukan
-                              </a>
-                            </p>
-                          )}
-
-                          {isLoading ? (
-                            <Skeleton height={30} />
-                          ) : (
-                            <input
-                              type="file"
-                              name="makalah"
-                              onChange={handleMakalahChange}
-                              className="form-control"
-                            />
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        {/* <!-- Bahasa Field --> */}
-                        <div className="form-group col-sm-12">
-                          <label htmlFor="is_english">Bahasa:</label>
-                          <select
-                            name="is_english"
-                            id="is_english"
-                            className="select2 form-control"
-                            value={isEnglish}
-                            onChange={(e) => setIsEnglish(e.target.value)}
-                          >
-                            {languages.map((data, index) => (
-                              <option value={data} key={index}>
-                                {data}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* <!-- Status Field --> */}
-                        <div className="form-group col-sm-12">
-                          <label htmlFor="status">Status:</label>
-                          <select
-                            name="status"
-                            id="status"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                          >
-                            <option value=""></option>
-                            {Object.entries(statusList).map(([key, value]) => (
-                              <option value={key} key={key}>
-                                {value}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* <!-- Komentar Field --> */}
-                        <div
-                          className="form-group col-sm-12"
-                          id="field_komentar"
-                          style={{ display: "none" }}
-                        >
-                          <label htmlFor="komentas">Komentar:</label>
-                          <textarea
-                            name="komentar"
-                            id="komentar"
-                            className="form-control"
-                            value={komentar}
-                            onChange={(e) => setKomentar(e.target.value)}
+                          <input
+                            type="hidden"
+                            defaultValue={`${form_bimbingan1};${form_bimbingan2}`}
                           />
                         </div>
-                      </>
-                    )}
 
-                    {/* <!-- Submit Field --> */}
-                    <div className="form-group col-sm-12">
-                      <button className="btn btn-primary">Simpan</button>
-                      <Link to="/home" className="btn btn-secondary">
-                        Batal
-                      </Link>
+                        {/* <!-- KK Field --> */}
+                        <div className="form-group col-sm-12 col-lg-12">
+                          <label htmlFor="kk">Kelompok Keahlian:</label>
+                          <input
+                            type="text"
+                            name="form_bimbingan1"
+                            className="form-control"
+                            defaultValue={userInfo.kk}
+                            disabled
+                          />
+                        </div>
+
+                        {/* <!-- peminatans Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="peminatans">Peminatan:</label>
+                          <select
+                            className="form-control select2"
+                            name="peminatan"
+                            value={peminatanId}
+                            onChange={(e) => setPeminatanId(e.target.value)}
+                          >
+                            <option value="">Pilih Peminatan</option>
+                            {peminatans &&
+                              peminatans.map((data, index) => (
+                                <option value={data.id} key={index}>
+                                  {data.nama}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+
+                        {/* <!-- Eprt Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="eprt">EPRT:</label>
+                          <input
+                            type="text"
+                            name="eprt"
+                            className="form-control"
+                            defaultValue={userInfo.eprt}
+                            disabled
+                          />
+                          <input
+                            type="hidden"
+                            name="eprt"
+                            defaultValue={userInfo.eprt}
+                          />
+                        </div>
+
+                        {/* <!-- Tak Field --> */}
+                        <div className="form-group col-sm-12">
+                          <label htmlFor="tak">TAK:</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="tak"
+                            defaultValue={userInfo.tak}
+                            disabled
+                          />
+                          <input
+                            type="hidden"
+                            name="tak"
+                            defaultValue={userInfo.tak}
+                          />
+                        </div>
+
+                        {jwtDecoded.role &&
+                        jwtDecoded.role.find(
+                          (role) => !["RLADM"].includes(role)
+                        ) ? (
+                          <>
+                            {/* <!-- Dokumen Ta Field --> */}
+                            <div className="form-group col-sm-12">
+                              <label htmlFor="dokumen_ta">
+                                Draft Dokumen TA:
+                              </label>
+                              {dataSidang.data && dataSidang.data.doc_ta ? (
+                                <p>
+                                  <a
+                                    href={`${process.env.SOFI_APP_API_URL}/public/doc_ta/${dataSidang.data.doc_ta}`}
+                                    className="btn btn-primary"
+                                    download
+                                  >
+                                    Download
+                                  </a>
+                                </p>
+                              ) : (
+                                <p>
+                                  <a
+                                    href="#"
+                                    target="_blank"
+                                    className="btn btn-primary disabled"
+                                  >
+                                    Data tidak ditemukan
+                                  </a>
+                                </p>
+                              )}
+
+                              <input
+                                type="file"
+                                name="dokumen_ta"
+                                onChange={handleDocTAChange}
+                                className="form-control"
+                              />
+                            </div>
+
+                            {/* <!-- Makalah Field -/-> */}
+                            <div className="form-group col-sm-12">
+                              <label htmlFor="makalah">Jurnal:</label>
+                              {dataSidang.data && dataSidang.data.makalah ? (
+                                <p>
+                                  <a
+                                    href={`${process.env.SOFI_APP_API_URL}/public/doc_ta/${dataSidang.data.makalah}`}
+                                    className="btn btn-primary"
+                                    download
+                                  >
+                                    Download
+                                  </a>
+                                </p>
+                              ) : (
+                                <p>
+                                  <a
+                                    href="#"
+                                    target="_blank"
+                                    className="btn btn-primary disabled"
+                                  >
+                                    Data tidak ditemukan
+                                  </a>
+                                </p>
+                              )}
+
+                              <input
+                                type="file"
+                                name="makalah"
+                                onChange={handleMakalahChange}
+                                className="form-control"
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* <!-- Bahasa Field --> */}
+                            <div className="form-group col-sm-12">
+                              <label htmlFor="is_english">Bahasa:</label>
+                              <select
+                                name="is_english"
+                                id="is_english"
+                                className="select2 form-control"
+                                value={isEnglish}
+                                onChange={(e) => setIsEnglish(e.target.value)}
+                              >
+                                {languages.map((data, index) => (
+                                  <option value={data} key={index}>
+                                    {data}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {/* <!-- Status Field --> */}
+                            <div className="form-group col-sm-12">
+                              <label htmlFor="status">Status:</label>
+                              <select
+                                name="status"
+                                id="status"
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                              >
+                                <option value=""></option>
+                                {Object.entries(statusList).map(
+                                  ([key, value]) => (
+                                    <option value={key} key={key}>
+                                      {value}
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </div>
+
+                            {/* <!-- Komentar Field --> */}
+                            <div
+                              className="form-group col-sm-12"
+                              id="field_komentar"
+                              style={{ display: "none" }}
+                            >
+                              <label htmlFor="komentas">Komentar:</label>
+                              <textarea
+                                name="komentar"
+                                id="komentar"
+                                className="form-control"
+                                value={komentar}
+                                onChange={(e) => setKomentar(e.target.value)}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {/* <!-- Submit Field --> */}
+                        <div className="form-group col-sm-12">
+                          <button className="btn btn-primary">Simpan</button>
+                          <Link to="/home" className="btn btn-secondary">
+                            Batal
+                          </Link>
+                        </div>
+                      </form>
                     </div>
-                  </form>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="col-12 col-md-6">
-              <div className="card">
-                <div className="card-body">
-                  <div
-                    className="table-responsive-sm"
-                    style={{ height: "100vh", overflowY: "scroll" }}
-                  >
-                    <table className="table table-striped" id="sidangs-table">
-                      <thead>
-                        <tr>
-                          <td>Tanggal</td>
-                          <td>Nama Event</td>
-                          <td>Komentar</td>
-                          <td>Oleh</td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {statusLog &&
-                          statusLog.map((value, index) => (
-                            <tr key={index}>
-                              <td>{formatDate(value.created_at)}</td>
-                              <td>{value.name}</td>
-                              <td>{value.feedback}</td>
-                              <td>{value.created_by}</td>
+                <div className="col-12 col-md-6">
+                  <div className="card">
+                    <div className="card-body">
+                      <div
+                        className="table-responsive-sm"
+                        style={{ height: "100vh", overflowY: "scroll" }}
+                      >
+                        <table
+                          className="table table-striped"
+                          id="sidangs-table"
+                        >
+                          <thead>
+                            <tr>
+                              <td>Tanggal</td>
+                              <td>Nama Event</td>
+                              <td>Komentar</td>
+                              <td>Oleh</td>
                             </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody>
+                            {statusLog &&
+                              statusLog.map((value, index) => (
+                                <tr key={index}>
+                                  <td>{formatDate(value.created_at)}</td>
+                                  <td>{value.name}</td>
+                                  <td>{value.feedback}</td>
+                                  <td>{value.created_by}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </MainLayout>
   );
 };
