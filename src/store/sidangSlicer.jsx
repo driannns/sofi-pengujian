@@ -1,21 +1,28 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const getAllSidang = createAsyncThunk("getAllSidang", async () => {
-  try {
-    const res = await axios.get(process.env.SOFI_APP_API_URL, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        "ngrok-skip-browser-warning": true,
-      },
-    });
-    if (res.data.code === 200) {
-      return res.data.data;
+export const getAllSidang = createAsyncThunk(
+  "getAllSidang",
+  async (authToken) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/get`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      if (res.data.code === 200) {
+        return res.data.data;
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-  } catch (error) {
-    throw error;
   }
-});
+);
 
 export const createSidang = createAsyncThunk(
   "createSidang",
@@ -51,7 +58,7 @@ export const createSidang = createAsyncThunk(
       };
 
       const res = await axios.post(
-        `${process.env.SOFI_APP_API_URL}/pengajuan/create`,
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/create`,
         data,
         {
           headers: {
@@ -64,11 +71,11 @@ export const createSidang = createAsyncThunk(
       localStorage.setItem("successMessage", "Sidang Berhasil Disimpan.");
       return res.data.data;
     } catch (error) {
+      console.log(error);
       if (error.response.data.message) {
         localStorage.setItem("errorMessage", error.response.data.message);
         throw error.response.data.message;
       }
-      console.log(error.response);
     }
   }
 );
@@ -108,7 +115,7 @@ export const updateSidang = createAsyncThunk(
       };
 
       const res = await axios.patch(
-        `${process.env.SOFI_APP_API_URL}/pengajuan/update/${sidangId}`,
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/update/${sidangId}`,
         data,
         {
           headers: {
@@ -135,7 +142,7 @@ export const checkSidang = createAsyncThunk(
   async (authToken) => {
     try {
       const res = await axios.get(
-        `${process.env.SOFI_APP_API_URL}/pengajuan/check-user`,
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/check-user`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -148,8 +155,56 @@ export const checkSidang = createAsyncThunk(
         return res.data.data;
       }
     } catch (error) {
-      console.log(error.response.data);
-      return thunkAPI.rejectWithValue(error.response.data);
+      throw error.response;
+    }
+  }
+);
+
+export const feedbackSidang = createAsyncThunk(
+  "feedbackSidang",
+  async ({ authToken, feedback, sidangId }, thunkAPI) => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/rejected/${sidangId}`,
+        { feedback: feedback },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      console.log(res);
+      if (res.data.code === 200) {
+        localStorage.setItem("successMessage", "Feedback Sudah Dikirim");
+      }
+      thunkAPI.dispatch(getAllSidang(authToken));
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+);
+
+export const approveFeedbackSidang = createAsyncThunk(
+  "approveFeedbackSidang",
+  async ({ authToken, feedbackApprove, bahasa, sidangId }, thunkAPI) => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/${sidangId}`,
+        { feedback: feedbackApprove, is_english: bahasa },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      console.log(res);
+      thunkAPI.dispatch(getAllSidang(authToken));
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 );
@@ -204,8 +259,19 @@ const sidangSlice = createSlice({
     builder.addCase(checkSidang.fulfilled, (state, action) => {
       state.data = action.payload;
     });
-    builder.addCase(checkSidang.rejected, (state, action) => {
-      console.log(action);
+    builder.addCase(checkSidang.rejected, (state) => {
+      state.error = true;
+    });
+    // builder.addCase(feedbackSidang.fulfilled, (state) => {
+    //   state.error = true;
+    // });
+    builder.addCase(feedbackSidang.rejected, (state) => {
+      state.error = true;
+    });
+    // builder.addCase(approveFeedbackSidang.fulfilled, (state, action) => {
+    //   state.error = true;
+    // });
+    builder.addCase(approveFeedbackSidang.rejected, (state) => {
       state.error = true;
     });
   },
