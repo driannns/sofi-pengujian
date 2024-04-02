@@ -22,6 +22,13 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const expirationDate = new Date(new Date().getTime() + 120 * 60 * 1000);
 
+  const clearLocalStorage = () => {
+    localStorage.removeItem("persist:root");
+    localStorage.removeItem("errorMessage");
+    localStorage.removeItem("warningMessage");
+    localStorage.removeItem("successMessage");
+  };
+
   const login = async (username, password) => {
     try {
       setIsLoading(true);
@@ -50,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem("persist:root");
+    clearLocalStorage();
     removeCookie("auth-token");
     navigate("/loginsso");
   };
@@ -65,7 +72,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setIsLoggedIn(false);
       delete axios.defaults.headers.common["Authorization"];
-      localStorage.removeItem("persist:root");
+      clearLocalStorage();
       removeCookie("auth-token");
     }
   }, [cookies["auth-token"]]);
