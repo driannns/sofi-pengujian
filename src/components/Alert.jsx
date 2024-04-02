@@ -19,16 +19,6 @@ const Alert = ({ type, message }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (error) {
-      localStorage.setItem("errorMessage", error);
-      localStorage.setItem("warningMessage", error);
-      localStorage.setItem("successMessage", error);
-    } else {
-      clearLocalStorage();
-    }
-  }, [error]);
-
   return message ? (
     <div className={`alert alert-${type}`} role="alert">
       {message}
