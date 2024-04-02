@@ -9,7 +9,6 @@ import { fetchLecturer } from "../../store/lecturerSlicer";
 import { createSidang, checkSidang } from "../../store/sidangSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
-
 import "sweetalert2/dist/sweetalert2.min.css";
 import Swal from "sweetalert2";
 
@@ -19,12 +18,12 @@ const tokenSSO =
 const SidangCreate = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-
   const [isLoading, setIsLoading] = useState(false);
-
   const [cookies] = useCookies("");
+
   const [userInfo, setUserInfo] = useState({});
   const [dataStudent, setDataStudent] = useState({});
   const [statusLog, setStatusLog] = useState("");
@@ -52,9 +51,7 @@ const SidangCreate = () => {
     dataStudent && !dataStudent.totalguidance_advisor2
       ? 0
       : dataStudent.totalguidance_advisor2;
-  const [peminatanId, setPeminatanId] = useState(
-    userInfo.peminatan_id ? userInfo.peminatan_id : ""
-  );
+  const [peminatanId, setPeminatanId] = useState("");
   const [docTA, setDocTA] = useState("");
   const [makalah, setMakalah] = useState("");
   const [isEnglish, setIsEnglish] = useState("");
@@ -78,12 +75,13 @@ const SidangCreate = () => {
         dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
-          `${process.env.OLD_SOFI_API_URL}/student/${jwtDecoded.id}`
+          `https://sofi.my.id/api/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
+        setPeminatanId(resUserInfo.data.data.peminatan_id);
 
         const resALlPeriods = await axios.get(
-          `${process.env.SOFI_APP_API_URL}/api/period/get`,
+          `${import.meta.env.VITE_API_URL}/api/period/get`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -114,15 +112,15 @@ const SidangCreate = () => {
         //? Parameter
 
         const resStudentData = await axios.get(
-          // `${process.env.getAllStudents_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
-          `${process.env.getAllStudents_API_URL}/2324-2/1202204011`,
+          // `${import.meta.env.getAllStudents_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+          `${import.meta.env.VITE_getAllStudents_API_URL}/2324-2/1202204011`,
           {
             headers: {
               Authorization: `Bearer ${tokenSSO} `,
             },
           }
         );
-
+        console.log(resStudentData.data.data);
         if (resStudentData.data.data.length === 0) {
           localStorage.setItem(
             "errorMessage",
@@ -134,8 +132,8 @@ const SidangCreate = () => {
         setDataStudent(resStudentData.data.data[0]);
 
         const resStatusLog = await axios.get(
-          // `${process.env.getStatusLog_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
-          `${process.env.getStatusLog_API_URL}/2324-2/1202204011`,
+          // `${import.meta.env.getStatusLog_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+          `${import.meta.env.VITE_getStatusLog_API_URL}/2324-2/1202204011`,
           {
             headers: { Authorization: `Bearer ${tokenSSO}` },
           }
@@ -152,7 +150,7 @@ const SidangCreate = () => {
         setStatusLog(resStatusLog.data.data[0]);
 
         const resPeminatans = await axios.post(
-          `${process.env.OLD_SOFI_API_URL}/peminatans`,
+          "https://sofi.my.id/api/peminatans",
           {
             kk: resUserInfo.data.data.kk,
           }
@@ -160,7 +158,7 @@ const SidangCreate = () => {
         setPeminatans(resPeminatans.data.data);
       } catch (error) {
         console.error("Erorr fetching data:", error);
-        if (!error.response.status === 404) {
+        if (error.reponse && !error.response.status === 404) {
           localStorage.setItem("errorMessage", "Network Error");
           navigate("/home");
         }
@@ -463,8 +461,8 @@ const SidangCreate = () => {
                           <label htmlFor="peminatans">Peminatan:</label>
                           <select
                             className="form-control select2"
-                            name="peminatan"
                             value={peminatanId}
+                            name="peminatan"
                             onChange={(e) => setPeminatanId(e.target.value)}
                           >
                             <option value="">Pilih Peminatan</option>

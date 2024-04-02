@@ -3,7 +3,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from "react";
-import { Link, redirect, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { updateSidang, checkSidang } from "../../store/sidangSlicer";
@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 
 const SidangEdit = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
 
@@ -112,13 +113,13 @@ const SidangEdit = () => {
         await dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
-          `${process.env.SOFIOLD_API_URL}/student/${jwtDecoded.id}`
+          `https://sofi.my.id/api/student/${jwtDecoded.id}`
         );
         setUserInfo(resUserInfo.data.data);
         setPeminatanId(resUserInfo.data.data.peminatan_id);
 
         const resPeminatans = await axios.post(
-          `${process.env.SOFIOLD_API_URL}/peminatans`,
+          "https://sofi.my.id/api/peminatans",
           {
             kk: resUserInfo.data.data.kk,
           }
@@ -127,7 +128,7 @@ const SidangEdit = () => {
 
         if (jwtDecoded.role.find((role) => !["RLADM"].includes(role))) {
           const resStatusLog = await axios.get(
-            `${process.env.SOFI_APP_API_URL}/api/status-log/get`,
+            `${import.meta.env.VITE_API_URL}/api/status-log/get`,
             {
               headers: {
                 "ngrok-skip-browser-warning": true,
@@ -138,7 +139,7 @@ const SidangEdit = () => {
           setStatusLog(resStatusLog.data.data);
         } else {
           const resStatusLog = await axios.get(
-            `${process.env.SOFI_APP_API_URL}/api/status-log/get`,
+            `${import.meta.env.VITE_API_URL}/api/status-log/get`,
             {
               headers: {
                 "ngrok-skip-browser-warning": true,
@@ -151,7 +152,7 @@ const SidangEdit = () => {
 
         // Parameter
         const resALlPeriods = await axios.get(
-          `${process.env.SOFI_APP_API_URL}/api/period/get`,
+          `${import.meta.env.VITE_API_URL}/api/period/get`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -163,11 +164,13 @@ const SidangEdit = () => {
 
         if (!dataSidangStudent.payload) {
           localStorage.setItem("errorMessage", "Sidang Tidak Ada");
-          return redirect("/sidangs");
+          navigate("/sidangs");
+          return;
         }
 
         if (params.id != dataSidangStudent.payload.id) {
-          return redirect("/home"); //? dicek lgi
+          navigate("/home");
+          return;
         }
 
         if (
@@ -176,13 +179,15 @@ const SidangEdit = () => {
           ) &&
           !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
         ) {
-          return redirect(`/sidangs/${dataSidangStudent.payload.id}`);
+          navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+          return;
         }
       } catch (error) {
         if (error.response.status === 404) {
           localStorage.setItem("errorMessage", "Network Error");
-          return redirect("/home");
           console.error("Erorr fetching data:", e);
+          navigate("/home");
+          return;
         }
       } finally {
         setIsLoading(false);
@@ -195,7 +200,8 @@ const SidangEdit = () => {
     const fetchData = async () => {
       try {
         if (params.id != dataSidang.data.id) {
-          return redirect("/home"); //? dicek lgi
+          navigate("/home"); //? dicek lgi
+          return;
         }
         if (
           !["pengajuan", "ditolak oleh admin", "pending"].includes(
@@ -203,7 +209,8 @@ const SidangEdit = () => {
           ) &&
           !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
         ) {
-          return redirect(`/sidangs/${dataSidang.data.id}`);
+          navigate(`/sidangs/${dataSidang.data.id}`);
+          return;
         }
       } catch (e) {
         console.error("Erorr fetching data:", e);
@@ -245,7 +252,8 @@ const SidangEdit = () => {
           })
         );
         localStorage.setItem("successMessage", "Sidang berhasil diedit");
-        return redirect("/sidangs/create");
+        navigate("/sidangs/create");
+        return;
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -362,6 +370,7 @@ const SidangEdit = () => {
                             name="pembimbing1_id"
                             value={pembimbing1}
                             onChange={(e) => setPembimbing1(e.target.value)}
+                            disabled
                           >
                             <option value="">Pilih Pembimbing 1</option>
                             {dataLecturer.data &&
@@ -385,6 +394,7 @@ const SidangEdit = () => {
                             onChange={(e) => {
                               setPembimbing2(e.target.value);
                             }}
+                            disabled
                           >
                             <option value="">Pilih Pembimbing 2</option>
                             {dataLecturer.data &&
@@ -515,7 +525,9 @@ const SidangEdit = () => {
                               {dataSidang.data && dataSidang.data.doc_ta ? (
                                 <p>
                                   <a
-                                    href={`${process.env.SOFI_APP_API_URL}/public/doc_ta/${dataSidang.data.doc_ta}`}
+                                    href={`${
+                                      import.meta.env.VITE_API_URL
+                                    }/public/doc_ta/${dataSidang.data.doc_ta}`}
                                     className="btn btn-primary"
                                     download
                                   >
@@ -548,7 +560,9 @@ const SidangEdit = () => {
                               {dataSidang.data && dataSidang.data.makalah ? (
                                 <p>
                                   <a
-                                    href={`${process.env.SOFI_APP_API_URL}/public/doc_ta/${dataSidang.data.makalah}`}
+                                    href={`${
+                                      import.meta.env.VITE_API_URL
+                                    }/public/doc_ta/${dataSidang.data.makalah}`}
                                     className="btn btn-primary"
                                     download
                                   >

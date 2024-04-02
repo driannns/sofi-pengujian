@@ -19,7 +19,7 @@ const MateriPresentasi = () => {
   const fetchSlide = async () => {
     try {
       const res = await axios.get(
-        `${process.env.SOFI_APP_API_URL}/api/slide/get-latest-slide`,
+        `${import.meta.env.VITE_API_URL}/api/slide/get-latest-slide`,
         {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -45,7 +45,7 @@ const MateriPresentasi = () => {
     const fetchData = async () => {
       try {
         const resPeriodNow = await axios.get(
-          `${process.env.SOFI_APP_API_URL}/api/period/check-period`,
+          `${import.meta.env.VITE_API_URL}/api/period/check-period`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -99,7 +99,9 @@ const MateriPresentasi = () => {
         if (dataSidang.data.status === "tidak lulus") {
           setOldPeriod(dataSidang.data.period_id);
           const resPeriodNow = await axios.get(
-            `${process.env.SOFI_APP_API_URL}/api/period/get/${dataSidang.data.period_id}`,
+            `${import.meta.env.VITE_API_URL}/api/period/get/${
+              dataSidang.data.period_id
+            }`,
             {
               headers: {
                 Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -123,40 +125,40 @@ const MateriPresentasi = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (!dataSidang.data) {
-      localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
-      navigate("/sidangs/create");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!dataSidang.data) {
+  //     localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
+  //     navigate("/sidangs/create");
+  //     return;
+  //   }
 
-    if (
-      dataSidang.data?.status === "sudah dijadwalkan" ||
-      dataSidang.data?.status === "tidak lulus (sudah dijadwalkan)"
-    ) {
-      localStorage.setItem("warningMessage", "Anda belum mendaftar sidang!");
-      navigate("schedule/mahasiswa");
-      return;
-    }
+  //   if (
+  //     dataSidang.data?.status === "sudah dijadwalkan" ||
+  //     dataSidang.data?.status === "tidak lulus (sudah dijadwalkan)"
+  //   ) {
+  //     localStorage.setItem("warningMessage", "Anda belum mendaftar sidang!");
+  //     navigate("schedule/mahasiswa");
+  //     return;
+  //   }
 
-    if (
-      dataSidang.data &&
-      !dataSidang.data.status.includes([
-        "telah disetujui admin",
-        "belum dijadwalkan",
-        "tidak lulus",
-        "tidak lulus (sudah update dokumen)",
-        "tidak lulus (belum dijadwalkan)",
-      ])
-    ) {
-      localStorage.setItem(
-        "errorMessage",
-        "Sidang anda belum di approve dosen pembimbing dan admin"
-      );
-      navigate(-1);
-      return;
-    }
-  }, [dataSidang]);
+  //   if (
+  //     dataSidang.data &&
+  //     !dataSidang.data.status.includes([
+  //       "telah disetujui admin",
+  //       "belum dijadwalkan",
+  //       "tidak lulus",
+  //       "tidak lulus (sudah update dokumen)",
+  //       "tidak lulus (belum dijadwalkan)",
+  //     ])
+  //   ) {
+  //     localStorage.setItem(
+  //       "errorMessage",
+  //       "Sidang anda belum di approve dosen pembimbing dan admin"
+  //     );
+  //     navigate(-1);
+  //     return;
+  //   }
+  // }, [dataSidang]);
 
   return (
     <MainLayout>
@@ -312,7 +314,9 @@ const MateriPresentasi = () => {
                         {slide ? (
                           <div className="row ml-0">
                             <a
-                              href={`${process.env.SOFI_APP_API_URL}/public/slides/${slide.url}`}
+                              href={`${
+                                import.meta.env.VITE_API_URL
+                              }/public/slides/${slide.url}`}
                               className="btn btn-danger mr-2"
                             >
                               Download

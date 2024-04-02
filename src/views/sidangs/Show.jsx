@@ -68,14 +68,14 @@ const SidangShow = () => {
   useEffect(() => {
     const fetchingData = async () => {
       const resPembimbing1 = await axios.get(
-        `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing1_id}`
+        `https://sofi.my.id/api/lecturer/${dataSidang.data.pembimbing1_id}`
       );
       setPembimbing1(
         `${resPembimbing1.data.data.code} - ${resPembimbing1.data.data.user.nama}`
       );
 
       const resPembimbing2 = await axios.get(
-        `http://127.0.0.1:8000/api/lecturer/${dataSidang.data.pembimbing2_id}`
+        `https://sofi.my.id/api/lecturer/${dataSidang.data.pembimbing2_id}`
       );
       setPembimbing2(
         `${resPembimbing2.data.data.code} - ${resPembimbing2.data.data.user.nama}`
