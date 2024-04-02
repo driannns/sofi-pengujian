@@ -1,16 +1,35 @@
 import { MainLayout } from "./layouts/MainLayout";
+import Alert from "../components/Alert";
+import { useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
-import Alert from "../components/Alert";
+import { useState, useEffect } from "react";
+import { checkSidang } from "../store/sidangSlicer";
 
 const Home = () => {
   const [cookies] = useCookies();
-  const authToken = cookies["auth-token"];
-  const userData = jwtDecode(authToken);
-  const statusSidang = null;
+  const dispatch = useDispatch();
+  const [userData] = useState(jwtDecode(cookies["auth-token"]));
+  const [sidang, setSidang] = useState(null);
   const kaurAkademik = "Edi Sutoyo, S.Kom., M.CompSc.";
   const no_laa = "+6281311997199";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (userData.role?.find((roles) => "RLMHS".includes(roles))) {
+          const resSidang = await dispatch(checkSidang(cookies["auth-token"]));
+          if (resSidang.payload) {
+            setSidang(resSidang.payload);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <MainLayout>
@@ -26,7 +45,7 @@ const Home = () => {
             {userData.role?.find((roles) => "RLADM".includes(roles)) ? (
               <div className="card">
                 <div className="card-header">
-                  <h1>Selamat Datang username {userData?.nama}</h1>
+                  <h1>Selamat Datang {userData?.nama}</h1>
                 </div>
                 <div className="card-body">
                   <ol>
@@ -49,11 +68,11 @@ const Home = () => {
                 <h3>TATA TERTIB PELAKSAAN SIDANG TUGAS AKHIR</h3>
                 {/* <!-- update notif lulus --> */}
                 {userData.role?.find((roles) => "RLMHS".includes(roles)) &&
-                  statusSidang &&
-                  statusSidang.status === "lulus" && (
+                  sidang &&
+                  sidang.status === "lulus" && (
                     <div className="alert alert-success" role="alert">
                       Selamat Anda Dinyatakan <b>LULUS</b> pada sidang periode{" "}
-                      {statusSidang.period_id}
+                      {sidang.period_id}
                     </div>
                   )}
                 <hr className="mt-0" />
