@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import lecturerReducer from "./lecturerSlicer";
 import sidangReducer from "./sidangSlicer";
+import loadingReducer from "./loadingSlicer";
 import storage from "redux-persist/lib/storage";
 import {
   persistReducer,
@@ -22,6 +23,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   lecturer: lecturerReducer,
   sidang: sidangReducer,
+  loading: loadingReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
