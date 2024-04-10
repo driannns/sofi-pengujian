@@ -46,8 +46,12 @@ const router = (
     </Route>
 
     {/* RLMHS Routes */}
-    <Route element={<PrivateRoutes role={["RLMHS", "RLADM"]} />}>
+    <Route
+      element={<PrivateRoutes role={["RLMHS", "RLADM", "RLPIC", "RLPBB"]} />}
+    >
       <Route path="/sidangs" element={<SidangIndex />} />
+      <Route path="/sidangs/pic" element={<SidangIndex />} />
+      <Route path="/sidangs/pembimbing" element={<SidangIndex />} />
       <Route path="/sidangs/create" element={<SidangCreate />} />
       <Route path="/sidangs/:id/edit" element={<SidangEdit />} />
       <Route path="/slides" element={<PowerPoint />} />

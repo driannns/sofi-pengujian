@@ -289,7 +289,7 @@ const SidangIndex = () => {
             </div>
           );
         } else if (
-          jwtDecoded?.role?.find((role) => ["RLPBG"].includes(role)) &&
+          jwtDecoded?.role?.find((role) => ["RLPBB"].includes(role)) &&
           location.pathname.startsWith === "/sidangs/pembimbing"
         ) {
           return (
@@ -386,7 +386,7 @@ const SidangIndex = () => {
       ) : (
         <>
           <ol className="breadcrumb  mb-0">
-            {jwtDecoded.role.find((role) => ["RLPBG"].includes(role)) &&
+            {jwtDecoded.role.find((role) => ["RLPBB"].includes(role)) &&
             location.pathname === "/sidangs/pembimbing" ? (
               <div className="col-12">
                 <h3>BIMBINGAN TA</h3>
