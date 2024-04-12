@@ -7,13 +7,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { createSidang, checkSidang } from "../../store/sidangSlicer";
+import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
 import "sweetalert2/dist/sweetalert2.min.css";
 import Swal from "sweetalert2";
-
-const tokenSSO =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiOWY3ZDMxZTZhMzhmYmFmOTI5NjljMDNlMzJhOTc4MjFkNjY0MGJiZWQ4NzU0Y2Y0MzY4NWVjM2EyZTdkOGU5NTBkYWUzYWJjOGFiZWNhMDAiLCJpYXQiOjE3MTAyMzQ4MjMsIm5iZiI6MTcxMDIzNDgyMywiZXhwIjoxNzEwMzIxMjIzLCJzdWIiOiJla2t5bm92cml6YWxhbSIsInNjb3BlcyI6WyJjZWxvZS1kYXNoYm9hcmQiLCJvbGQtZG9zZW4iLCJvbGQtZG9zZW4td2FsaSIsImFkbWlzc2lvbi1hZG1pbiIsImFkbWlzc2lvbi1kYXNoYm9hcmQtdXNlcnMiLCJhdHRlbmRhbmNlLWVtcGxveWVlIiwiZGFzaGJvYXJkLXVzZXIiLCJuZXctc3NvIiwib2xkLXBlZ2F3YWkiLCJzc28tb3BlbmxpYiIsInN0YWZmX3Rlc3Rfc3BzIiwib2xkLWtlbG9tcG9rLWtlYWhsaWFuIiwiZW1wbG95ZWUtc3RydWN0dXJhbCIsIm9sZC1hZG1pbi1yZWdpc3RyYXNpLWZha3VsdGFzIl19.PDA6tjeuPNeaqi3KORQR7H-MD4qZc7dEzSFVKbilas4Q4T8MRtSVeHLmRUAaM4WiiqIrf486hnEw0RvV9YkXIYtU1zVVN456Zyano66pW9FfLHbptxC59zc_MM560XT7fokxATYZGPKn5Ds8AHyOB4Z3Mfak82FAJHFp9O_eEG_JDvX8OVGxTS5mJDhLnsnOUs6DTiJlyLM4nMlfn1WBwvpv6hn3U_q9g0CNflaULd6jYfvvFf63ybShOvxQeevZDdk1wpVrYB26fjVo5TJuHGg7fuPaO1jrJLiCXQWZN0u51ZGvt1PMLoxNVhpWMio6EMiEiECbAZsQ99JmCv_mJhWBT-g2_udJZcPFSmaABTKAV3glrImbIf--17UC7lqllYthXyVD03JWQIpLf9Bycab4jH4Bl7aFSdFyzTvCOfEBEbq3jqL9IqBToOc6FEV0Sfzxx9VlKHE3t-AQ4a9twPYZw1xhxoiaeFwH_g6Fh9ii2ALZJLwozy7GaR5qgnOWTEO5dnjaDIiA2nAcfPcSGAcL5hzP8HqLvPAV-ya4hqB9HlRgaajhiWMxeTdE3L1vQ2Qpku7c1GHkHABahS3zqVyGQTvoT8pMX2oBw2rvrB0NQbaga7lxCNbeqgJWSYhJD-tNn46dHKqyq9XbumDOghfcRBIwdgkZhXJpCBAE5tw";
 
 const SidangCreate = () => {
   const dispatch = useDispatch();
@@ -21,7 +19,7 @@ const SidangCreate = () => {
 
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useSelector((state) => state.loading.loading);
   const [cookies] = useCookies("");
 
   const [userInfo, setUserInfo] = useState({});
@@ -43,14 +41,8 @@ const SidangCreate = () => {
   const [pembimbing1, setPembimbing1] = useState("");
   const [pembimbing2, setPembimbing2] = useState("");
   const [judul, setJudul] = useState("");
-  const form_bimbingan1 =
-    dataStudent && !dataStudent.totalguidance_advisor1
-      ? 0
-      : dataStudent.totalguidance_advisor1;
-  const form_bimbingan2 =
-    dataStudent && !dataStudent.totalguidance_advisor2
-      ? 0
-      : dataStudent.totalguidance_advisor2;
+  const form_bimbingan1 = dataStudent?.totalguidance_advisor1 || 0;
+  const form_bimbingan2 = dataStudent?.totalguidance_advisor2 || 0;
   const [peminatanId, setPeminatanId] = useState("");
   const [docTA, setDocTA] = useState("");
   const [makalah, setMakalah] = useState("");
@@ -71,7 +63,8 @@ const SidangCreate = () => {
   useEffect(() => {
     const fetchSidangData = async () => {
       try {
-        setIsLoading(true);
+        dispatch(isLoadingTrue());
+
         dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
@@ -98,8 +91,7 @@ const SidangCreate = () => {
         if (dataSidangStudent.payload) {
           if (
             dataSidangStudent.payload.status === "pengajuan" ||
-            dataSidangStudent.payload.status === "ditolak oleh admin" ||
-            dataSidangStudent.payload.status === "pending"
+            dataSidangStudent.payload.status === "ditolak oleh admin"
           ) {
             navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
             return;
@@ -116,11 +108,10 @@ const SidangCreate = () => {
           `${import.meta.env.VITE_getAllStudents_API_URL}/2324-2/1202204011`,
           {
             headers: {
-              Authorization: `Bearer ${tokenSSO} `,
+              Authorization: `Bearer ${import.meta.env.VITE_tokenSSO} `,
             },
           }
         );
-        console.log(resStudentData.data.data);
         if (resStudentData.data.data.length === 0) {
           localStorage.setItem(
             "errorMessage",
@@ -135,7 +126,9 @@ const SidangCreate = () => {
           // `${import.meta.env.getStatusLog_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
           `${import.meta.env.VITE_getStatusLog_API_URL}/2324-2/1202204011`,
           {
-            headers: { Authorization: `Bearer ${tokenSSO}` },
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_tokenSSO}`,
+            },
           }
         );
 
@@ -158,12 +151,13 @@ const SidangCreate = () => {
         setPeminatans(resPeminatans.data.data);
       } catch (error) {
         console.error("Erorr fetching data:", error);
-        if (error.reponse && !error.response.status === 404) {
+        if (error.reponse?.status !== 404) {
           localStorage.setItem("errorMessage", "Network Error");
           navigate("/home");
+          return;
         }
       } finally {
-        setIsLoading(false);
+        dispatch(isLoadingFalse());
       }
     };
 
@@ -174,8 +168,7 @@ const SidangCreate = () => {
     if (dataSidang.data) {
       if (
         dataSidang.data.status === "pengajuan" ||
-        dataSidang.data.status === "ditolak oleh admin" ||
-        dataSidang.data.status === "pending"
+        dataSidang.data.status === "ditolak oleh admin"
       ) {
         navigate(`/sidangs/${dataSidang.data.id}/edit`);
         return;
@@ -227,6 +220,8 @@ const SidangCreate = () => {
     <MainLayout>
       {isLoading || dataSidang.loading ? (
         <Loading />
+      ) : dataLecturer.error ? (
+        navigate("/home")
       ) : (
         <div>
           <ol className="breadcrumb mb-0">

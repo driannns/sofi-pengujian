@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "proxy": "https://ccbd-180-253-64-207.ngrok-free.app",
+  "proxy": "https://a0c2-182-2-68-137.ngrok-free.app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -21,7 +21,6 @@
     "react-data-table-component": "^7.6.2",
     "react-dom": "^18.2.0",
     "react-loading": "^2.0.3",
-    "react-loading-skeleton": "^3.4.0",
     "react-redux": "^9.1.0",
     "react-router-dom": "^6.22.3",
     "redux-persist": "^6.0.0",

@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { updateSidang, checkSidang } from "../../store/sidangSlicer";
+import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
 
@@ -18,9 +19,8 @@ const SidangEdit = () => {
   const navigate = useNavigate();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-
+  const isLoading = useSelector((state) => state.loading.loading);
   const params = useParams();
-  const [isLoading, setIsLoading] = useState(false);
   const [cookies] = useCookies("");
 
   const [userInfo, setUserInfo] = useState({});
@@ -36,20 +36,17 @@ const SidangEdit = () => {
     "reset status": "Reset Status",
   };
 
-  const [periodId, setPeriodId] = useState(
-    dataSidang.data && dataSidang.data.period_id
-  );
+  const [periodId, setPeriodId] = useState(dataSidang?.data.period_id);
   const [pembimbing1, setPembimbing1] = useState(
-    dataSidang.data ? dataSidang.data.pembimbing1_id : ""
+    dataSidang?.data.pembimbing1_id || ""
   );
   const [pembimbing2, setPembimbing2] = useState(
-    dataSidang.data ? dataSidang.data.pembimbing2_id : ""
+    dataSidang?.data.pembimbing2_id || ""
   );
-
-  const [judul, setJudul] = useState(dataSidang.data && dataSidang.data.judul);
-  const form_bimbingan1 = dataSidang.data ? dataSidang.data.form_bimbingan1 : 0;
-  const form_bimbingan2 = dataSidang.data ? dataSidang.data.form_bimbingan2 : 0;
-  const [peminatanId, setPeminatanId] = useState(userInfo.peminatan_id);
+  const [judul, setJudul] = useState(dataSidang?.data.judul);
+  const form_bimbingan1 = dataSidang?.data.form_bimbingan1 || 0;
+  const form_bimbingan2 = dataSidang?.data.form_bimbingan2 || 0;
+  const [peminatanId, setPeminatanId] = useState(userInfo?.peminatan_id);
   const [docTA, setDocTA] = useState("");
   const [makalah, setMakalah] = useState("");
   const [isEnglish, setIsEnglish] = useState("");
@@ -106,11 +103,11 @@ const SidangEdit = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
+        dispatch(isLoadingTrue());
         const dataSidangStudent = await dispatch(
           checkSidang(cookies["auth-token"])
         );
-        await dispatch(fetchLecturer());
+        dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
           `https://sofi.my.id/api/student/${jwtDecoded.id}`
@@ -174,7 +171,7 @@ const SidangEdit = () => {
         }
 
         if (
-          !["pengajuan", "ditolak oleh admin", "pending"].includes(
+          !["pengajuan", "ditolak oleh admin"].includes(
             dataSidangStudent.payload.status
           ) &&
           !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
@@ -190,7 +187,7 @@ const SidangEdit = () => {
           return;
         }
       } finally {
-        setIsLoading(false);
+        dispatch(isLoadingFalse());
       }
     };
     fetchData();
@@ -200,11 +197,11 @@ const SidangEdit = () => {
     const fetchData = async () => {
       try {
         if (params.id != dataSidang.data.id) {
-          navigate("/home"); //? dicek lgi
+          navigate("/home");
           return;
         }
         if (
-          !["pengajuan", "ditolak oleh admin", "pending"].includes(
+          !["pengajuan", "ditolak oleh admin"].includes(
             dataSidang.data.status
           ) &&
           !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
@@ -262,7 +259,7 @@ const SidangEdit = () => {
 
   return (
     <MainLayout>
-      {isLoading || dataSidang.loading ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <>

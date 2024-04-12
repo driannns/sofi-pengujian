@@ -1,6 +1,67 @@
 import { MainLayout } from "../../layouts/MainLayout";
+import { Link, useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { useState } from "react";
+import Alert from "../../../components/Alert";
+import Loading from "../../../components/Loading";
 
-const TeamCreate = () => {
+const TeamsCreate = () => {
+  const [cookies] = useCookies();
+  const navigate = useNavigate();
+  const [teamName, setTeamName] = useState("");
+
+  const handleIndividual = async (e) => {
+    try {
+      e.preventDefault();
+      console.log(cookies["auth-token"]);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/team/create-individual`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        }
+      );
+      console.log(res.data);
+      if (res.data.status === 200) {
+        localStorage.setItem(
+          "successMessage",
+          "Berhasil Mengajukan Sidang Individu"
+        );
+        navigate("/teams");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleTeam = async (e) => {
+    try {
+      e.preventDefault();
+
+      const body = {
+        name: teamName,
+      };
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/team/create-team`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        }
+      );
+      console.log(res.data);
+      if (res.data.status === 200) {
+        localStorage.setItem("successMessage", "Berhasil Membuat Team");
+        navigate("/teams");
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <MainLayout>
       <ol className="breadcrumb mb-0">
@@ -15,37 +76,22 @@ const TeamCreate = () => {
           </h6>
         </div>
       </ol>
-      {/* @include('flash::message') */}
+
+      <Alert type="danger" />
+      <Alert type="success" />
+      <Alert type="warning" />
+
       <div className="container-fluid">
         <div className="animated fadeIn">
-          {/* {{-- @include('flash::message') --}} */}
           {/* @include('coreui-templates::common.errors') */}
           <div className="row">
             <div className="col-lg-4 offset-2">
-              <div className="card" style="min-height: 300px">
+              <div className="card" style={{ minHeight: "300px" }}>
                 <div className="card-body text-center">
-                  {/* {{-- {!! Form::open(['route' => 'teams.store']) !!}
-
-                            @include('teams.fields')
-
-                            {!! Form::close() !!}
-
-                            <hr>
-
-                            <!-- individu Field -->
-                            <div className="form-group col-sm-12">
-                                <p>Dengan menekan button dibawah, maka anda memilih untuk sidang secara individu</p>
-                                <form className="" action="{{ route('teams.individu') }}" method="post">
-                            @csrf
-                            <button type="submit" className="btn btn-primary" name="button"
-                                onclick="return confirm('apakah anda yakin?')">Sidang Individu</button>
-                            </form>
-                        </div> --}} */}
-
                   <h3>SIDANG INDIVIDU</h3>
                   <i
                     className="fa fa-user mb-4 mt-3"
-                    style="font-size: 80px"
+                    style={{ fontSize: "80px" }}
                   ></i>
 
                   <p>
@@ -78,10 +124,9 @@ const TeamCreate = () => {
                           </button>
                         </div>
                         <div className="modal-body text-center">
-                          <form
-                          // action="{{ route('teams.individu') }}"
-                          // method="post"
-                          >
+                          <form onSubmit={handleIndividual}>
+                            {" "}
+                            //Individu
                             <h5>
                               Apa anda yakin untuk memilih Sidang Individu?
                             </h5>
@@ -109,28 +154,25 @@ const TeamCreate = () => {
             </div>
 
             <div className="col-md-4">
-              <div className="card" style="min-height: 300px">
+              <div className="card" style={{ minHeight: "300px" }}>
                 <div className="card-body text-center">
                   <h3>SIDANG KELOMPOK</h3>
                   <i
                     className="fa fa-users mb-4 mt-3"
-                    style="font-size: 80px"
+                    style={{ fontSize: "80px" }}
                   ></i>
-                  <form>
-                    {/* {!! Form::open(['route' => 'teams.store']) !!}
-                        @include('teams.fields')
-                      {!! Form::close() !!} */}
-                    {/* <!-- Name Field --> */}
+                  <form onSubmit={handleTeam}>
                     <div className="form-group">
                       <input
                         type="text"
                         id="name"
                         name="name"
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
                         placeholder="Masukkan Nama Kelompok"
                         className="form-control"
                       />
                     </div>
-
                     {/* <!-- Submit Field --> */}
                     <div className="form-group col-sm-12">
                       <button type="submit" className="btn btn-primary">
@@ -151,4 +193,4 @@ const TeamCreate = () => {
   );
 };
 
-export default TeamCreate;
+export default TeamsCreate;
