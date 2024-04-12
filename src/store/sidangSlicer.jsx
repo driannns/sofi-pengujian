@@ -191,7 +191,7 @@ export const approveFeedbackSidang = createAsyncThunk(
   async ({ authToken, feedbackApprove, bahasa, sidangId }, thunkAPI) => {
     try {
       const res = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/${sidangId}`,
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/approve/${sidangId}`,
         { feedback: feedbackApprove, is_english: bahasa },
         {
           headers: {

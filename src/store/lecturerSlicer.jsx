@@ -24,6 +24,7 @@ const lecturerSlice = createSlice({
 
   extraReducers: (builder) => {
     builder.addCase(fetchLecturer.pending, (state) => {
+      state.error = false;
       state.isLoading = true;
     });
     builder.addCase(fetchLecturer.fulfilled, (state, action) => {
@@ -31,6 +32,7 @@ const lecturerSlice = createSlice({
       state.data = action.payload;
     });
     builder.addCase(fetchLecturer.rejected, (state) => {
+      localStorage.setItem("errorMessage", "Network Error");
       state.error = true;
     });
   },
