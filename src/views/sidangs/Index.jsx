@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Link, useLocation } from "react-router-dom";
+import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
 import { useSelector, useDispatch } from "react-redux";
 import {
   getAllSidang,
@@ -27,6 +28,36 @@ const SidangIndex = () => {
   const [sidangs, setSidangs] = useState(null);
   const [documents, setDocuments] = useState(null);
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
+
+  const updateDate = async (sidangId) => {
+    try {
+      dispatch(isLoadingTrue());
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/get/${sidangId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warnign": true,
+          },
+        }
+      );
+      console.log(res);
+
+      //? Parameter
+
+      const resGetAllStudent = await axios.get(
+        `${import.meta.env.VITE_getAllStudents_API_URL}/2023-2/${
+          res.data.data.nim
+        }`,
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_tokenSSO}`,
+          },
+        }
+      );
+      console.log(resGetAllStudent);
+    } catch (error) {}
+  };
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);

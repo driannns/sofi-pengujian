@@ -18,9 +18,84 @@ const Teams = () => {
 
   const [team, setTeam] = useState(null);
   const [student, setStudent] = useState(null);
+  const [member, setMember] = useState(null);
   const [isSudahDijadwalkan, setIsSudahDijadwalkan] = useState(true);
   const [isIndividu, setIsIndividu] = useState(false);
+  const [teamName, setTeamName] = useState("");
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
+
+  const handleLeaveTeam = async (e) => {
+    try {
+      dispatch(isLoadingTrue());
+      console.log("loading true1");
+      e.preventDefault();
+      const body = {
+        team_id: team.id,
+      };
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/team/leave-team`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      if (res.data.code === 200) {
+        fetchSidangData();
+        localStorage.setItem("successMessage", "Berhasil Dihapus.");
+      }
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+      dispatch(isLoadingFalse());
+    }
+  };
+
+  const handleAddMember = async (e) => {
+    try {
+      dispatch(isLoadingTrue());
+      e.preventDefault();
+      const memberId = parseInt(member);
+      const body = {
+        team_id: team.id,
+        user_id: memberId,
+      };
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/team/add-member`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      console.log(res.data);
+      if (res.data.code === 200) {
+        localStorage.setItem(
+          "succesMessage",
+          `${res.data.data.nim} Berhasil Ditambahkan.`
+        );
+        fetchSidangData();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      dispatch(isLoadingFalse());
+    }
+  };
+
+  const formatUser = async (userId) => {
+    try {
+      const res = await axios.get(`https://sofi.my.id/api/user/${userId}`);
+      // console.log(res.data.data);
+      return res.data.data.nama;
+    } catch (error) {
+      return "-";
+    }
+  };
 
   const fetchTeam = async () => {
     try {
@@ -34,7 +109,7 @@ const Teams = () => {
         }
       );
 
-      console.log(res.data);
+      handleIsIndividu(res.data.data);
       if (res.data.code === 200) {
         setTeam(res.data.data);
       }
@@ -53,14 +128,34 @@ const Teams = () => {
 
   const fetchMember = async () => {
     try {
-      //? katanya fetching 2x (pertama ngeget yang teamId 0 lalu difilter base on pengajuan status)
-      const resNonMembers = await axios.get(
-        "http://127.0.0.1:8000/api/team/get-nonmember"
+      const studentNoTeam = await axios.get(
+        "https://sofi.my.id/api/team/get-nonmember"
       );
-      console.log(resNonMembers);
-      if (resNonMembers.data.status === 200) {
-        setStudent(resNonMembers.data.data);
-      }
+
+      const studentRegistered = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/status/approve`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+
+      const matchedStudents = studentNoTeam.data.data.filter((student) => {
+        return studentRegistered.data.data.some(
+          (registeredStudent) => registeredStudent.user_id === student.user_id
+        );
+      });
+
+      const formatStudents = await Promise.all(
+        matchedStudents.map(async (value) => {
+          const manipulatedData = await formatUser(value.user_id);
+          return { ...value, username: manipulatedData };
+        })
+      );
+      setStudent(formatStudents);
+      console.log(formatStudents);
     } catch (error) {
       console.error(error);
       if (error.response?.status !== 404 || error.message === "Network Error") {
@@ -82,111 +177,141 @@ const Teams = () => {
   };
 
   const handleIsIndividu = (team) => {
-    if (!team) {
+    if (team.name === `${jwtDecoded.nim} Sidang Individu`) {
       setIsIndividu(true);
     }
   };
 
-  useEffect(() => {
-    const fetchSidangData = async () => {
-      try {
-        dispatch(isLoadingTrue());
-        dispatch(checkSidang(cookies["auth-token"]));
+  const fetchSidangData = async () => {
+    try {
+      dispatch(isLoadingTrue());
 
-        if (!dataSidang.data) {
-          localStorage.setItem(
-            "errorMessage",
-            "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
-          );
-          navigate(-1);
-          return;
-        }
+      dispatch(checkSidang(cookies["auth-token"]));
 
-        if (
-          dataSidang.data.status === "sudah dijadwalkan" ||
-          dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
-        ) {
-          localStorage.setItem(
-            "errorMessage",
-            "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
-          );
-          navigate("/schedule/mahasiswa"); //?Belum dibuat
-          return;
-        }
-
-        if (dataSidang.data.status === "tidak lulus") {
-          localStorage.setItem(
-            "errorMessage",
-            "Silahkan update berkas sidang ulang dan slide!"
-          );
-          navigate("/slides");
-          return;
-        }
-        if (
-          dataSidang.data.status !== "telah disetujui admin" &&
-          dataSidang.data.status !== "belum dijadwalkan" &&
-          dataSidang.data.status !== "tidak lulus (sudah update dokumen)" &&
-          dataSidang.data.status !== "tidak lulus (belum dijadwalkan)"
-        ) {
-          localStorage.setItem(
-            "errorMessage",
-            "Sidang anda belum di approve dosen pembimbing dan admin"
-          );
-          navigate(`/sidangs/${dataSidang.data.id}/edit`);
-          return;
-        }
-        await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/slide/get-latest-slide`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-              "ngrok-skip-browser-warning": true,
-            },
-          }
+      if (!dataSidang.data) {
+        localStorage.setItem(
+          "errorMessage",
+          "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
         );
+        navigate(-1);
+        return;
+      }
 
-        const resUserInfo = await axios.get(
-          `https://sofi.my.id/api/student/${jwtDecoded.id}`
+      if (
+        dataSidang.data.status === "sudah dijadwalkan" ||
+        dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
+      ) {
+        localStorage.setItem(
+          "errorMessage",
+          "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
         );
+        navigate("/schedule/mahasiswa"); //?Belum dibuat
+        return;
+      }
 
-        let team_id = 0;
-        if ((team_id = resUserInfo.data.data.team_id !== 0)) {
-          if (dataSidang.data.status === "tidak lulus (sudah update dokumen)") {
-            console.log("a");
-            navigate("/teams/create");
-            return;
-          }
-          team_id = resUserInfo.data.data.team_id;
-        } else {
-          console.log("b");
+      if (dataSidang.data.status === "tidak lulus") {
+        localStorage.setItem(
+          "errorMessage",
+          "Silahkan update berkas sidang ulang dan slide!"
+        );
+        navigate("/slides");
+        return;
+      }
+      if (
+        dataSidang.data.status !== "telah disetujui admin" &&
+        dataSidang.data.status !== "belum dijadwalkan" &&
+        dataSidang.data.status !== "tidak lulus (sudah update dokumen)" &&
+        dataSidang.data.status !== "tidak lulus (belum dijadwalkan)"
+      ) {
+        localStorage.setItem(
+          "errorMessage",
+          "Sidang anda belum di approve dosen pembimbing dan admin"
+        );
+        navigate(`/sidangs/${dataSidang.data.id}/edit`);
+        return;
+      }
+      await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/slide/get-latest-slide`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+
+      const resUserInfo = await axios.get(
+        `https://sofi.my.id/api/student/${jwtDecoded.id}`
+      );
+
+      let team_id = 0;
+      if ((team_id = resUserInfo.data.data.team_id !== 0)) {
+        if (dataSidang.data.status === "tidak lulus (sudah update dokumen)") {
+          console.log("a");
           navigate("/teams/create");
           return;
         }
-        await fetchTeam();
-        console.log("test dicoba");
-        await fetchMember();
-
-        handleIsIndividu(team);
-        handleIsSudahDijadwalkan();
-      } catch (error) {
-        if (error.response?.status === 404) {
-          localStorage.setItem(
-            "errorMessage",
-            "Anda harus mengupload berkas presentasi terlebih dahulu!"
-          );
-          navigate("/slides");
-          return;
-        }
-        if (error.message === "Network Error") {
-          localStorage.setItem("errorMessage", "Network Error3");
-          navigate("/home");
-          return;
-        }
-        console.error(error);
-      } finally {
-        dispatch(isLoadingFalse());
+        team_id = resUserInfo.data.data.team_id;
+      } else {
+        console.log("b");
+        navigate("/teams/create");
+        return;
       }
-    };
+
+      await fetchTeam();
+      await fetchMember();
+
+      handleIsSudahDijadwalkan();
+    } catch (error) {
+      if (error.response?.status === 404) {
+        localStorage.setItem(
+          "errorMessage",
+          "Anda harus mengupload berkas presentasi terlebih dahulu!"
+        );
+        navigate("/slides");
+        return;
+      }
+      if (error.message === "Network Error") {
+        localStorage.setItem("errorMessage", "Network Error3");
+        navigate("/home");
+        return;
+      }
+      console.error(error);
+    } finally {
+      dispatch(isLoadingFalse());
+    }
+  };
+
+  const handleUpdateTeam = async (e, teamId) => {
+    try {
+      e.preventDefault();
+      dispatch(isLoadingTrue());
+      const body = {
+        name: teamName,
+      };
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/team/update/${teamId}`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        }
+      );
+      console.log(res.data);
+      if (res.data.code === 201) {
+        localStorage.setItem("successMessage", "Tim Berhasil Di Ubah.");
+        await fetchSidangData();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setTeamName("");
+      dispatch(isLoadingFalse());
+    }
+  };
+
+  useEffect(() => {
     fetchSidangData();
   }, []);
 
@@ -294,7 +419,7 @@ const Teams = () => {
                                               </button>
                                             </div>
                                             <div className="modal-body text-center">
-                                              <form action="">
+                                              <form onSubmit={handleLeaveTeam}>
                                                 <div className="btn-group">
                                                   {jwtDecoded.id ===
                                                   value.team_id ? (
@@ -359,19 +484,24 @@ const Teams = () => {
                     &times;
                   </button>
                 </div>
-                <form>
+                <form onSubmit={handleAddMember}>
                   {/* <!-- Modal body --> */}
                   <div className="modal-body">
                     {/* <!-- Name Field --> */}
                     <div className="form-group col-8">
                       <label htmlFor="nim">NIM Anggota Tim:</label>
-                      <select className="form-control select2" name="nim">
+                      <select
+                        className="form-control select2"
+                        name="nim"
+                        value={member}
+                        onChange={(e) => setMember(e.target.value)}
+                      >
                         <option value="" readOnly>
                           -- Silahkan pilih nama anggota --
                         </option>
                         {student?.map((value, index) => (
-                          <option value={value.nim}>
-                            {value.nim} - {value.user_id}
+                          <option key={index} value={value.user_id}>
+                            {value.nim} - {value.username}
                           </option>
                         ))}
                       </select>
@@ -405,7 +535,7 @@ const Teams = () => {
                   </button>
                 </div>
                 {/* {!! Form::model($team, ['route' => ['teams.update', $team->id], 'method' => 'patch']) !!} */}
-                <form>
+                <form onSubmit={(e) => handleUpdateTeam(e, team.id)}>
                   {/* <!-- Modal body --> */}
                   <div className="modal-body">
                     {/* <!-- Name Field --> */}
@@ -414,6 +544,8 @@ const Teams = () => {
                         type="text"
                         id="name"
                         name="name"
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
                         className="form-control"
                         placeholder="Masukkan Nama Kelompok"
                       />

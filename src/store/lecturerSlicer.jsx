@@ -3,10 +3,8 @@ import axios from "axios";
 
 export const fetchLecturer = createAsyncThunk("fetchLecturer", async () => {
   try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_OLDSOFI_API_URL}/lecturer`
-    );
-    if (res.data.status === 200) {
+    const res = await axios.get(`https://sofi.my.id/api/lecturer`);
+    if (res.data.code === 200) {
       return res.data.data;
     }
   } catch (error) {

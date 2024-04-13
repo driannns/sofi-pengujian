@@ -100,6 +100,15 @@ const SidangEdit = () => {
     return `${dayOfWeek}, ${dayOfMonth} ${month} ${year} - ${hour}:${minute}`;
   };
 
+  const formatUser = async (userId) => {
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/api/user/${userId}`);
+      return res.data.data.username;
+    } catch (error) {
+      return "-";
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -133,7 +142,13 @@ const SidangEdit = () => {
               },
             }
           );
-          setStatusLog(resStatusLog.data.data);
+          const formatStatusLog = await Promise.all(
+            resStatusLog.data.data.map(async (value) => {
+              const manipulatedData = await formatUser(value.created_by);
+              return { ...value, created_by: manipulatedData };
+            })
+          );
+          setStatusLog(formatStatusLog);
         } else {
           const resStatusLog = await axios.get(
             `${import.meta.env.VITE_API_URL}/api/status-log/get`,
@@ -144,7 +159,13 @@ const SidangEdit = () => {
               },
             }
           );
-          setStatusLog(resStatusLog.data.data);
+          const formatStatusLog = await Promise.all(
+            resStatusLog.data.data.map(async (value) => {
+              const manipulatedData = await formatUser(value.created_by);
+              return { ...value, created_by: manipulatedData };
+            })
+          );
+          setStatusLog(formatStatusLog);
         }
 
         // Parameter
@@ -180,9 +201,12 @@ const SidangEdit = () => {
           return;
         }
       } catch (error) {
-        if (error.response.status === 404) {
+        if (
+          error.response?.status !== 404 ||
+          error.message === "Network Error"
+        ) {
           localStorage.setItem("errorMessage", "Network Error");
-          console.error("Erorr fetching data:", e);
+          console.error("Erorr fetching data:", error);
           navigate("/home");
           return;
         }

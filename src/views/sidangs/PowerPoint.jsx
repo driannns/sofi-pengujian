@@ -117,7 +117,7 @@ const MateriPresentasi = () => {
           return;
         }
 
-        fetchSlide();
+        await fetchSlide();
 
         if (dataSidang.data.status === "tidak lulus") {
           setOldPeriod(dataSidang.data.period_id);
@@ -152,41 +152,6 @@ const MateriPresentasi = () => {
 
     fetchData();
   }, []);
-
-  // useEffect(() => {
-  //   if (!dataSidang.data) {
-  //     localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
-  //     navigate("/sidangs/create");
-  //     return;
-  //   }
-
-  //   if (
-  //     dataSidang.data?.status === "sudah dijadwalkan" ||
-  //     dataSidang.data?.status === "tidak lulus (sudah dijadwalkan)"
-  //   ) {
-  //     localStorage.setItem("warningMessage", "Anda belum mendaftar sidang!");
-  //     navigate("schedule/mahasiswa");
-  //     return;
-  //   }
-
-  //   if (
-  //     dataSidang.data &&
-  //     !dataSidang.data.status.includes([
-  //       "telah disetujui admin",
-  //       "belum dijadwalkan",
-  //       "tidak lulus",
-  //       "tidak lulus (sudah update dokumen)",
-  //       "tidak lulus (belum dijadwalkan)",
-  //     ])
-  //   ) {
-  //     localStorage.setItem(
-  //       "errorMessage",
-  //       "Sidang anda belum di approve dosen pembimbing dan admin"
-  //     );
-  //     navigate(-1);
-  //     return;
-  //   }
-  // }, [dataSidang]);
 
   return (
     <MainLayout>

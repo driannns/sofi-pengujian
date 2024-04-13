@@ -10,7 +10,7 @@ import Loading from "../../components/Loading";
 
 const formatUser = async (userId) => {
   try {
-    const res = await axios.get(`http://127.0.0.1:8000/api/user/${userId}`);
+    const res = await axios.get(`https://sofi.my.id/api/user/${userId}`);
     return res.data.data.username;
   } catch (error) {
     return "-";
@@ -93,18 +93,14 @@ const SidangShow = () => {
         setStatusLog(formatStatusLog);
 
         const resPembimbing1 = await axios.get(
-          `${import.meta.env.VITE_OLDSOFI_API_URL}/lecturer/${
-            dataSidang.data.pembimbing1_id
-          }`
+          `https://sofi.my.id/api/lecturer/${dataSidang.data.pembimbing1_id}`
         );
         setPembimbing1(
           `${resPembimbing1.data.data.code} - ${resPembimbing1.data.data.user.nama}`
         );
 
         const resPembimbing2 = await axios.get(
-          `${import.meta.env.VITE_OLDSOFI_API_URL}/lecturer/${
-            dataSidang.data.pembimbing2_id
-          }`
+          `https://sofi.my.id/api/lecturer/${dataSidang.data.pembimbing2_id}`
         );
         setPembimbing2(
           `${resPembimbing2.data.data.code} - ${resPembimbing2.data.data.user.nama}`
@@ -135,7 +131,7 @@ const SidangShow = () => {
       }
     };
     fetchingData();
-  }, [dataSidang]);
+  }, []);
 
   return (
     <MainLayout>
@@ -265,9 +261,10 @@ const SidangShow = () => {
                             <td>
                               {dataSidang.data.doc_ta ? (
                                 <a
-                                  href="/{{$dokumen_ta->file_url}}"
+                                  href={`${import.meta.env.VITE_API_URL}${
+                                    dataSidang.data.doc_ta
+                                  }`}
                                   className="btn btn-outline-primary"
-                                  download
                                 >
                                   Download
                                 </a>
@@ -293,9 +290,10 @@ const SidangShow = () => {
                             <td>
                               {dataSidang.data.makalah ? (
                                 <a
-                                  href="/{{$makalah->file_url}}"
+                                  href={`${import.meta.env.VITE_API_URL}${
+                                    dataSidang.data.makalah
+                                  }`}
                                   className="btn btn-outline-primary"
-                                  download
                                 >
                                   Download
                                 </a>
