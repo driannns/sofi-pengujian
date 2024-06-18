@@ -3,32 +3,34 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { isLoadingTrue, isLoadingFalse } from "../../../store/loadingSlicer";
 import Alert from "../../../components/Alert";
 import Loading from "../../../components/Loading";
+import ModalComponent from "../../../components/Modal";
 
 const TeamsCreate = () => {
   const [cookies] = useCookies();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [teamName, setTeamName] = useState("");
-  const isLoading = useSelector((state) => state.loading.loading);
+  const [individuModal, setIndividuModal] = useState(false);
 
   const handleIndividual = async (e) => {
     try {
-      dispatch(isLoadingTrue());
+      setIsLoading(true);
       e.preventDefault();
-      console.log(cookies["auth-token"]);
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/team/create-individual`,
+        `${import.meta.env.VITE_API_URL}/api/team/create/individual`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
           },
         }
       );
-      console.log(res.data);
-      if (res.data.status === 200) {
+      if (res.data.code === 201) {
         localStorage.setItem(
           "successMessage",
           "Berhasil Mengajukan Sidang Individu"
@@ -36,26 +38,27 @@ const TeamsCreate = () => {
         navigate("/teams");
       }
     } catch (error) {
-      console.error(error);
+      setIsLoading(false);
     } finally {
-      dispatch(isLoadingFalse());
+      setIndividuModal(false);
     }
   };
 
   const handleTeam = async (e) => {
     try {
-      dispatch(isLoadingTrue());
+      setIsLoading(true);
 
       e.preventDefault();
       const body = {
         name: teamName,
       };
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/team/create-team`,
+        `${import.meta.env.VITE_API_URL}/api/team/create/team`,
         body,
         {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
           },
         }
       );
@@ -65,9 +68,8 @@ const TeamsCreate = () => {
         return;
       }
     } catch (error) {
-      console.error(error);
+      setIsLoading(false);
     } finally {
-      dispatch(isLoadingFalse());
       setTeamName("");
     }
   };
@@ -93,7 +95,6 @@ const TeamsCreate = () => {
 
           <div className="container-fluid">
             <div className="animated fadeIn">
-              {/* @include('coreui-templates::common.errors') */}
               <Alert type="danger" />
               <Alert type="success" />
               <Alert type="warning" />
@@ -113,22 +114,25 @@ const TeamsCreate = () => {
                       </p>
 
                       <button
+                        type="button"
                         className="btn btn-primary"
-                        name="button"
-                        data-toggle="modal"
-                        data-target="#individu"
+                        onClick={() => setIndividuModal(true)}
                       >
                         Sidang Individu
                       </button>
 
                       {/* {{-- MODAL SIDANG INDIVIDU  --}} */}
-                      <div className="modal fade" id="individu">
-                        <div className="modal-dialog">
+                      <ModalComponent
+                        show={individuModal}
+                        onHide={() => setIndividuModal(false)}
+                      >
+                        <div className="modal-dialog" style={{ margin: 0 }}>
                           <div className="modal-content">
                             {/* <!-- Modal body --> */}
                             <div className="modal-header">
                               <h4 className="modal-title">Perhatian</h4>
                               <button
+                                onClick={() => setIndividuModal(false)}
                                 type="button"
                                 className="close"
                                 data-dismiss="modal"
@@ -138,21 +142,20 @@ const TeamsCreate = () => {
                             </div>
                             <div className="modal-body text-center">
                               <form onSubmit={handleIndividual}>
-                                {" "}
-                                //Individu
                                 <h5>
                                   Apa anda yakin untuk memilih Sidang Individu?
                                 </h5>
                                 <br />
                                 <button
-                                  data-dismiss="modal"
-                                  className="btn btn-secondary"
+                                  type="button"
+                                  onClick={() => setIndividuModal(false)}
+                                  className="btn btn-secondary mr-1"
                                 >
                                   Tidak
                                 </button>
                                 <button
                                   type="submit"
-                                  className="btn btn-primary"
+                                  className="btn btn-primary ml-1"
                                   name="button"
                                 >
                                   Iya
@@ -161,7 +164,7 @@ const TeamsCreate = () => {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </ModalComponent>
                     </div>
                   </div>
                 </div>
@@ -188,10 +191,13 @@ const TeamsCreate = () => {
                         </div>
                         {/* <!-- Submit Field --> */}
                         <div className="form-group col-sm-12">
-                          <button type="submit" className="btn btn-primary">
+                          <button
+                            type="submit"
+                            className="btn btn-primary mr-1"
+                          >
                             Simpan
                           </button>
-                          <Link to="/teams" className="btn btn-secondary">
+                          <Link to="/teams" className="btn btn-secondary ml-1">
                             Batal
                           </Link>
                         </div>

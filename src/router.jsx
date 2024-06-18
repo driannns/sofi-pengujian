@@ -3,10 +3,13 @@ import { Routes, Route } from "react-router-dom";
 
 import Welcome from "./views/Welcome";
 import Home from "./views/Home";
+import Notification from "./views/Notification";
 import Login from "./views/auth/Login";
 import LoginSSO from "./views/auth/LoginSSO";
 
 import SidangIndex from "./views/sidangs/Index";
+import IndexSKPenguji from "./views/sidangs/IndexSKPenguji";
+import UploadSKForm from "./views/sidangs/UploadSKForm";
 import SidangShow from "./views/sidangs/Show";
 import SidangCreate from "./views/sidangs/Create";
 import SidangEdit from "./views/sidangs/Edit";
@@ -29,7 +32,6 @@ const router = (
   <Routes>
     {/* Public Routes */}
     <Route path="/" element={<Welcome />} />
-
     {/* Auth Routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/loginsso" element={<LoginSSO />} />
@@ -43,6 +45,7 @@ const router = (
       }
     >
       <Route path="/home" element={<Home />} />
+      <Route path="/notification" element={<Notification />} />
     </Route>
 
     {/* RLMHS Routes */}
@@ -67,6 +70,8 @@ const router = (
 
     {/* RLADM Routes */}
     <Route element={<PrivateRoutes role={["RLADM"]} />}>
+      <Route path="/sidangs/surat-tugas" element={<IndexSKPenguji />} />
+      <Route path="/sidangs/:id/storeSkForm" element={<UploadSKForm />} />
       <Route path="/studyPrograms" element={<StudyPrograms />} />
       <Route path="/studyPrograms/create" element={<StudyProgramCreate />} />
       <Route path="/studyPrograms/:id/edit" element={<StudyProgramEdit />} />

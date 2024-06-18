@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const Alert = ({ type, message }) => {
-  const [error, setError] = useState(null);
+  const location = useLocation();
+  const [alertMessage, setAlertMessage] = useState(null);
 
   const clearLocalStorage = () => {
     localStorage.removeItem("errorMessage");
@@ -10,14 +12,18 @@ const Alert = ({ type, message }) => {
   };
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      clearLocalStorage();
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    const messageType = `${type}Message`;
+    const storedMessage = localStorage.getItem("errorMessage");
+    if (storedMessage) {
+      setAlertMessage(storedMessage);
+    }
+
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (storedMessage) {
+        localStorage.removeItem("errorMessage");
+      }
     };
-  }, []);
+  }, [location, type]);
 
   return message ? (
     <div className={`alert alert-${type}`} role="alert">

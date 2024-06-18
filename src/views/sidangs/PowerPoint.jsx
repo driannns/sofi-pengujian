@@ -1,74 +1,59 @@
 import { MainLayout } from "../layouts/MainLayout";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { checkSidang } from "../../store/sidangSlicer";
 import { uploadSlide } from "../../store/dokumentLogSlicer";
 import { useCookies } from "react-cookie";
-import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
+import DownloadButton from "../../components/DownloadButton";
 
 const MateriPresentasi = () => {
   const dataSidang = useSelector((state) => state.sidang);
-  const isLoading = useSelector((state) => state.loading.loading);
-  const dokumenLog = useSelector((state) => state.dokumenLog);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [cookies] = useCookies();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [periodNow, setPeriodNow] = useState(null);
   const [oldPeriod, setOldPeriod] = useState(null);
-  const [slide, setSlide] = useState(null);
   const [file, setFile] = useState("");
+  const isMounted = useRef(true);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  const fetchSlide = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/slide/get-latest-slide`,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
-      //? bingung ini error.response.data.code atau error.response.status?
-      console.log(res.data);
-      if (res.data.code === 200) {
-        setSlide(res.data.data);
-      }
-    } catch (error) {
-      if (error.response.data.code !== 404) {
-        localStorage.setItem("errorMessage", "Network Error");
-        navigate("/home");
-        return;
-      }
-    }
-  };
-
   const handleUploadSlide = async (e) => {
     try {
+      setIsLoading(true);
       e.preventDefault();
-      await dispatch(
+      const resUploadSlide = await dispatch(
         uploadSlide({ authToken: cookies["auth-token"], slide: file })
       );
-      fetchSlide();
-      setFile("");
+      console.log(resUploadSlide);
+      if (
+        resUploadSlide.payload ||
+        resUploadSlide.type === "checkSidang/fulfilled"
+      ) {
+        await dispatch(checkSidang(cookies["auth-token"]));
+      }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
+      setFile("");
     }
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     const fetchData = async () => {
       try {
-        dispatch(isLoadingTrue());
-
+        setIsLoading(true);
         const resPeriodNow = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/period/check-period`,
           {
@@ -76,61 +61,64 @@ const MateriPresentasi = () => {
               Authorization: `Bearer ${cookies["auth-token"]}`,
               "ngrok-skip-browser-warning": true,
             },
-          }
+          },
+          { signal }
         );
         if (resPeriodNow.data.code === 200) {
           setPeriodNow(resPeriodNow.data.data);
         }
 
-        dispatch(checkSidang(cookies["auth-token"]));
+        const dataSidangMHS = await dispatch(
+          checkSidang(cookies["auth-token"])
+        );
 
-        if (!dataSidang.data) {
+        if (!dataSidangMHS.payload) {
           localStorage.setItem("errorMessage", "Anda belum mendaftar sidang!");
-          navigate(-1);
+          if (isMounted.current) navigate(-1);
           return;
         }
 
         if (
-          dataSidang.data.status === "sudah dijadwalkan" ||
-          dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
+          dataSidangMHS.payload.status === "sudah dijadwalkan" ||
+          dataSidangMHS.payload.status === "tidak lulus (sudah dijadwalkan)"
         ) {
           localStorage.setItem(
             "warningMessage",
             "Sidang anda sudah dijadwalkan, tidak dapat merubah file presentasi"
           );
-          navigate("/schedule/mahasiswa"); //?Belum dibuat
+          if (isMounted.current) navigate("/schedule/mahasiswa");
           return;
         }
 
         if (
-          dataSidang.data.status !== "telah disetujui admin" &&
-          dataSidang.data.status !== "belum dijadwalkan" &&
-          dataSidang.data.status !== "tidak lulus" &&
-          dataSidang.data.status !== "tidak lulus (sudah update dokumen)" &&
-          dataSidang.data.status !== "tidak lulus (belum dijadwalkan)"
+          dataSidangMHS.payload.status !== "telah disetujui admin" &&
+          dataSidangMHS.payload.status !== "belum dijadwalkan" &&
+          dataSidangMHS.payload.status !== "tidak lulus" &&
+          dataSidangMHS.payload.status !==
+            "tidak lulus (sudah update dokumen)" &&
+          dataSidangMHS.payload.status !== "tidak lulus (belum dijadwalkan)"
         ) {
           localStorage.setItem(
             "errorMessage",
             "Sidang anda belum di approve dosen pembimbing dan admin"
           );
-          navigate(-1);
+          if (isMounted.current) navigate(-1);
           return;
         }
 
-        await fetchSlide();
-
-        if (dataSidang.data.status === "tidak lulus") {
-          setOldPeriod(dataSidang.data.period_id);
+        if (dataSidangMHS.payload.status === "tidak lulus") {
+          setOldPeriod(dataSidangMHS.payload.period_id);
           const resPeriodNow = await axios.get(
             `${import.meta.env.VITE_API_URL}/api/period/get/${
-              dataSidang.data.period_id
+              dataSidangMHS.payload.period_id
             }`,
             {
               headers: {
                 Authorization: `Bearer ${cookies["auth-token"]}`,
                 "ngrok-skip-browser-warning": true,
               },
-            }
+            },
+            { signal }
           );
           if (resPeriodNow.data.code === 200) {
             setPeriodNow(resPeriodNow.data.data);
@@ -142,15 +130,28 @@ const MateriPresentasi = () => {
           error.message === "Networking error"
         ) {
           localStorage.setItem("errorMessage", "Network error");
-          navigate(-1);
+          if (isMounted.current) navigate(-1);
+          return;
+        }
+        if (
+          error.response?.status === 404 &&
+          error.response.data.message === "time is not valid with period data"
+        ) {
+          localStorage.setItem("errorMessage", "Network error");
+          if (isMounted.current) navigate(-1);
           return;
         }
       } finally {
-        dispatch(isLoadingFalse());
+        setIsLoading(false);
       }
     };
 
     fetchData();
+
+    return () => {
+      isMounted.current = false;
+      abortController.abort();
+    };
   }, []);
 
   return (
@@ -289,7 +290,7 @@ const MateriPresentasi = () => {
                             />
                             <div className="input-group mb-3">
                               <div className="custom-file">
-                                {slide ? (
+                                {dataSidang?.data?.slide ? (
                                   <>
                                     <input
                                       type="file"
@@ -298,7 +299,7 @@ const MateriPresentasi = () => {
                                       name="slide"
                                     />
                                     <label className="custom-file-label">
-                                      {slide.file_url}
+                                      {dataSidang?.data.slide?.file_name}
                                     </label>
                                   </>
                                 ) : (
@@ -317,16 +318,14 @@ const MateriPresentasi = () => {
                                 )}
                               </div>
                             </div>
-                            {slide ? (
+                            {dataSidang?.data?.slide ? (
                               <div className="row ml-0">
-                                <a
-                                  href={`${import.meta.env.VITE_API_URL}${
-                                    slide.file_url
+                                <DownloadButton
+                                  url={`${import.meta.env.VITE_API_URL}${
+                                    dataSidang.data.slide.file_url
                                   }`}
                                   className="btn btn-danger mr-2"
-                                >
-                                  Download
-                                </a>
+                                />
                                 <br />
                                 <button
                                   type="submit"

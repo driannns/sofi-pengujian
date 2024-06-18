@@ -1,36 +1,42 @@
 import { MainLayout } from "../../layouts/MainLayout";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { checkSidang } from "../../../store/sidangSlicer";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
-import { isLoadingTrue, isLoadingFalse } from "../../../store/loadingSlicer";
 import Loading from "../../../components/Loading";
 import Alert from "../../../components/Alert";
+import ModalComponent from "../../../components/Modal";
 
 const Teams = () => {
   const dataSidang = useSelector((state) => state.sidang);
-  const isLoading = useSelector((state) => state.loading.loading);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [cookies] = useCookies();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [team, setTeam] = useState(null);
   const [student, setStudent] = useState(null);
-  const [member, setMember] = useState(null);
+  const [member, setMember] = useState("");
   const [isSudahDijadwalkan, setIsSudahDijadwalkan] = useState(true);
   const [isIndividu, setIsIndividu] = useState(false);
   const [teamName, setTeamName] = useState("");
+
+  const [tambahModal, setTambahModal] = useState(false);
+  const [ubahModal, setUbahModal] = useState(false);
+  const [leaveModal, setLeaveModal] = useState(false);
+  const [userIdLeave, setUserIdLeave] = useState(null);
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
+  const isMounted = useRef(true);
 
   const handleLeaveTeam = async (e) => {
     try {
-      dispatch(isLoadingTrue());
-      console.log("loading true1");
+      setIsLoading(true);
       e.preventDefault();
       const body = {
         team_id: team.id,
+        user_id: userIdLeave,
       };
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/team/leave-team`,
@@ -46,16 +52,16 @@ const Teams = () => {
         fetchSidangData();
         localStorage.setItem("successMessage", "Berhasil Dihapus.");
       }
-      console.log(res.data);
     } catch (error) {
-      console.error(error);
-      dispatch(isLoadingFalse());
+      setIsLoading(false);
+    } finally {
+      setLeaveModal(false);
     }
   };
 
   const handleAddMember = async (e) => {
     try {
-      dispatch(isLoadingTrue());
+      setIsLoading(true);
       e.preventDefault();
       const memberId = parseInt(member);
       const body = {
@@ -72,25 +78,33 @@ const Teams = () => {
           },
         }
       );
-      console.log(res.data);
+      console.log(res);
       if (res.data.code === 200) {
         localStorage.setItem(
-          "succesMessage",
-          `${res.data.data.nim} Berhasil Ditambahkan.`
+          "successMessage",
+          `${res.data.data} Berhasil Ditambahkan.`
         );
         fetchSidangData();
+        return;
       }
     } catch (error) {
-      console.error(error);
+      if (
+        error.response.data.code === 404 &&
+        error.response.data.message === "make sure student already upload slide"
+      ) {
+        localStorage.setItem("errorMessage", `${error.response.data.message}`);
+      }
+      console.error("error", error);
+      setIsLoading(false);
     } finally {
-      dispatch(isLoadingFalse());
+      setMember("");
+      setTambahModal(false);
     }
   };
 
   const formatUser = async (userId) => {
     try {
       const res = await axios.get(`https://sofi.my.id/api/user/${userId}`);
-      // console.log(res.data.data);
       return res.data.data.nama;
     } catch (error) {
       return "-";
@@ -100,7 +114,7 @@ const Teams = () => {
   const fetchTeam = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/team/get-team`,
+        `${import.meta.env.VITE_API_URL}/api/team/user/get`,
         {
           headers: {
             "ngrok-skip-browser-warning": true,
@@ -112,15 +126,15 @@ const Teams = () => {
       handleIsIndividu(res.data.data);
       if (res.data.code === 200) {
         setTeam(res.data.data);
+        setTeamName(res.data.data.name);
       }
     } catch (error) {
-      console.error(error);
       if (
-        error.response?.data.status !== 404 ||
+        error.response?.data.code !== 404 ||
         error.message === "Network Error"
       ) {
         localStorage.setItem("errorMessage", "Network Error1");
-        navigate("/home");
+        if (isMounted.current) navigate("/home");
         return;
       }
     }
@@ -128,12 +142,8 @@ const Teams = () => {
 
   const fetchMember = async () => {
     try {
-      const studentNoTeam = await axios.get(
-        "https://sofi.my.id/api/team/get-nonmember"
-      );
-
       const studentRegistered = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/status/approve`,
+        `${import.meta.env.VITE_API_URL}/api/team/available-member`,
         {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -141,26 +151,11 @@ const Teams = () => {
           },
         }
       );
-
-      const matchedStudents = studentNoTeam.data.data.filter((student) => {
-        return studentRegistered.data.data.some(
-          (registeredStudent) => registeredStudent.user_id === student.user_id
-        );
-      });
-
-      const formatStudents = await Promise.all(
-        matchedStudents.map(async (value) => {
-          const manipulatedData = await formatUser(value.user_id);
-          return { ...value, username: manipulatedData };
-        })
-      );
-      setStudent(formatStudents);
-      console.log(formatStudents);
+      setStudent(studentRegistered.data.data);
     } catch (error) {
-      console.error(error);
       if (error.response?.status !== 404 || error.message === "Network Error") {
         localStorage.setItem("errorMessage", "Network Error2");
-        navigate("/home");
+        if (isMounted.current) navigate("/home");
         return;
       }
     }
@@ -184,8 +179,7 @@ const Teams = () => {
 
   const fetchSidangData = async () => {
     try {
-      dispatch(isLoadingTrue());
-
+      setIsLoading(true);
       dispatch(checkSidang(cookies["auth-token"]));
 
       if (!dataSidang.data) {
@@ -193,10 +187,9 @@ const Teams = () => {
           "errorMessage",
           "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
         );
-        navigate(-1);
+        if (isMounted.current) navigate(-1);
         return;
       }
-
       if (
         dataSidang.data.status === "sudah dijadwalkan" ||
         dataSidang.data.status === "tidak lulus (sudah dijadwalkan)"
@@ -205,7 +198,7 @@ const Teams = () => {
           "errorMessage",
           "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
         );
-        navigate("/schedule/mahasiswa"); //?Belum dibuat
+        if (isMounted.current) navigate("/schedule/mahasiswa"); //?Belum dibuat
         return;
       }
 
@@ -214,7 +207,7 @@ const Teams = () => {
           "errorMessage",
           "Silahkan update berkas sidang ulang dan slide!"
         );
-        navigate("/slides");
+        if (isMounted.current) navigate("/slides");
         return;
       }
       if (
@@ -227,34 +220,31 @@ const Teams = () => {
           "errorMessage",
           "Sidang anda belum di approve dosen pembimbing dan admin"
         );
-        navigate(`/sidangs/${dataSidang.data.id}/edit`);
+        if (isMounted.current) navigate(`/sidangs/${dataSidang.data.id}/edit`);
         return;
       }
-      await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/slide/get-latest-slide`,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+
+      if (dataSidang.data.slide === null) {
+        localStorage.setItem(
+          "errorMessage",
+          "Anda harus mengupload berkas presentasi terlebih dahulu!"
+        );
+        if (isMounted.current) navigate("/slides");
+        return;
+      }
 
       const resUserInfo = await axios.get(
         `https://sofi.my.id/api/student/${jwtDecoded.id}`
       );
-
       let team_id = 0;
       if ((team_id = resUserInfo.data.data.team_id !== 0)) {
         if (dataSidang.data.status === "tidak lulus (sudah update dokumen)") {
-          console.log("a");
-          navigate("/teams/create");
+          if (isMounted.current) navigate("/teams/create");
           return;
         }
         team_id = resUserInfo.data.data.team_id;
       } else {
-        console.log("b");
-        navigate("/teams/create");
+        if (isMounted.current) navigate("/teams/create");
         return;
       }
 
@@ -263,29 +253,20 @@ const Teams = () => {
 
       handleIsSudahDijadwalkan();
     } catch (error) {
-      if (error.response?.status === 404) {
-        localStorage.setItem(
-          "errorMessage",
-          "Anda harus mengupload berkas presentasi terlebih dahulu!"
-        );
-        navigate("/slides");
-        return;
-      }
       if (error.message === "Network Error") {
         localStorage.setItem("errorMessage", "Network Error3");
-        navigate("/home");
+        if (isMounted.current) navigate("/home");
         return;
       }
-      console.error(error);
     } finally {
-      dispatch(isLoadingFalse());
+      setIsLoading(false);
     }
   };
 
   const handleUpdateTeam = async (e, teamId) => {
     try {
+      setIsLoading(true);
       e.preventDefault();
-      dispatch(isLoadingTrue());
       const body = {
         name: teamName,
       };
@@ -298,21 +279,135 @@ const Teams = () => {
           },
         }
       );
-      console.log(res.data);
-      if (res.data.code === 201) {
+      if (res.data.code === 200) {
         localStorage.setItem("successMessage", "Tim Berhasil Di Ubah.");
         await fetchSidangData();
       }
     } catch (error) {
-      console.error(error);
     } finally {
       setTeamName("");
-      dispatch(isLoadingFalse());
+      setUbahModal(false);
+      setIsLoading(false);
     }
   };
 
+  const handleLeaveModalOpen = (userId) => {
+    setLeaveModal(true);
+    setUserIdLeave(userId);
+  };
+
   useEffect(() => {
-    fetchSidangData();
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const fetchSidang = async () => {
+      try {
+        setIsLoading(true);
+        const dataSidangTeam = await dispatch(
+          checkSidang(cookies["auth-token"])
+        );
+        if (
+          dataSidangTeam.type === "checkSidang/rejected" &&
+          dataSidangTeam.error.message === "Network Error"
+        ) {
+          localStorage.setItem("errorMessage", "Network Error");
+          if (isMounted.current) navigate("/home");
+          return;
+        }
+        if (!dataSidangTeam.payload) {
+          localStorage.setItem(
+            "errorMessage",
+            "Anda belum mendaftar sidang, silahkan daftar sidang terlebih dahulu"
+          );
+          if (isMounted.current) navigate(-1);
+          return;
+        }
+
+        if (
+          dataSidangTeam.payload.status === "sudah dijadwalkan" ||
+          dataSidangTeam.payload.status === "tidak lulus (sudah dijadwalkan)"
+        ) {
+          localStorage.setItem(
+            "errorMessage",
+            "Jadwal sidang anda sudah diumumkan, tidak dapat membuat team lagi"
+          );
+          if (isMounted.current) navigate("/schedule/mahasiswa"); //?Belum dibuat
+          return;
+        }
+
+        if (dataSidangTeam.payload.status === "tidak lulus") {
+          localStorage.setItem(
+            "errorMessage",
+            "Silahkan update berkas sidang ulang dan slide!"
+          );
+          if (isMounted.current) navigate("/slides");
+          return;
+        }
+        if (
+          dataSidangTeam.payload.status !== "telah disetujui admin" &&
+          dataSidangTeam.payload.status !== "belum dijadwalkan" &&
+          dataSidangTeam.payload.status !==
+            "tidak lulus (sudah update dokumen)" &&
+          dataSidangTeam.payload.status !== "tidak lulus (belum dijadwalkan)"
+        ) {
+          localStorage.setItem(
+            "errorMessage",
+            "Sidang anda belum di approve dosen pembimbing dan admin"
+          );
+          if (isMounted.current)
+            navigate(`/sidangs/${dataSidangTeam.payload.id}/edit`);
+          return;
+        }
+
+        if (dataSidangTeam.payload.slide === null) {
+          localStorage.setItem(
+            "errorMessage",
+            "Anda harus mengupload berkas presentasi terlebih dahulu!"
+          );
+          if (isMounted.current) navigate("/slides");
+          return;
+        }
+
+        const resUserInfo = await axios.get(
+          `https://sofi.my.id/api/student/${jwtDecoded.id}`,
+          { signal }
+        );
+        let team_id = 0;
+        if ((team_id = resUserInfo.data.data.team_id !== 0)) {
+          if (
+            dataSidangTeam.payload.status ===
+            "tidak lulus (sudah update dokumen)"
+          ) {
+            if (isMounted.current) navigate("/teams/create");
+            return;
+          }
+          team_id = resUserInfo.data.data.team_id;
+        } else {
+          if (isMounted.current) navigate("/teams/create");
+          return;
+        }
+
+        await fetchTeam();
+        await fetchMember();
+
+        handleIsSudahDijadwalkan();
+      } catch (error) {
+        if (error.message === "Network Error") {
+          localStorage.setItem("errorMessage", "Network Error");
+          if (isMounted.current) navigate("/home");
+          return;
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSidang();
+
+    return () => {
+      isMounted.current = false;
+      abortController.abort();
+    };
   }, []);
 
   return (
@@ -349,15 +444,13 @@ const Teams = () => {
                         <>
                           <button
                             className="pull-right btn btn-primary btn-sm"
-                            data-toggle="modal"
-                            data-target="#modaltambah"
+                            onClick={() => setTambahModal(true)}
                           >
                             TAMBAH ANGGOTA
                           </button>
                           <button
                             className="pull-right mr-2 btn btn-primary btn-sm"
-                            data-toggle="modal"
-                            data-target="#modalubah"
+                            onClick={() => setUbahModal(true)}
                           >
                             UBAH NAMA TIM
                           </button>
@@ -383,7 +476,7 @@ const Teams = () => {
                               <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{value.nim}</td>
-                                <td>{value.user_id}</td>
+                                <td>{value.name}</td>
                                 <td>
                                   {isSudahDijadwalkan ? (
                                     <div className="btn-group">
@@ -395,15 +488,22 @@ const Teams = () => {
                                     <>
                                       <button
                                         className="btn btn-danger btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#hapustim"
+                                        onClick={() =>
+                                          handleLeaveModalOpen(value.user_id)
+                                        }
                                       >
                                         Tinggalkan
                                       </button>
-
                                       {/* {{-- MODAL HAPUS TIM  --}} */}
-                                      <div className="modal fade" id="hapustim">
-                                        <div className="modal-dialog">
+                                      <ModalComponent
+                                        show={leaveModal}
+                                        onHide={() => setLeaveModal(false)}
+                                        className="modal fade"
+                                      >
+                                        <div
+                                          className="modal-dialog"
+                                          style={{ margin: 0 }}
+                                        >
                                           <div className="modal-content">
                                             {/* <!-- Modal body --> */}
                                             <div className="modal-header">
@@ -413,7 +513,9 @@ const Teams = () => {
                                               <button
                                                 type="button"
                                                 className="close"
-                                                data-dismiss="modal"
+                                                onClick={() =>
+                                                  setLeaveModal(false)
+                                                }
                                               >
                                                 &times;
                                               </button>
@@ -426,7 +528,9 @@ const Teams = () => {
                                                     <button
                                                       type="submit"
                                                       className="btn btn-danger btn-sm"
-                                                    ></button>
+                                                    >
+                                                      Tinggalkan
+                                                    </button>
                                                   ) : (
                                                     <center>
                                                       <h5>
@@ -435,20 +539,23 @@ const Teams = () => {
                                                         akan meninggalkan tim.
                                                       </h5>
                                                       <br />
-                                                      <button
-                                                        type="submit"
-                                                        className="btn btn-danger"
-                                                        data-toggle="modal"
-                                                        data-target="#hapustim"
-                                                      >
-                                                        Tinggalkan
-                                                      </button>
-                                                      <button
-                                                        data-dismiss="modal"
-                                                        className="btn btn-secondary"
-                                                      >
-                                                        Batal
-                                                      </button>
+                                                      <div className="d-flex justify-content-center">
+                                                        <button
+                                                          type="submit"
+                                                          className="btn btn-danger w-25 mr-1"
+                                                        >
+                                                          Tinggalkan
+                                                        </button>
+                                                        <button
+                                                          type="button"
+                                                          onClick={() =>
+                                                            setLeaveModal(false)
+                                                          }
+                                                          className="btn btn-secondary w-25"
+                                                        >
+                                                          Batal
+                                                        </button>
+                                                      </div>
                                                     </center>
                                                   )}
                                                 </div>
@@ -456,7 +563,7 @@ const Teams = () => {
                                             </div>
                                           </div>
                                         </div>
-                                      </div>
+                                      </ModalComponent>
                                     </>
                                   )}
                                 </td>
@@ -474,13 +581,21 @@ const Teams = () => {
           </div>
 
           {/* {{-- MODAL TAMBAH --}} */}
-          <div className="modal fade" id="modaltambah">
-            <div className="modal-dialog modal-lg">
+          <ModalComponent
+            show={tambahModal}
+            onHide={() => setTambahModal(false)}
+            className="modal fade"
+          >
+            <div className="modal-dialog modal-lg" style={{ margin: 0 }}>
               <div className="modal-content">
                 {/* <!-- Modal Header --> */}
                 <div className="modal-header">
                   <h4 className="modal-title">Tambah Anggota Tim</h4>
-                  <button type="button" className="close" data-dismiss="modal">
+                  <button
+                    type="button"
+                    className="close"
+                    onClick={() => setTambahModal(false)}
+                  >
                     &times;
                   </button>
                 </div>
@@ -501,36 +616,47 @@ const Teams = () => {
                         </option>
                         {student?.map((value, index) => (
                           <option key={index} value={value.user_id}>
-                            {value.nim} - {value.username}
+                            {value.nim} - {value.name}
                           </option>
                         ))}
                       </select>
                     </div>
                   </div>
 
-                  <div class="modal-footer">
+                  <div className="modal-footer">
                     <input
                       type="submit"
-                      value="tambah"
+                      value="Tambah"
                       className="btn btn-primary"
                     />
-                    <button data-dismiss="modal" class="btn btn-secondary">
+                    <div
+                      onClick={() => setTambahModal(false)}
+                      className="btn btn-secondary"
+                    >
                       Batal
-                    </button>
+                    </div>
                   </div>
                 </form>
               </div>
             </div>
-          </div>
+          </ModalComponent>
 
           {/* {{-- MODAL UBAH TIM  --}} */}
-          <div className="modal fade" id="modalubah">
-            <div className="modal-dialog">
+          <ModalComponent
+            className="modal fade"
+            show={ubahModal}
+            onHide={() => setUbahModal(false)}
+          >
+            <div className="modal-dialog" style={{ margin: 0 }}>
               <div className="modal-content">
                 {/* <!-- Modal Header --> */}
                 <div className="modal-header">
                   <h4 className="modal-title">Ubah Nama Tim</h4>
-                  <button type="button" className="close" data-dismiss="modal">
+                  <button
+                    type="button"
+                    className="close"
+                    onClick={() => setUbahModal(false)}
+                  >
                     &times;
                   </button>
                 </div>
@@ -557,14 +683,17 @@ const Teams = () => {
                     <button type="submit" className="btn btn-primary">
                       Simpan
                     </button>
-                    <button data-dismiss="modal" className="btn btn-secondary">
+                    <div
+                      onClick={() => setUbahModal(false)}
+                      className="btn btn-secondary"
+                    >
                       Batal
-                    </button>
+                    </div>
                   </div>
                 </form>
               </div>
             </div>
-          </div>
+          </ModalComponent>
         </>
       )}
     </MainLayout>

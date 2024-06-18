@@ -9,4 +9,10 @@ export default defineConfig({
     globals: true,
     setupFiles: "./tests/setup.js",
   },
+  build: {
+    sourcemap: false,
+  },
+  server: {
+    open: true, // Automatically open the app in the browser
+  },
 });

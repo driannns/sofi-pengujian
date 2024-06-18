@@ -1,5 +1,6 @@
 import { MainLayout } from "../layouts/MainLayout";
 import picGuideBook from "../../assets/documents/guide_book/pictauserguide.pdf";
+import { Link } from "react-router-dom";
 
 export function GuidePIC() {
   return (
@@ -9,9 +10,9 @@ export function GuidePIC() {
           <h3>GUIDE BOOK</h3>
           <hr class="mt-0" />
           <h6 class="mb-3">
-            <a href="{{ route('home') }}" class="text-dark">
+            <Link to="home" className="text-dark">
               BERANDA
-            </a>{" "}
+            </Link>{" "}
             / GUIDE BOOK
           </h6>
           <a

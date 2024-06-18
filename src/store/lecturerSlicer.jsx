@@ -22,7 +22,7 @@ const lecturerSlice = createSlice({
 
   extraReducers: (builder) => {
     builder.addCase(fetchLecturer.pending, (state) => {
-      state.error = false;
+      state.error = null;
       state.isLoading = true;
     });
     builder.addCase(fetchLecturer.fulfilled, (state, action) => {

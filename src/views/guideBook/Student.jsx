@@ -1,44 +1,45 @@
 import { MainLayout } from "../layouts/MainLayout";
 import studentGuideBook from "../../assets/documents/guide_book/mahasiswaguide.pdf";
+import { Link } from "react-router-dom";
 
 export function GuideStudent() {
   return (
     <MainLayout>
-      <ol class="breadcrumb mb-0">
-        <div class="col-12">
+      <ol className="breadcrumb mb-0">
+        <div className="col-12">
           <h3>GUIDE BOOK</h3>
-          <hr class="mt-0" />
-          <h6 class="mb-3">
-            <a href="{{ route('home') }}" class="text-dark">
+          <hr className="mt-0" />
+          <h6 className="mb-3">
+            <Link to="home" className="text-dark">
               BERANDA
-            </a>{" "}
+            </Link>{" "}
             / GUIDE BOOK
           </h6>
           <a
             href={studentGuideBook}
             download="guide_book_admin.pdf"
             type="button"
-            class="btn btn-primary float-right"
+            className="btn btn-primary float-right"
           >
             Download
           </a>
         </div>
       </ol>
-      <div class="container-fluid">
-        <div class="animated fadeIn">
+      <div className="container-fluid">
+        <div className="animated fadeIn">
           {/* @include('flash::message') */}
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="card">
-                <div class="card-header">
-                  <div class="card-body">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="card">
+                <div className="card-header">
+                  <div className="card-body">
                     <embed
                       type=""
                       src={studentGuideBook}
                       height="500px"
                       width="100%"
                     />
-                    <div class="pull-right mr-3"></div>
+                    <div className="pull-right mr-3"></div>
                   </div>
                 </div>
               </div>

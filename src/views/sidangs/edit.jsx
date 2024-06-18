@@ -2,14 +2,14 @@ import { MainLayout } from "../layouts/MainLayout";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { updateSidang, checkSidang } from "../../store/sidangSlicer";
-import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
+import DownloadButton from "../../components/DownloadButton";
 
 import "sweetalert2/dist/sweetalert2.min.css";
 import Swal from "sweetalert2";
@@ -19,13 +19,14 @@ const SidangEdit = () => {
   const navigate = useNavigate();
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-  const isLoading = useSelector((state) => state.loading.loading);
-  const params = useParams();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [cookies] = useCookies("");
+  const params = useParams();
 
   const [userInfo, setUserInfo] = useState({});
   const [peminatans, setPeminatans] = useState("");
-  const [periods, setPeriods] = useState();
+  const [periods, setPeriods] = useState(null);
   const languages = ["Indonesia", "English"];
   const statusList = {
     0: "--Pilihan Ubah Status--",
@@ -36,16 +37,12 @@ const SidangEdit = () => {
     "reset status": "Reset Status",
   };
 
-  const [periodId, setPeriodId] = useState(dataSidang?.data.period_id);
-  const [pembimbing1, setPembimbing1] = useState(
-    dataSidang?.data.pembimbing1_id || ""
-  );
-  const [pembimbing2, setPembimbing2] = useState(
-    dataSidang?.data.pembimbing2_id || ""
-  );
-  const [judul, setJudul] = useState(dataSidang?.data.judul);
-  const form_bimbingan1 = dataSidang?.data.form_bimbingan1 || 0;
-  const form_bimbingan2 = dataSidang?.data.form_bimbingan2 || 0;
+  const [periodId, setPeriodId] = useState(dataSidang?.data?.period_id);
+  const [pembimbing1, setPembimbing1] = useState("");
+  const [pembimbing2, setPembimbing2] = useState("");
+  const [judul, setJudul] = useState("");
+  const [form_bimbingan1, setForm_Bimbingan1] = useState(0);
+  const [form_bimbingan2, setForm_Bimbingan2] = useState(0);
   const [peminatanId, setPeminatanId] = useState(userInfo?.peminatan_id);
   const [docTA, setDocTA] = useState("");
   const [makalah, setMakalah] = useState("");
@@ -53,7 +50,7 @@ const SidangEdit = () => {
   const [status, setStatus] = useState("");
   const [komentar, setKomentar] = useState("");
   const [statusLog, setStatusLog] = useState("");
-
+  const isMounted = useRef(true);
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
 
   const handleDocTAChange = (e) => {
@@ -101,25 +98,136 @@ const SidangEdit = () => {
   };
 
   const formatUser = async (userId) => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/user/${userId}`);
+      const res = await axios.get(`https://sofi.my.id/api/user/${userId}`, {
+        signal,
+      });
       return res.data.data.username;
     } catch (error) {
       return "-";
     }
   };
 
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const dataSidangEdit = await dispatch(checkSidang(cookies["auth-token"]));
+      if (!dataSidangEdit.payload) {
+        localStorage.setItem("errorMessage", "Sidang Tidak Ada");
+        if (isMounted.current) navigate("/sidangs");
+        return;
+      }
+
+      if (
+        !["pengajuan", "ditolak oleh admin"].includes(
+          dataSidangEdit.payload.status
+        ) &&
+        !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
+      ) {
+        if (isMounted.current)
+          navigate(`/sidangs/${dataSidangEdit.payload.id}`);
+        return;
+      }
+      setForm_Bimbingan1(dataSidangEdit?.payload.form_bimbingan1);
+      setForm_Bimbingan2(dataSidangEdit?.payload.form_bimbingan2);
+      setPembimbing1(dataSidangEdit?.payload.pembimbing1_id);
+      setPembimbing2(dataSidangEdit?.payload.pembimbing2_id);
+      setJudul(dataSidangEdit?.payload.judul);
+
+      dispatch(fetchLecturer());
+
+      const resUserInfo = await axios.get(
+        `https://sofi.my.id/api/student/${jwtDecoded.id}`,
+        { signal }
+      );
+      setUserInfo(resUserInfo.data.data);
+      setPeminatanId(resUserInfo.data.data.peminatan_id);
+
+      const resPeminatans = await axios.post(
+        "https://sofi.my.id/api/peminatans",
+        {
+          kk: resUserInfo.data.data.kk,
+        },
+        { signal }
+      );
+      setPeminatans(resPeminatans.data.data);
+
+      const formatStatusLog = await Promise.all(
+        dataSidangEdit?.payload?.status_logs?.map(async (value) => {
+          const manipulatedData = await formatUser(value.created_by);
+          return { ...value, created_by: manipulatedData };
+        })
+      );
+      setStatusLog(formatStatusLog);
+
+      const resALlPeriods = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/period/get`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        },
+        { signal }
+      );
+
+      setPeriods(resALlPeriods.data.data);
+
+      if (params.id != dataSidangEdit.payload.id) {
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+    } catch (error) {
+      if (error.response?.status !== 404 || error.message === "Network Error") {
+        localStorage.setItem("errorMessage", "Network Error");
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     const fetchData = async () => {
       try {
-        dispatch(isLoadingTrue());
-        const dataSidangStudent = await dispatch(
+        setIsLoading(true);
+        const dataSidangEdit = await dispatch(
           checkSidang(cookies["auth-token"])
         );
+        if (!dataSidangEdit.payload) {
+          localStorage.setItem("errorMessage", "Sidang Tidak Ada");
+          if (isMounted.current) navigate("/sidangs");
+          return;
+        }
+
+        if (
+          !["pengajuan", "ditolak oleh admin"].includes(
+            dataSidangEdit.payload.status
+          ) &&
+          !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
+        ) {
+          if (isMounted.current)
+            navigate(`/sidangs/${dataSidangEdit.payload.id}`);
+          return;
+        }
+        setForm_Bimbingan1(dataSidangEdit?.payload.form_bimbingan1);
+        setForm_Bimbingan2(dataSidangEdit?.payload.form_bimbingan2);
+        setPembimbing1(dataSidangEdit?.payload.pembimbing1_id);
+        setPembimbing2(dataSidangEdit?.payload.pembimbing2_id);
+        setJudul(dataSidangEdit?.payload.judul);
+
         dispatch(fetchLecturer());
 
         const resUserInfo = await axios.get(
-          `https://sofi.my.id/api/student/${jwtDecoded.id}`
+          `https://sofi.my.id/api/student/${jwtDecoded.id}`,
+          { signal }
         );
         setUserInfo(resUserInfo.data.data);
         setPeminatanId(resUserInfo.data.data.peminatan_id);
@@ -128,47 +236,19 @@ const SidangEdit = () => {
           "https://sofi.my.id/api/peminatans",
           {
             kk: resUserInfo.data.data.kk,
-          }
+          },
+          { signal }
         );
         setPeminatans(resPeminatans.data.data);
 
-        if (jwtDecoded.role.find((role) => !["RLADM"].includes(role))) {
-          const resStatusLog = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/status-log/get`,
-            {
-              headers: {
-                "ngrok-skip-browser-warning": true,
-                Authorization: `Bearer ${cookies["auth-token"]}`,
-              },
-            }
-          );
-          const formatStatusLog = await Promise.all(
-            resStatusLog.data.data.map(async (value) => {
-              const manipulatedData = await formatUser(value.created_by);
-              return { ...value, created_by: manipulatedData };
-            })
-          );
-          setStatusLog(formatStatusLog);
-        } else {
-          const resStatusLog = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/status-log/get`,
-            {
-              headers: {
-                "ngrok-skip-browser-warning": true,
-                Authorization: `Bearer ${cookies["auth-token"]}`,
-              },
-            }
-          );
-          const formatStatusLog = await Promise.all(
-            resStatusLog.data.data.map(async (value) => {
-              const manipulatedData = await formatUser(value.created_by);
-              return { ...value, created_by: manipulatedData };
-            })
-          );
-          setStatusLog(formatStatusLog);
-        }
+        const formatStatusLog = await Promise.all(
+          dataSidangEdit?.payload?.status_logs?.map(async (value) => {
+            const manipulatedData = await formatUser(value.created_by);
+            return { ...value, created_by: manipulatedData };
+          })
+        );
+        setStatusLog(formatStatusLog);
 
-        // Parameter
         const resALlPeriods = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/period/get`,
           {
@@ -176,28 +256,14 @@ const SidangEdit = () => {
               Authorization: `Bearer ${cookies["auth-token"]}`,
               "ngrok-skip-browser-warning": true,
             },
-          }
+          },
+          { signal }
         );
+
         setPeriods(resALlPeriods.data.data);
 
-        if (!dataSidangStudent.payload) {
-          localStorage.setItem("errorMessage", "Sidang Tidak Ada");
-          navigate("/sidangs");
-          return;
-        }
-
-        if (params.id != dataSidangStudent.payload.id) {
-          navigate("/home");
-          return;
-        }
-
-        if (
-          !["pengajuan", "ditolak oleh admin"].includes(
-            dataSidangStudent.payload.status
-          ) &&
-          !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
-        ) {
-          navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+        if (params.id != dataSidangEdit.payload.id) {
+          if (isMounted.current) navigate("/home");
           return;
         }
       } catch (error) {
@@ -206,39 +272,20 @@ const SidangEdit = () => {
           error.message === "Network Error"
         ) {
           localStorage.setItem("errorMessage", "Network Error");
-          console.error("Erorr fetching data:", error);
-          navigate("/home");
+          if (isMounted.current) navigate("/home");
           return;
         }
       } finally {
-        dispatch(isLoadingFalse());
+        setIsLoading(false);
       }
     };
     fetchData();
-  }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (params.id != dataSidang.data.id) {
-          navigate("/home");
-          return;
-        }
-        if (
-          !["pengajuan", "ditolak oleh admin"].includes(
-            dataSidang.data.status
-          ) &&
-          !jwtDecoded.role.find((role) => ["RLADM"].includes(role))
-        ) {
-          navigate(`/sidangs/${dataSidang.data.id}`);
-          return;
-        }
-      } catch (e) {
-        console.error("Erorr fetching data:", e);
-      }
+    return () => {
+      isMounted.current = false;
+      abortController.abort();
     };
-    fetchData();
-  }, [dataSidang]);
+  }, []);
 
   function attend2(e) {
     e.preventDefault();
@@ -254,7 +301,7 @@ const SidangEdit = () => {
       reverseButtons: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        dispatch(
+        const updateData = await dispatch(
           updateSidang({
             nim: jwtDecoded.nim,
             pembimbing1,
@@ -272,9 +319,12 @@ const SidangEdit = () => {
             authToken: cookies["auth-token"],
           })
         );
-        localStorage.setItem("successMessage", "Sidang berhasil diedit");
-        navigate("/sidangs/create");
-        return;
+        console.log(updateData);
+        if (updateData.type === "updateSidang/fulfilled") {
+          localStorage.setItem("successMessage", "Sidang berhasil diedit");
+          if (isMounted.current) navigate("/sidangs/create");
+          return;
+        }
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -283,7 +333,7 @@ const SidangEdit = () => {
 
   return (
     <MainLayout>
-      {isLoading ? (
+      {isLoading || dataSidang.loading ? (
         <Loading />
       ) : (
         <>
@@ -545,15 +595,11 @@ const SidangEdit = () => {
                               </label>
                               {dataSidang.data && dataSidang.data.doc_ta ? (
                                 <p>
-                                  <a
-                                    href={`${
-                                      import.meta.env.VITE_API_URL
-                                    }/public/doc_ta/${dataSidang.data.doc_ta}`}
-                                    className="btn btn-primary"
-                                    download
-                                  >
-                                    Download
-                                  </a>
+                                  <DownloadButton
+                                    url={`${import.meta.env.VITE_API_URL}${
+                                      dataSidang.data.doc_ta
+                                    }`}
+                                  />
                                 </p>
                               ) : (
                                 <p>
@@ -580,15 +626,11 @@ const SidangEdit = () => {
                               <label htmlFor="makalah">Jurnal:</label>
                               {dataSidang.data && dataSidang.data.makalah ? (
                                 <p>
-                                  <a
-                                    href={`${
-                                      import.meta.env.VITE_API_URL
-                                    }/public/doc_ta/${dataSidang.data.makalah}`}
-                                    className="btn btn-primary"
-                                    download
-                                  >
-                                    Download
-                                  </a>
+                                  <DownloadButton
+                                    url={`${import.meta.env.VITE_API_URL}${
+                                      dataSidang.data.makalah
+                                    }`}
+                                  />
                                 </p>
                               ) : (
                                 <p>
@@ -670,8 +712,10 @@ const SidangEdit = () => {
 
                         {/* <!-- Submit Field --> */}
                         <div className="form-group col-sm-12">
-                          <button className="btn btn-primary">Simpan</button>
-                          <Link to="/home" className="btn btn-secondary">
+                          <button className="btn btn-primary mx-1">
+                            Simpan
+                          </button>
+                          <Link to="/home" className="btn btn-secondary mx-1">
                             Batal
                           </Link>
                         </div>

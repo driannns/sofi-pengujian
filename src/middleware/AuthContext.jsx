@@ -9,6 +9,7 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { persistor } from "../store/store";
 
 const loginUrl = "https://sofi.my.id";
 
@@ -44,7 +45,6 @@ export const AuthProvider = ({ children }) => {
         });
         setIsLoggedIn(true);
         navigate("/home");
-        window.location.reload();
       } else {
         console.error("Login failed");
       }
@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     clearLocalStorage();
     removeCookie("auth-token");
+    persistor.purge();
     navigate("/loginsso");
   };
 
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setIsLoggedIn(false);
       delete axios.defaults.headers.common["Authorization"];
+      persistor.purge();
       clearLocalStorage();
       removeCookie("auth-token");
     }

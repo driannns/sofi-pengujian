@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { eachQuarterOfInterval } from "date-fns";
 
 export const getAllSidang = createAsyncThunk(
   "getAllSidang",
@@ -18,7 +19,88 @@ export const getAllSidang = createAsyncThunk(
         return res.data.data;
       }
     } catch (error) {
-      console.log(error);
+      throw error;
+    }
+  }
+);
+
+export const getPICSidang = createAsyncThunk(
+  "getPICSidang",
+  async (authToken) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/pic/get`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      if (res.data.code === 200) {
+        return res.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const getPembimbingSidang = createAsyncThunk(
+  "getPembimbingSidang",
+  async (authToken) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/pembimbing/get`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      if (res.data.code === 200) {
+        return res.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const getSidangById = createAsyncThunk(
+  "getSidangById",
+  async ({ authToken, sidangId }) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/get/${sidangId}`,
+        {
+          headers: { Authorization: "Bearer " + authToken },
+        }
+      );
+      if (res.data.code === 200) {
+        return res.data.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+export const getSidangByPeriod = createAsyncThunk(
+  "getSidangByPeriod",
+  async (authToken, period) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/period/get/${period}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      return res.data.data;
+    } catch (error) {
       throw error;
     }
   }
@@ -71,7 +153,6 @@ export const createSidang = createAsyncThunk(
       localStorage.setItem("successMessage", "Sidang Berhasil Disimpan.");
       return res.data.data;
     } catch (error) {
-      console.log(error);
       if (error.response.data.message) {
         localStorage.setItem("errorMessage", error.response.data.message);
         throw error.response.data.message;
@@ -132,7 +213,6 @@ export const updateSidang = createAsyncThunk(
         localStorage.setItem("errorMessage", error.response.data.message);
         throw error.response.data.message;
       }
-      console.log(error.response);
     }
   }
 );
@@ -142,7 +222,7 @@ export const checkSidang = createAsyncThunk(
   async (authToken) => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/check-user`,
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/user/get`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -155,7 +235,10 @@ export const checkSidang = createAsyncThunk(
         return res.data.data;
       }
     } catch (error) {
-      throw error.response;
+      if (error.message === "Network Error") {
+        throw error;
+      }
+      throw new Error(error.response.data.message);
     }
   }
 );
@@ -174,13 +257,11 @@ export const feedbackSidang = createAsyncThunk(
           },
         }
       );
-      console.log(res);
       if (res.data.code === 200) {
         localStorage.setItem("successMessage", "Feedback Sudah Dikirim");
       }
       thunkAPI.dispatch(getAllSidang(authToken));
     } catch (error) {
-      console.error(error);
       throw error;
     }
   }
@@ -190,9 +271,10 @@ export const approveFeedbackSidang = createAsyncThunk(
   "approveFeedbackSidang",
   async ({ authToken, feedbackApprove, bahasa, sidangId }, thunkAPI) => {
     try {
+      const isEnglish = bahasa === "true" ? true : false;
       const res = await axios.patch(
         `${import.meta.env.VITE_API_URL}/api/pengajuan/approve/${sidangId}`,
-        { feedback: feedbackApprove, is_english: bahasa },
+        { feedback: feedbackApprove, is_english: isEnglish },
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -200,10 +282,8 @@ export const approveFeedbackSidang = createAsyncThunk(
           },
         }
       );
-      console.log(res);
       thunkAPI.dispatch(getAllSidang(authToken));
     } catch (error) {
-      console.error(error);
       throw error;
     }
   }
@@ -220,6 +300,7 @@ const sidangSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getAllSidang.pending, (state) => {
       state.loading = true;
+      state.data = null;
       state.error = null;
     });
     builder.addCase(getAllSidang.fulfilled, (state, action) => {
@@ -228,10 +309,63 @@ const sidangSlice = createSlice({
     });
     builder.addCase(getAllSidang.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.error.message;
+    });
+    builder.addCase(getPICSidang.pending, (state) => {
+      state.loading = true;
+      state.data = null;
+      state.error = null;
+    });
+    builder.addCase(getPICSidang.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+    });
+    builder.addCase(getPICSidang.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(getPembimbingSidang.pending, (state) => {
+      state.loading = true;
+      state.data = null;
+      state.error = null;
+    });
+    builder.addCase(getPembimbingSidang.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+    });
+    builder.addCase(getPembimbingSidang.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(getSidangById.pending, (state) => {
+      state.loading = true;
+      state.data = null;
+      state.error = null;
+    });
+    builder.addCase(getSidangById.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+    });
+    builder.addCase(getSidangById.rejected, (state) => {
+      state.loading = false;
+      state.error = true;
+    });
+    builder.addCase(getSidangByPeriod.pending, (state) => {
+      state.loading = true;
+      state.data = null;
+      state.error = null;
+    });
+    builder.addCase(getSidangByPeriod.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+    });
+    builder.addCase(getSidangByPeriod.rejected, (state) => {
+      state.loading = false;
+      state.error = true;
     });
     builder.addCase(createSidang.pending, (state) => {
       state.loading = true;
+      state.data = null;
       state.error = null;
     });
     builder.addCase(createSidang.fulfilled, (state, action) => {
@@ -245,6 +379,7 @@ const sidangSlice = createSlice({
     });
     builder.addCase(updateSidang.pending, (state) => {
       state.loading = true;
+      state.data = null;
       state.error = null;
     });
     builder.addCase(updateSidang.fulfilled, (state, action) => {
@@ -256,21 +391,27 @@ const sidangSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     });
+    builder.addCase(checkSidang.pending, (state) => {
+      state.loading = true;
+      state.data = null;
+    });
     builder.addCase(checkSidang.fulfilled, (state, action) => {
+      state.loading = false;
       state.data = action.payload;
     });
-    builder.addCase(checkSidang.rejected, (state) => {
+    builder.addCase(checkSidang.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(feedbackSidang.fulfilled, (state) => {
       state.error = true;
     });
-    // builder.addCase(feedbackSidang.fulfilled, (state) => {
-    //   state.error = true;
-    // });
     builder.addCase(feedbackSidang.rejected, (state) => {
       state.error = true;
     });
-    // builder.addCase(approveFeedbackSidang.fulfilled, (state, action) => {
-    //   state.error = true;
-    // });
+    builder.addCase(approveFeedbackSidang.fulfilled, (state, action) => {
+      state.error = true;
+    });
     builder.addCase(approveFeedbackSidang.rejected, (state) => {
       state.error = true;
     });

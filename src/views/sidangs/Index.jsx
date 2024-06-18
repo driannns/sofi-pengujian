@@ -1,98 +1,130 @@
 import { MainLayout } from "../layouts/MainLayout";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Link, useLocation } from "react-router-dom";
-import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   getAllSidang,
+  getPICSidang,
+  getPembimbingSidang,
   feedbackSidang,
   approveFeedbackSidang,
 } from "../../store/sidangSlicer";
 import Loading from "../../components/Loading";
-import DataTable from "react-data-table-component";
+import DatatableComponent from "../../components/Datatable";
+import ModalComponent from "../../components/Modal";
+import DownloadButton from "../../components/DownloadButton";
 
 const SidangIndex = () => {
-  const dataSidang = useSelector((state) => state.sidang);
-
   const [cookies] = useCookies();
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
+  const jwtDecoded = jwtDecode(cookies["auth-token"]);
+  const isMounted = useRef(true);
 
+  const dataSidang = useSelector((state) => state.sidang);
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [feedbackApprove, setFeedbackApprove] = useState("");
   const [bahasa, setBahasa] = useState("");
-  const [sidangs, setSidangs] = useState(null);
-  const [documents, setDocuments] = useState(null);
-  const jwtDecoded = jwtDecode(cookies["auth-token"]);
+  const [data, setData] = useState([]);
+  const [approveModal, setApproveModal] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState("");
+  const [rejectModal, setRejectModal] = useState(false);
 
-  const updateDate = async (sidangId) => {
+  const formatUser = async (userId) => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     try {
-      dispatch(isLoadingTrue());
+      const res = await axios.get(`https://sofi.my.id/api/user/${userId}`, {
+        signal,
+      });
+      return res.data.data.nama;
+    } catch (error) {
+      return "-";
+    }
+  };
+
+  const periodById = async (periodId) => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/get/${sidangId}`,
+        `${import.meta.env.VITE_API_URL}/api/period/get/${periodId}`,
+        { signal }
+      );
+      return res.data.data.name;
+    } catch (error) {
+      return "-";
+    }
+  };
+
+  const handleApproveModalOpen = (rowData) => {
+    setSelectedRowData(rowData);
+    setApproveModal(true);
+  };
+
+  const handleRejectModalOpen = (rowData) => {
+    setSelectedRowData(rowData);
+    setRejectModal(true);
+  };
+
+  const updateData = async (sidangId) => {
+    try {
+      setIsLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/pengajuan/get/${sidangId}`,
         {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warnign": true,
+            "ngrok-skip-browser-warning": true,
           },
         }
       );
-      console.log(res);
-
       //? Parameter
 
       const resGetAllStudent = await axios.get(
-        `${import.meta.env.VITE_getAllStudents_API_URL}/2023-2/${
-          res.data.data.nim
-        }`,
+        // `${import.meta.env.VITE_getAllStudents_API_URL}/2324-2/${res.data.data.nim}`,
+        `${import.meta.env.VITE_getAllStudents_API_URL}/2324-2/1202204011`,
         {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_tokenSSO}`,
           },
         }
       );
-      console.log(resGetAllStudent);
-    } catch (error) {}
+      if (resGetAllStudent.data.data.length === 0) {
+        localStorage.setItem(
+          "errorMessage",
+          "Mahasiswa tidak terdaftar di periode akademik ini"
+        );
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+
+      if (jwtDecoded.role.find((role) => ["RLSPR"].includes(role))) {
+        if (isMounted.current) navigate("/sidangs/indexAll");
+        return;
+      } else {
+        if (isMounted.current) navigate("/sidangs/create");
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
 
-    const dayOfWeek = days[date.getDay()];
-    const dayOfMonth = date.getDate();
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-
-    return `${dayOfWeek}, ${dayOfMonth} ${month} ${year} - ${hour}:${minute}`;
+    const options = { day: "2-digit", month: "long", year: "numeric" };
+    return date.toLocaleDateString("id-ID", options);
   };
 
   const columns = [
@@ -100,26 +132,33 @@ const SidangIndex = () => {
       name: "NIM",
       selector: (row) => row.nim,
       sortable: true,
+      width: "120px",
+      left: true,
     },
     {
       name: "Nama",
-      selector: (row) => row.nim, // Assuming nested structure
+      cell: (row) => row.nama,
       sortable: true,
+      left: true,
+      width: "120px",
     },
     {
       name: "Judul TA",
-      selector: (row) => row.judul,
+      cell: (row) => row.judul,
       sortable: true,
+      width: "220px",
+      left: true,
     },
     {
       name: "Jumlah Bimbingan",
-      selector: (row) => (
+      cell: (row) => (
         <>
           Pembimbing 1: {row.form_bimbingan1} Pertemuan <br />
           Pembimbing 2: {row.form_bimbingan2} Pertemuan
         </>
       ),
       sortable: true,
+      width: "200px",
     },
     ...(jwtDecoded.role &&
     jwtDecoded.role.find((role) => ["RLADM"].includes(role))
@@ -128,21 +167,25 @@ const SidangIndex = () => {
             name: "Tak",
             selector: (row) => row.tak,
             sortable: true,
+            width: "100px",
           },
           {
             name: "Eprt",
             selector: (row) => row.eprt,
             sortable: true,
+            width: "100px",
           },
           {
             name: "Bahasa Sidang",
             selector: (row) => (row.is_english == 0 ? "Indonesia" : "Inggris"),
             sortable: true,
+            width: "100px",
           },
           {
             name: "Periode",
-            selector: (row) => row.period_id,
+            cell: (row) => row.periodName,
             sortable: true,
+            width: "100px",
           },
           {
             name: "SKS",
@@ -153,6 +196,7 @@ const SidangIndex = () => {
               </>
             ),
             sortable: true,
+            width: "100px",
           },
         ]
       : []),
@@ -160,35 +204,27 @@ const SidangIndex = () => {
       name: "Dokumen TA",
       selector: (row) =>
         row.doc_ta != null ? (
-          <a
-            href={`/uploads/ta/${row.doc_ta}`}
-            className="btn btn-outline-primary"
-            download={`${import.meta.env.VITE_API_URL}/public/doc_ta/${
-              row.doc_ta
-            }`}
-          >
-            Download
-          </a>
+          <DownloadButton
+            url={`${import.meta.env.VITE_API_URL}${row.doc_ta}`}
+          />
         ) : null,
       sortable: true,
+      width: "120px",
     },
     {
       name: "Jurnal",
       selector: (row) =>
         row.makalah != null ? (
-          <a
-            href={`/uploads/makalah/${row.makalah}`}
-            className="btn btn-outline-primary"
-            download
-          >
-            Download
-          </a>
+          <DownloadButton
+            url={`${import.meta.env.VITE_API_URL}${row.makalah}`}
+          />
         ) : null,
       sortable: true,
+      width: "120px",
     },
     {
       name: "Status",
-      selector: (row) => {
+      cell: (row) => {
         if (row.status == "lulus") {
           return <span className="badge badge-success">LULUS</span>;
         } else if (row.status == "belum dijadwalkan") {
@@ -238,36 +274,33 @@ const SidangIndex = () => {
         }
       },
       sortable: true,
+      width: "150px",
     },
     {
       name: "Diajukan pada",
       selector: (row) => formatDate(row.created_at),
       sortable: true,
+      width: "140px",
     },
     {
       name: "Aksi",
       selector: (row) => {
         if (
           jwtDecoded?.role?.find((role) => ["RLADM"].includes(role)) &&
-          jwtDecoded?.role?.find((role) => !["RLSDM"].includes(role))
+          jwtDecoded?.role?.find((role) => !["RLSPR"].includes(role))
         ) {
-          if (
-            row.status === "belum disetujui admin" ||
-            row.status === "pending"
-          ) {
+          if (row.status === "belum disetujui admin") {
             return (
               <div className="btn-group">
                 <button
                   className="btn btn-success"
-                  data-toggle="modal"
-                  data-target={`#feedbackAcceptAdminModal_${row.id}`}
+                  onClick={() => handleApproveModalOpen(row)}
                 >
                   <i className="fa fa-check" style={{ color: "white" }}></i>
                 </button>
                 <button
                   className="btn btn-danger"
-                  data-toggle="modal"
-                  data-target={`#feedbackRejectAdminModal_${row.id}`}
+                  onClick={() => handleRejectModalOpen(row)}
                 >
                   <i className="fa fa-times" style={{ color: "white" }}></i>
                 </button>
@@ -287,101 +320,169 @@ const SidangIndex = () => {
           }
           return (
             <div className="btn-group w-100">
-              <a
-                href="{{ route('sidangs.updateData', [$sidang->id]) }}"
+              <button
+                onClick={() => updateData(row.id)}
                 className="btn btn-light w-100"
               >
                 Update
-              </a>
+              </button>
             </div>
           );
-        } else if (
-          jwtDecoded?.role?.find((role) => ["RLADM"].includes(role)) ||
-          (jwtDecoded?.role?.find((role) => ["RLSDM"].includes(role)) &&
-            location.pathname.startsWith == "/sidangs/pic")
-        ) {
-          return (
-            <div className="btn-group">
-              {row.status === "belum dijadwalkan" ||
-                (row.status === "tidak lulus (belum dijadwalkan)" && (
+        } else if (location.pathname === "/sidangs/pic") {
+          if (
+            jwtDecoded?.role?.find((role) => ["RLPIC"].includes(role)) ||
+            jwtDecoded?.role?.find((role) => ["RLSPR"].includes(role))
+          ) {
+            return (
+              <div className="btn-group">
+                {row.status === "belum dijadwalkan" ||
+                row.status === "tidak lulus (belum dijadwalkan)" ? (
                   <a
                     href="{{ route('schedules.create', [$sidang->mahasiswa->team->id]) }}"
                     className="btn btn-primary"
                   >
                     Jadwalkan
                   </a>
-                ))}
-              {row.status === "sudah dijadwalkan" ||
-                (row.status === "tidak lulus (sudah dijadwalkan)" && (
-                  <button type="button" className="btn btn-primary" disabled>
-                    Sudah Dijadwalkan
-                  </button>
-                ))}
-            </div>
-          );
+                ) : (
+                  ""
+                )}
+                {row.status === "sudah dijadwalkan" ||
+                  (row.status === "tidak lulus (sudah dijadwalkan)" && (
+                    <button type="button" className="btn btn-primary" disabled>
+                      Sudah Dijadwalkan
+                    </button>
+                  ))}
+              </div>
+            );
+          }
         } else if (
           jwtDecoded?.role?.find((role) => ["RLPBB"].includes(role)) &&
-          location.pathname.startsWith === "/sidangs/pembimbing"
+          location.pathname === "/sidangs/pembimbing"
         ) {
-          return (
-            <div className="btn-group">
-              {row.status === "sudah dijadwalkan" ? (
-                row.schedules.last().status === "telah dilaksanakan" ? (
+          if (row.status !== "sudah dijadwalkan") {
+            return (
+              <div className="btn-group">
+                <a href="#" className="btn btn-dark text-white disabled">
+                  List Revisi
+                </a>
+              </div>
+            );
+          } else {
+            if (row.status === "telah dilaksanakan") {
+              return (
+                <div className="btn-group">
                   <a
                     href="{{ route('revisions.show', $sidang->schedules->last()->id) }}"
                     className="btn btn-success text-white"
                   >
                     List Revisi
                   </a>
-                ) : (
-                  <a href="#" className="btn btn-dark text-white disabled">
-                    List Revisi
-                  </a>
-                )
-              ) : (
+                </div>
+              );
+            }
+            return (
+              <div className="btn-group">
                 <a href="#" className="btn btn-dark text-white disabled">
                   List Revisi
                 </a>
-              )}
-            </div>
-          );
+              </div>
+            );
+          }
         }
       },
+      width: "140px",
     },
   ];
 
   useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const dataSidangAdmin = await dispatch(
-          getAllSidang(cookies["auth-token"])
-        );
-        setSidangs(dataSidangAdmin.payload);
-        setSidangs(dataSidang.data);
-        if (!dataSidangAdmin.payload) {
-          localStorage.setItem("errorMessage", "Network Error");
-          navigate("/home");
-          return;
-        }
-
-        const resSlide = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/slide/get`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-              "ngrok-skip-browser-warning": true,
-            },
+        let datas;
+        if (
+          jwtDecoded.role.find((role) => ["RLPIC"].includes(role)) &&
+          location.pathname === "/sidangs/pic"
+        ) {
+          datas = await dispatch(getPICSidang(cookies["auth-token"]));
+          if (datas.type === "getPICSidang/fulfilled") {
+            if (datas.payload) {
+              const dataSidangMHS = await Promise.all(
+                datas?.payload?.map(async (value) => {
+                  const manipulatedData = await formatUser(value.user_id);
+                  return {
+                    ...value,
+                    nama: manipulatedData,
+                  };
+                })
+              );
+              setData(dataSidangMHS);
+            } else {
+              setData([]);
+            }
           }
-        );
-        if (resSlide.data.code === 200) {
-          setDocuments(resSlide.data.data);
+        } else if (
+          jwtDecoded.role.find((role) => ["RLPBB"].includes(role)) &&
+          location.pathname === "/sidangs/pembimbing"
+        ) {
+          datas = await dispatch(getPembimbingSidang(cookies["auth-token"]));
+          if (datas.type === "getPembimbingSidang/fulfilled") {
+            if (datas.payload) {
+              const dataSidangMHS = await Promise.all(
+                datas?.payload?.map(async (value) => {
+                  const manipulatedData = await formatUser(value.user_id);
+                  return {
+                    ...value,
+                    nama: manipulatedData,
+                  };
+                })
+              );
+              setData(dataSidangMHS);
+            } else {
+              setData([]);
+            }
+          }
+        } else if (jwtDecoded.role.find((role) => ["RLADM"].includes(role))) {
+          datas = await dispatch(getAllSidang(cookies["auth-token"]));
+          if (datas.type === "getAllSidang/fulfilled") {
+            if (datas.payload) {
+              const dataSidangMHS = await Promise.all(
+                datas?.payload?.map(async (value) => {
+                  const manipulatedData = await formatUser(value.user_id);
+                  const periodName = await periodById(value.period_id);
+                  return {
+                    ...value,
+                    nama: manipulatedData,
+                    periodName: periodName,
+                  };
+                })
+              );
+              setData(dataSidangMHS);
+            } else {
+              setData([]);
+            }
+          }
+        }
+        if (
+          datas.type === "getAllSidang/rejected" ||
+          datas.type === "getPembimbingSidang/rejected" ||
+          datas.type === "getPICSidang/rejected"
+        ) {
+          if (datas.error.message === "Network Error") {
+            localStorage.setItem("errorMessage", "Network Error");
+            if (isMounted.current) navigate("/home");
+            return;
+          }
         }
       } catch (error) {
-        console.error("Erorr fetching data:", error);
-        if (!error.response.status === 404) {
+        if (
+          error.response?.status !== 404 ||
+          error.message === "Network Error"
+        ) {
           localStorage.setItem("errorMessage", "Network Error");
-          navigate("/home");
+          if (isMounted.current) navigate("/home");
           return;
         }
       } finally {
@@ -389,25 +490,117 @@ const SidangIndex = () => {
       }
     };
     fetchData();
-  }, []);
 
-  const handleFeedbackSidang = (e, sidangId) => {
-    e.preventDefault();
-    dispatch(
-      feedbackSidang({ authToken: cookies["auth-token"], feedback, sidangId })
-    );
+    return () => {
+      isMounted.current = false;
+      abortController.abort();
+    };
+  }, [location.pathname]);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      let datas;
+      if (
+        jwtDecoded.role.find((role) => ["RLPIC"].includes(role)) &&
+        location.pathname === "/sidangs/pic"
+      ) {
+        datas = await dispatch(getPICSidang(cookies["auth-token"]));
+      } else if (
+        jwtDecoded.role.find((role) => ["RLPBB"].includes(role)) &&
+        location.pathname === "/sidangs/pembimbing"
+      ) {
+        datas = await dispatch(getPembimbingSidang(cookies["auth-token"]));
+        if (datas.payload) {
+          const dataSidangMHS = await Promise.all(
+            datas?.payload?.map(async (value) => {
+              const manipulatedData = await formatUser(value.user_id);
+              return {
+                ...value,
+                nama: manipulatedData,
+              };
+            })
+          );
+          setData(dataSidangMHS);
+        }
+      } else if (jwtDecoded.role.find((role) => ["RLADM"].includes(role))) {
+        datas = await dispatch(getAllSidang(cookies["auth-token"]));
+        if (datas.payload) {
+          const dataSidangMHS = await Promise.all(
+            datas?.payload?.map(async (value) => {
+              const manipulatedData = await formatUser(value.user_id);
+              const periodName = await periodById(value.period_id);
+              return {
+                ...value,
+                nama: manipulatedData,
+                periodName: periodName,
+              };
+            })
+          );
+          setData(dataSidangMHS);
+        }
+      }
+      if (
+        datas.type === "getAllSidang/rejected" ||
+        datas.type === "getPembimbingSidang/rejected" ||
+        datas.type === "getPICSidang/rejected"
+      ) {
+        if (datas.error.message === "Network Error") {
+          localStorage.setItem("errorMessage", "Network Error");
+          if (isMounted.current) navigate("/home");
+          return;
+        }
+      }
+    } catch (error) {
+      if (error.response?.status !== 404 || error.message === "Network Error") {
+        localStorage.setItem("errorMessage", "Network Error");
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleApproveFeedbackSidang = (e, sidangId) => {
-    e.preventDefault();
-    dispatch(
-      approveFeedbackSidang({
-        authToken: cookies["auth-token"],
-        feedbackApprove,
-        bahasa,
-        sidangId,
-      })
-    );
+  const handleFeedbackSidang = async (e, sidangId) => {
+    try {
+      e.preventDefault();
+      const approveSidang = await dispatch(
+        feedbackSidang({ authToken: cookies["auth-token"], feedback, sidangId })
+      );
+
+      if (approveSidang.type === "feedbackSidang/fulfilled") {
+        fetchData();
+        setFeedback("");
+      }
+    } catch (error) {
+      console.error("error", error);
+    } finally {
+      setRejectModal(false);
+    }
+  };
+
+  const handleApproveFeedbackSidang = async (e, sidangId) => {
+    try {
+      e.preventDefault();
+      const approveSidang = await dispatch(
+        approveFeedbackSidang({
+          authToken: cookies["auth-token"],
+          feedbackApprove,
+          bahasa,
+          sidangId,
+        })
+      );
+
+      if (approveSidang.type === "approveFeedbackSidang/fulfilled") {
+        fetchData();
+        setFeedbackApprove("");
+      }
+    } catch (error) {
+      console.error("error", error);
+    } finally {
+      setApproveModal(false);
+    }
   };
 
   return (
@@ -452,13 +645,10 @@ const SidangIndex = () => {
                   / PENGAJUAN SIDANG
                 </h6>
               </div>
-              // @endif
             )}
           </ol>
           <div className="container-fluid">
             <div className="animated fadeIn">
-              {/* @include('flash::message') 
-              @include('coreui-templates::common.errors') */}
               <div className="row">
                 <div className="col-lg-12">
                   <div className="card">
@@ -467,33 +657,32 @@ const SidangIndex = () => {
                         className="table-responsive-sm"
                         style={{ overflowX: "scroll" }}
                       >
-                        <DataTable
-                          data={dataSidang.data ? dataSidang.data : ""}
+                        <DatatableComponent
+                          data={data ? data : ""}
                           columns={columns}
-                          fixedHeader
-                          pagination
                         />
                         {jwtDecoded?.role?.find((role) =>
                           ["RLADM"].includes(role)
                         ) &&
-                          dataSidang.data &&
-                          dataSidang.data.map((value, index) => (
+                          data && (
                             <>
-                              <div
-                                className="modal fade"
-                                id={`feedbackAcceptAdminModal_${value.id}`}
-                                tabIndex="-1"
-                                role="dialog"
-                                aria-labelledby="feedbackModal"
-                                aria-hidden="true"
-                                key={`feedbackAcceptAdminModal_${index}`}
+                              <ModalComponent
+                                show={approveModal}
+                                onHide={() => setApproveModal(false)}
                               >
                                 <form
                                   onSubmit={(e) =>
-                                    handleApproveFeedbackSidang(e, value.id)
+                                    handleApproveFeedbackSidang(
+                                      e,
+                                      selectedRowData?.id
+                                    )
                                   }
                                 >
-                                  <div className="modal-dialog" role="document">
+                                  <div
+                                    className="modal-dialog"
+                                    role="document"
+                                    style={{ margin: 0 }}
+                                  >
                                     <div className="modal-content">
                                       <div className="modal-header">
                                         <h5 className="modal-title">
@@ -502,8 +691,7 @@ const SidangIndex = () => {
                                         <button
                                           type="button"
                                           className="close"
-                                          data-dismiss="modal"
-                                          aria-label="Close"
+                                          onClick={() => setApproveModal(false)}
                                         >
                                           <span aria-hidden="true">
                                             &times;
@@ -549,8 +737,12 @@ const SidangIndex = () => {
                                               setBahasa(e.target.value)
                                             }
                                           >
-                                            <option value="0">Indonesia</option>
-                                            <option value="1">Inggris</option>
+                                            <option value="false">
+                                              Indonesia
+                                            </option>
+                                            <option value="true">
+                                              Inggris
+                                            </option>
                                           </select>
                                         </div>
                                       </div>
@@ -558,7 +750,7 @@ const SidangIndex = () => {
                                         <button
                                           type="button"
                                           className="btn btn-secondary"
-                                          data-dismiss="modal"
+                                          onClick={() => setApproveModal(false)}
                                         >
                                           Close
                                         </button>
@@ -572,23 +764,22 @@ const SidangIndex = () => {
                                     </div>
                                   </div>
                                 </form>
-                              </div>
+                              </ModalComponent>
 
-                              <div
-                                className="modal fade"
-                                id={`feedbackRejectAdminModal_${value.id}`}
-                                tabIndex="-1"
-                                role="dialog"
-                                aria-labelledby="feedbackModal"
-                                aria-hidden="true"
-                                key={`feedbackRejectAdminModal_${index}`}
+                              <ModalComponent
+                                show={rejectModal}
+                                onHide={() => setRejectModal(false)}
                               >
                                 <form
                                   onSubmit={(e) =>
-                                    handleFeedbackSidang(e, value.id)
+                                    handleFeedbackSidang(e, selectedRowData?.id)
                                   }
                                 >
-                                  <div className="modal-dialog" role="document">
+                                  <div
+                                    className="modal-dialog"
+                                    role="document"
+                                    style={{ margin: 0 }}
+                                  >
                                     <div className="modal-content">
                                       <div className="modal-header">
                                         <h5 className="modal-title">
@@ -597,8 +788,7 @@ const SidangIndex = () => {
                                         <button
                                           type="button"
                                           className="close"
-                                          data-dismiss="modal"
-                                          aria-label="Close"
+                                          onClick={() => setRejectModal(false)}
                                         >
                                           <span aria-hidden="true">
                                             &times;
@@ -628,7 +818,7 @@ const SidangIndex = () => {
                                         <button
                                           type="button"
                                           className="btn btn-secondary"
-                                          data-dismiss="modal"
+                                          onClick={() => setRejectModal(false)}
                                         >
                                           Close
                                         </button>
@@ -642,9 +832,9 @@ const SidangIndex = () => {
                                     </div>
                                   </div>
                                 </form>
-                              </div>
+                              </ModalComponent>
                             </>
-                          ))}
+                          )}
                       </div>
                       <div className="pull-right mr-3"></div>
                     </div>

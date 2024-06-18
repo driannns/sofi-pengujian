@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { isLoadingTrue, isLoadingFalse } from "./loadingSlicer";
 
 export const uploadSlide = createAsyncThunk(
   "uploadSlide",
-  async ({ authToken, slide }, thunkAPI) => {
+  async ({ authToken, slide }) => {
     try {
-      thunkAPI.dispatch(isLoadingTrue());
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/slide/create-slide`,
+        `${import.meta.env.VITE_API_URL}/api/documentLog/create/slide`,
         { slide },
         {
           headers: {
@@ -18,17 +16,14 @@ export const uploadSlide = createAsyncThunk(
           },
         }
       );
-      console.log(res.data);
       localStorage.setItem(
         "successMessage",
         "Berhasil mengupload slide presentasi, silahkan buat team jika belum membuat team. PERHATIAN : Slide presentasi dapat diubah sebelum sidang anda telah dijadwalkan!"
       );
       return res.data.data;
     } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      thunkAPI.dispatch(isLoadingFalse());
+      localStorage.setItem("errorMessage", error.response.data.message);
+      throw new Error(error.response.data.message);
     }
   }
 );
@@ -48,9 +43,10 @@ const dokumenLogSlice = createSlice({
     builder.addCase(uploadSlide.fulfilled, (state, action) => {
       state.data = action.payload;
     });
-    builder.addCase(uploadSlide.rejected, (state) => {
+    builder.addCase(uploadSlide.rejected, (state, action) => {
+      console.log(action);
       state.data = null;
-      state.error = true;
+      state.error = action.error.message;
     });
   },
 });

@@ -2,12 +2,11 @@ import { MainLayout } from "../layouts/MainLayout";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchLecturer } from "../../store/lecturerSlicer";
 import { createSidang, checkSidang } from "../../store/sidangSlicer";
-import { isLoadingTrue, isLoadingFalse } from "../../store/loadingSlicer";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -19,9 +18,9 @@ const SidangCreate = () => {
 
   const dataLecturer = useSelector((state) => state.lecturer);
   const dataSidang = useSelector((state) => state.sidang);
-  const isLoading = useSelector((state) => state.loading.loading);
   const [cookies] = useCookies("");
 
+  const [isLoading, setIsLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({});
   const [dataStudent, setDataStudent] = useState({});
   const [statusLog, setStatusLog] = useState("");
@@ -49,8 +48,8 @@ const SidangCreate = () => {
   const [isEnglish, setIsEnglish] = useState("");
   const [status, setStatus] = useState("");
   const [komentar, setKomentar] = useState("");
-
   const jwtDecoded = jwtDecode(cookies["auth-token"]);
+  const isMounted = useRef(true);
 
   const handleDocTAChange = (e) => {
     setDocTA(e.target.files[0]);
@@ -60,18 +59,155 @@ const SidangCreate = () => {
     setMakalah(e.target.files[0]);
   };
 
+  const fetchSidangData = async () => {
+    try {
+      setIsLoading(true);
+
+      const dataSidangStudent = await dispatch(
+        checkSidang(cookies["auth-token"])
+      );
+
+      if (
+        dataSidangStudent.payload ||
+        dataSidangStudent.type === "checkSidang/fulfilled"
+      ) {
+        if (
+          dataSidangStudent.payload.status === "pengajuan" ||
+          dataSidangStudent.payload.status === "ditolak oleh admin"
+        ) {
+          navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
+          return;
+        } else {
+          navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+          return;
+        }
+      }
+
+      dispatch(fetchLecturer());
+      const resUserInfo = await axios.get(
+        `https://sofi.my.id/api/student/${jwtDecoded.id}`
+      );
+
+      setUserInfo(resUserInfo.data.data);
+      setPeminatanId(
+        resUserInfo.data.data.peminatan_id
+          ? resUserInfo.data.data.peminatan_id
+          : ""
+      );
+
+      const resALlPeriods = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/period/get`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+      setPeriods(resALlPeriods.data.data);
+
+      //? Parameter
+
+      const resStudentData = await axios.get(
+        // `${import.meta.env.getAllStudents_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+        `${import.meta.env.VITE_getAllStudents_API_URL}/2324-2/1202204011`,
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_tokenSSO} `,
+          },
+        }
+      );
+      if (resStudentData.data.data.length === 0) {
+        localStorage.setItem(
+          "errorMessage",
+          "Anda tidak terdaftar di periode akademik ini"
+        );
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+      setDataStudent(resStudentData.data.data[0]);
+
+      const resStatusLog = await axios.get(
+        // `${import.meta.env.getStatusLog_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+        `${import.meta.env.VITE_getStatusLog_API_URL}/2324-2/1202204011`,
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_tokenSSO}`,
+          },
+        }
+      );
+
+      if (resStatusLog.data.data.length === 0) {
+        localStorage.setItem(
+          "errorMessage",
+          "Data anda tidak ditemukan. Silahkan hubungi admin"
+        );
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+      setStatusLog(resStatusLog.data.data[0]);
+
+      const resPeminatans = await axios.post(
+        "https://sofi.my.id/api/peminatans",
+        {
+          kk: resUserInfo.data.data.kk,
+        }
+      );
+      setPeminatans(resPeminatans.data.data);
+    } catch (error) {
+      console.error("error", error);
+      if (error.reponse?.status !== 404) {
+        localStorage.setItem("errorMessage", "Network Error");
+        if (isMounted.current) navigate("/home");
+        return;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSidangData = async () => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const fetchSidang = async () => {
       try {
-        dispatch(isLoadingTrue());
+        setIsLoading(true);
+
+        const dataSidangStudent = await dispatch(
+          checkSidang(cookies["auth-token"])
+        );
+
+        if (
+          dataSidangStudent.payload ||
+          dataSidangStudent.type === "checkSidang/fulfilled"
+        ) {
+          if (
+            dataSidangStudent.payload.status === "pengajuan" ||
+            dataSidangStudent.payload.status === "ditolak oleh admin"
+          ) {
+            if (isMounted.current)
+              navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
+            return;
+          } else {
+            if (isMounted.current)
+              navigate(`/sidangs/${dataSidangStudent.payload.id}`);
+            return;
+          }
+        }
 
         dispatch(fetchLecturer());
-
         const resUserInfo = await axios.get(
-          `https://sofi.my.id/api/student/${jwtDecoded.id}`
+          `https://sofi.my.id/api/student/${jwtDecoded.id}`,
+          { signal }
         );
+
         setUserInfo(resUserInfo.data.data);
-        setPeminatanId(resUserInfo.data.data.peminatan_id);
+        setPeminatanId(
+          resUserInfo.data.data.peminatan_id
+            ? resUserInfo.data.data.peminatan_id
+            : ""
+        );
 
         const resALlPeriods = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/period/get`,
@@ -84,40 +220,27 @@ const SidangCreate = () => {
         );
         setPeriods(resALlPeriods.data.data);
 
-        const dataSidangStudent = await dispatch(
-          checkSidang(cookies["auth-token"])
-        );
-
-        if (dataSidangStudent.payload) {
-          if (
-            dataSidangStudent.payload.status === "pengajuan" ||
-            dataSidangStudent.payload.status === "ditolak oleh admin"
-          ) {
-            navigate(`/sidangs/${dataSidangStudent.payload.id}/edit`);
-            return;
-          } else {
-            navigate(`/sidangs/${dataSidangStudent.payload.id}`);
-            return;
-          }
-        }
-
         //? Parameter
 
         const resStudentData = await axios.get(
-          // `${import.meta.env.getAllStudents_API_URL}/2324-2/${resUserInfo.data.data.nim}`,
+          // `${import.meta.env.getAllStudents_API_URL}/2324-2/${
+          //   resUserInfo.data.data.nim
+          // }`,
           `${import.meta.env.VITE_getAllStudents_API_URL}/2324-2/1202204011`,
           {
             headers: {
               Authorization: `Bearer ${import.meta.env.VITE_tokenSSO} `,
             },
-          }
+          },
+          { signal }
         );
+
         if (resStudentData.data.data.length === 0) {
           localStorage.setItem(
             "errorMessage",
             "Anda tidak terdaftar di periode akademik ini"
           );
-          navigate("/home");
+          if (isMounted.current) navigate("/home");
           return;
         }
         setDataStudent(resStudentData.data.data[0]);
@@ -129,7 +252,8 @@ const SidangCreate = () => {
             headers: {
               Authorization: `Bearer ${import.meta.env.VITE_tokenSSO}`,
             },
-          }
+          },
+          { signal }
         );
 
         if (resStatusLog.data.data.length === 0) {
@@ -137,7 +261,7 @@ const SidangCreate = () => {
             "errorMessage",
             "Data anda tidak ditemukan. Silahkan hubungi admin"
           );
-          navigate("/home");
+          if (isMounted.current) navigate("/home");
           return;
         }
         setStatusLog(resStatusLog.data.data[0]);
@@ -146,38 +270,29 @@ const SidangCreate = () => {
           "https://sofi.my.id/api/peminatans",
           {
             kk: resUserInfo.data.data.kk,
-          }
+          },
+          { signal }
         );
         setPeminatans(resPeminatans.data.data);
       } catch (error) {
-        console.error("Erorr fetching data:", error);
-        if (error.reponse?.status !== 404) {
+        console.error("error", error);
+        if (error.code === "ERR_NETWORK" || error.reponse?.status !== 404) {
           localStorage.setItem("errorMessage", "Network Error");
-          navigate("/home");
+          if (isMounted.current) navigate("/home");
           return;
         }
       } finally {
-        dispatch(isLoadingFalse());
+        setIsLoading(false);
       }
     };
 
-    fetchSidangData();
-  }, []);
+    fetchSidang();
 
-  useEffect(() => {
-    if (dataSidang.data) {
-      if (
-        dataSidang.data.status === "pengajuan" ||
-        dataSidang.data.status === "ditolak oleh admin"
-      ) {
-        navigate(`/sidangs/${dataSidang.data.id}/edit`);
-        return;
-      } else {
-        navigate(`/sidangs/${dataSidang.data.id}`);
-        return;
-      }
-    }
-  }, [dataSidang]);
+    return () => {
+      isMounted.current = false;
+      abortController.abort();
+    };
+  }, []);
 
   function attend2(e) {
     e.preventDefault();
@@ -193,7 +308,7 @@ const SidangCreate = () => {
       reverseButtons: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
-        dispatch(
+        await dispatch(
           createSidang({
             nim: jwtDecoded.nim,
             pembimbing1,
@@ -210,6 +325,7 @@ const SidangCreate = () => {
             authToken: cookies["auth-token"],
           })
         );
+        fetchSidangData();
       } else if (result.isDenied) {
         Swal.fire("Changes are not saved", "", "info");
       }
@@ -220,8 +336,6 @@ const SidangCreate = () => {
     <MainLayout>
       {isLoading || dataSidang.loading ? (
         <Loading />
-      ) : dataLecturer.error ? (
-        navigate("/home")
       ) : (
         <div>
           <ol className="breadcrumb mb-0">
@@ -239,7 +353,6 @@ const SidangCreate = () => {
 
           <div className="container-fluid">
             <div className="animated fadeIn">
-              {/* @include('coreui-templates::common.errors') */}
               <Alert type="danger" />
               <Alert
                 type="warning"
@@ -282,6 +395,7 @@ const SidangCreate = () => {
                               className="select2 form-control"
                               value={periodId}
                               onChange={(e) => setPeriodId(e.target.value)}
+                              required
                             >
                               <option value="">Pilih Periode</option>
                               {periods &&
@@ -348,7 +462,7 @@ const SidangCreate = () => {
                             <option value="">Pilih Pembimbing 1</option>
                             {dataLecturer.data &&
                               dataLecturer.data.map((data, index) => (
-                                <option key={index} value={data.id}>
+                                <option key={index} value={data.user.id}>
                                   {data.code} - {data.user.nama}
                                 </option>
                               ))}
@@ -371,7 +485,7 @@ const SidangCreate = () => {
                             <option value="">Pilih Pembimbing 2</option>
                             {dataLecturer.data &&
                               dataLecturer.data.map((data, index) => (
-                                <option key={index} value={data.id}>
+                                <option key={index} value={data.user.id}>
                                   {data.code} - {data.user.nama}
                                 </option>
                               ))}
@@ -596,10 +710,13 @@ const SidangCreate = () => {
                           className="form-group col-sm-12"
                           style={{ display: "flex" }}
                         >
-                          <button className="btn btn-primary" onClick={attend2}>
+                          <button
+                            className="btn btn-primary mx-1"
+                            onClick={attend2}
+                          >
                             Simpan
                           </button>
-                          <Link to="/home" className="btn btn-secondary">
+                          <Link to="/home" className="btn btn-secondary mx-1">
                             Batal
                           </Link>
                         </div>
