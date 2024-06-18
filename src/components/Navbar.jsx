@@ -5,10 +5,7 @@ import { useAuth } from "../middleware/AuthContext";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-// import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
 
-// import "../assets/js/app.js";
 const Navbar = () => {
   const { logout } = useAuth();
 
