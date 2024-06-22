@@ -5,7 +5,7 @@ import { Footer } from "../../components/Footer";
 
 export function MainLayout(props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const toggleSidebar = () => {
