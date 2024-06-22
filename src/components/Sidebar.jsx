@@ -2,8 +2,9 @@ import { NavLink, useLocation } from "react-router-dom";
 import "../assets/css/sidebar.css";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
+import { useState, useEffect } from "react";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
   const location = useLocation();
   const [cookies] = useCookies();
   const authToken = cookies["auth-token"];
@@ -15,15 +16,97 @@ const Sidebar = () => {
   const isOpen = (path) => {
     return location.pathname.startsWith(path) ? "open" : "";
   };
+  const initialDropdownState = {
+    sidangTA: location.pathname.startsWith("/sidangs"),
+    dataMaster: location.pathname.startsWith("/data-master"),
+    exportData: location.pathname.startsWith("/export-data"),
+    guideBook: false,
+  };
+  const [openDropdowns, setOpenDropdowns] = useState(initialDropdownState);
+
+  const [guideBookDropdowns, setGuideBookDropdowns] = useState(false);
+  const toogleGuideBookDropdowns = () => {
+    setGuideBookDropdowns(!guideBookDropdowns);
+  };
+
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdowns((prevState) => ({
+      ...prevState,
+      [dropdown]: !prevState[dropdown],
+    }));
+  };
+
+  const menuItems = [
+    {
+      key: "sidangTA",
+      icon: "icon-list",
+      title: "Sidang TA",
+      items: [
+        { path: "/sidangs", icon: "icon-list", label: "Pengajuan" },
+        { path: "#", icon: "icon-list", label: "Jadwal Sidang" },
+        { path: "#", icon: "icon-calendar", label: "Perubahan Hak Akses" },
+        { path: "#", icon: "icon-exclamation", label: "Sidang Bermasalah" },
+        {
+          path: "/sidangs/surat-tugas",
+          icon: "icon-list",
+          label: "Surat Tugas Penguji",
+        },
+      ],
+    },
+    {
+      key: "dataMaster",
+      icon: "fa fa-database",
+      title: "Data Master",
+      items: [
+        { path: "#", icon: "icon-user", label: "Pengguna" },
+        { path: "#", icon: "fa fa-users", label: "Hak Akses" },
+        { path: "#", icon: "fa fa-clock-o", label: "Periode" },
+        { path: "/studyPrograms", icon: "icon-list", label: "Program Studi" },
+        { path: "#", icon: "icon-list", label: "Peminatan" },
+        { path: "#", icon: "icon-doc", label: "List SN Dokumen" },
+        { path: "#", icon: "icon-key", label: "Setting CLO" },
+        { path: "#", icon: "icon-key", label: "Porsi Nilai" },
+        { path: "/studyPrograms", icon: "icon-cursor", label: "Program Studi" },
+        { path: "#", icon: "icon-list", label: "Parameters" },
+        { path: "#", icon: "icon-list", label: "Status Revisi Mahasiswa" },
+      ],
+    },
+    {
+      key: "exportData",
+      icon: "icon-doc",
+      title: "Export Data",
+      items: [
+        { path: "#", icon: "fa fa-files-o", label: "Dokumen Sidang" },
+        { path: "#", icon: "fa fa-files-o", label: "Export Dokumen" },
+      ],
+    },
+  ];
+
+  useEffect(() => {
+    setOpenDropdowns({
+      ...openDropdowns,
+      sidangTA:
+        location.pathname.startsWith("/sidangs") || openDropdowns.sidangTA,
+      dataMaster:
+        location.pathname.startsWith("/data-master") ||
+        openDropdowns.dataMaster,
+      exportData:
+        location.pathname.startsWith("/export-data") ||
+        openDropdowns.exportData,
+    });
+  }, [location.pathname]);
 
   return (
-    <div className="sidebar shadow">
+    <div
+      className="sidebar shadow"
+      style={{ marginLeft: isOpenSidebar ? "-200px" : 0 }}
+    >
       <nav className="sidebar-nav">
         <ul className="nav">
           <li className="nav-item mb-2">
             <NavLink
               to="/home"
-              className={`nav-link ${isActive("/home")}`}
+              className={`nav-link`}
               style={{
                 fontSize: "14px",
                 fontWeight: "bold",
@@ -271,201 +354,49 @@ const Sidebar = () => {
 
           {userData.role?.find((roles) => "RLADM".includes(roles)) && (
             <>
-              <li
-                className={`nav-item nav-dropdown mb-2 ${isOpen("/sidangs")}`}
-              >
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+              {menuItems.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
                 >
-                  <i className="nav-icon icon-list"></i>Sidang TA
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className={`nav-item ${isActive("/sidangs")}`}>
-                    <NavLink className="nav-link" to="/sidangs">
-                      <i className="nav-icon icon-list"></i>
-                      <span>Pengajuan</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedules') ? 'active' : '' }}">
-                    <a className="nav-link" href="#">
-                      <i className="nav-icon icon-list"></i>
-                      <span>Jadwal Sidang</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedules') ? 'active' : '' }}">
-                    <a className="nav-link" href="#">
-                      <i className="nav-icon icon-calendar"></i>
-                      <span>Perubahan Hak Akses</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedule.adminBermasalah') ? 'active' : '' }}">
-                    <a className="nav-link" href="#">
-                      <i className="nav-icon icon-exclamation"></i>
-                      <span>Sidang Bermasalah</span>
-                    </a>
-                  </li>
-                  <li className={`nav-item ${isActive("/sidangs")}`}>
-                    <NavLink className="nav-link" to="/sidangs/surat-tugas">
-                      <i className="nav-icon icon-list"></i>
-                      <span>Surat Tugas Penguji</span>
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item nav-dropdown mb-2">
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="nav-icon fa fa-database"></i>Data Master
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item {{ Request::is('users*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('users*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-user"></i>
-                      <span>Pengguna</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('lecturers*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('lecturers*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-users"></i>
-                      <span>Hak Akses</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('periods*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('periods*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-clock-o"></i>
-                      <span>Periode</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/studyPrograms"
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active open" : "nav-link open"
-                      }
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Program Studi</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item {{ Request::is('peminatans*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('peminatans*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Peminatan</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('verifyDocuments*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('verifyDocuments*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-doc"></i>
-                      <span>List SN Dokumen</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ (Request::is('cLOS*') OR Request::is('clo*')) ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ (Request::is('cLOS*') OR Request::is('clo*')) ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-key"></i>
-                      <span>Setting CLO</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('scorePortions*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('scorePortions*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-key"></i>
-                      <span>Porsi Nilai</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/studyPrograms"
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active open" : "nav-link open"
-                      }
-                    >
-                      <i className="nav-icon icon-cursor"></i>
-                      <span>Program Studi</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item {{ Request::is('parameters.index') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('parameters.index') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Parameters</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedule/status_revisi') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('schedule/status_revisi') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Status Revisi Mahasiswa</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item nav-dropdown mb-2">
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="nav-icon icon-doc"></i>Export Data
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item {{ Request::is('cetak/index*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('cetak/index*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-files-o"></i>
-                      <span>Dokumen Sidang</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('exports*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('exports*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-files-o"></i>
-                      <span>Export Dokumen</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </>
           )}
 
@@ -499,11 +430,12 @@ const Sidebar = () => {
 
           {/* Guide Book */}
           <li
-            className={`nav-item nav-dropdown mb-2 ${isOpen(
+            className={`nav-item nav-dropdown mb-2  ${isOpen(
               "/guide-book-admin"
             )} ${isOpen("/guide-book-pembimbing")} ${isOpen(
               "/guide-book-student"
-            )} ${isOpen("/guide-book-PIC")}`}
+            )} ${isOpen("/guide-book-PIC")} ${guideBookDropdowns && "open"} `}
+            onClick={() => toogleGuideBookDropdowns()}
           >
             <a
               className="nav-link nav-dropdown-toggle "
@@ -577,6 +509,7 @@ const Sidebar = () => {
       <button
         className="sidebar-minimizer brand-minimizer"
         type="button"
+        onClick={toggleMinimize}
       ></button>
     </div>
   );

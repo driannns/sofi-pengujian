@@ -6,7 +6,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar, isOpen }) => {
   const { logout } = useAuth();
 
   const location = useLocation();
@@ -83,7 +83,7 @@ const Navbar = () => {
       <button
         className="navbar-toggler sidebar-toggler d-lg-none mr-auto"
         type="button"
-        data-toggle="sidebar-show"
+        onClick={toggleSidebar}
       >
         <span className="navbar-toggler-icon"></span>
       </button>
@@ -106,7 +106,7 @@ const Navbar = () => {
       <button
         className="navbar-toggler sidebar-toggler d-md-down-none"
         type="button"
-        data-toggle="sidebar-lg-show"
+        onClick={toggleSidebar}
       >
         <span className="navbar-toggler-icon"></span>
       </button>
