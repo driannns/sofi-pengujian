@@ -2,28 +2,278 @@ import { NavLink, useLocation } from "react-router-dom";
 import "../assets/css/sidebar.css";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
+import { useState, useEffect } from "react";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
   const location = useLocation();
   const [cookies] = useCookies();
   const authToken = cookies["auth-token"];
   const userData = jwtDecode(authToken);
 
   const isActive = (path) => {
-    return location.pathname.startsWith(path) ? "active" : "";
+    console.log(location.pathname, location.pathname === path);
+    return location.pathname === path ? "active" : "";
   };
   const isOpen = (path) => {
     return location.pathname.startsWith(path) ? "open" : "";
   };
+  const initialDropdownState = {
+    sidangTA: location.pathname.startsWith("/sidangs"),
+    dataMaster: location.pathname.startsWith("/data-master"),
+    exportData: location.pathname.startsWith("/export-data"),
+    mahasiswa:
+      location.pathname.startsWith("/sidangs") ||
+      location.pathname.startsWith("teams") ||
+      location.pathname.startsWith("slides"),
+    jadwalSidang: location.pathname.startsWith("/schedule"),
+    revisiTA: location.pathname.startsWith("/revision/mahasiswa"),
+    pembimbing:
+      location.pathname.startsWith("/schedule/pembimbing") ||
+      location.pathname.startsWith("/sidangs/pembimbing"),
+    penguji: location.pathname.startsWith("/schedule/penguji"),
+    picTA:
+      location.pathname.startsWith("/schedule/bukaAkses") ||
+      location.pathname.startsWith("/schedules") ||
+      location.pathname.startsWith("/sidangs/pic"),
+    revisiSidang: location.pathname.startsWith("/revisions/index/dosen"),
+    guideBook: false,
+  };
+  const [openDropdowns, setOpenDropdowns] = useState(initialDropdownState);
+
+  const [guideBookDropdowns, setGuideBookDropdowns] = useState(false);
+  const toogleGuideBookDropdowns = () => {
+    setGuideBookDropdowns(!guideBookDropdowns);
+  };
+
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdowns((prevState) => ({
+      ...prevState,
+      [dropdown]: !prevState[dropdown],
+    }));
+  };
+  const MHSMenu = [
+    {
+      key: "mahasiswa",
+      icon: "icon-user",
+      title: "Mahasiswa",
+      items: [
+        {
+          path: "/sidangs/create",
+          route: "/sidangs",
+          icon: "icon-info",
+          label: "Informasi Pendaftaran",
+        },
+        {
+          path: "/slides",
+          route: "/slides",
+          icon: "fa fa-folder-o",
+          label: "Materi Presentasi",
+        },
+        {
+          path: "/teams",
+          route: "/teams",
+          icon: "fa fa-users",
+          label: "Buat Tim",
+        },
+      ],
+    },
+    {
+      key: "jadwalSidang",
+      icon: "icon-list",
+      title: "Jadwal Sidang",
+      items: [
+        {
+          path: "#",
+          icon: "fa fa-calendar-check-o",
+          label: "Jadwal Sidang",
+        },
+      ],
+    },
+    {
+      key: "revisiTA",
+      icon: "icon-note",
+      title: "Revisi TA",
+      items: [
+        {
+          path: "#",
+          icon: "fa fa-check-square-o",
+          label: "Revisi TA",
+        },
+      ],
+    },
+  ];
+
+  const ADMMenu = [
+    {
+      key: "sidangTA",
+      icon: "icon-list",
+      title: "Sidang TA",
+      items: [
+        { path: "/sidangs", icon: "icon-list", label: "Pengajuan" },
+        { path: "#", icon: "icon-list", label: "Jadwal Sidang" },
+        { path: "#", icon: "icon-calendar", label: "Perubahan Hak Akses" },
+        { path: "#", icon: "icon-exclamation", label: "Sidang Bermasalah" },
+        {
+          path: "/sidangs/surat-tugas",
+          icon: "icon-list",
+          label: "Surat Tugas Penguji",
+        },
+      ],
+    },
+    {
+      key: "dataMaster",
+      icon: "fa fa-database",
+      title: "Data Master",
+      items: [
+        { path: "#", icon: "icon-user", label: "Pengguna" },
+        { path: "#", icon: "fa fa-users", label: "Hak Akses" },
+        { path: "#", icon: "fa fa-clock-o", label: "Periode" },
+        { path: "/studyPrograms", icon: "icon-list", label: "Program Studi" },
+        { path: "#", icon: "icon-list", label: "Peminatan" },
+        { path: "#", icon: "icon-doc", label: "List SN Dokumen" },
+        { path: "#", icon: "icon-key", label: "Setting CLO" },
+        { path: "#", icon: "icon-key", label: "Porsi Nilai" },
+        { path: "/studyPrograms", icon: "icon-cursor", label: "Program Studi" },
+        { path: "#", icon: "icon-list", label: "Parameters" },
+        { path: "#", icon: "icon-list", label: "Status Revisi Mahasiswa" },
+      ],
+    },
+    {
+      key: "exportData",
+      icon: "icon-doc",
+      title: "Export Data",
+      items: [
+        { path: "#", icon: "fa fa-files-o", label: "Dokumen Sidang" },
+        { path: "#", icon: "fa fa-files-o", label: "Export Dokumen" },
+      ],
+    },
+  ];
+
+  const PBBPGJMenu1 = [
+    {
+      key: "pembimbing",
+      icon: "fa fa-book",
+      title: "Pembimbing",
+      items: [
+        {
+          path: "/sidangs/pembimbing",
+          icon: "fa fa-check-square-o",
+          label: "Bimbingan TA",
+        },
+        {
+          path: "#",
+          icon: "fa fa-calendar-check-o",
+          label: "Jadwal Sidang Bimbingan",
+        },
+      ],
+    },
+  ];
+
+  const PGJMenu = [
+    {
+      key: "penguji",
+      icon: "fa fa-hourglass-half",
+      title: "Penguji",
+      items: [
+        {
+          path: "#",
+          icon: "fa fa-calendar-check-o",
+          label: "Jadwal Sidang Penguji",
+        },
+      ],
+    },
+  ];
+
+  const PICMenu = [
+    {
+      key: "picTA",
+      icon: "icon-list",
+      title: "PIC TA",
+      items: [
+        {
+          path: "/sidangs/pic",
+          icon: "fa fa-calendar",
+          label: "Penjadwalan Sidang",
+        },
+        {
+          path: "#",
+          icon: "fa fa-calendar-check-o",
+          label: "Jadwal Sidang KK",
+        },
+        {
+          path: "#",
+          icon: "icon-key",
+          label: "Buka Akses Menu",
+        },
+      ],
+    },
+  ];
+
+  const PBBPGJMenu2 = [
+    {
+      key: "revisiSidang",
+      icon: "icon-note",
+      title: "Revisi Sidang",
+      items: [
+        {
+          path: "#",
+          icon: "fa fa-check-square-o",
+          label: "Revisi Mahasiswa",
+        },
+      ],
+    },
+  ];
+
+  useEffect(() => {
+    setOpenDropdowns({
+      ...openDropdowns,
+      mahasiswa:
+        location.pathname.startsWith("/sidangs") ||
+        location.pathname.startsWith("teams") ||
+        location.pathname.startsWith("slides") ||
+        openDropdowns.mahasiswa,
+      jadwalSidang:
+        location.pathname.startsWith("/schedule") || openDropdowns.jadwalSidang,
+      revisiTA:
+        location.pathname.startsWith("/revision/mahasiswa") ||
+        openDropdowns.revisiTA,
+      pembimbing:
+        location.pathname.startsWith("/sidangs/pembimbing") ||
+        location.pathname.startsWith("/schedule/pembimbing") ||
+        openDropdowns.pembimbing,
+      penguji:
+        location.pathname.startsWith("/schedule/penguji") ||
+        openDropdowns.penguji,
+      picTA:
+        location.pathname.startsWith("/sidangs/pic") ||
+        location.pathname.startsWith("/schedules") ||
+        location.pathname.startsWith("/schedule/bukaAkses") ||
+        openDropdowns.picTA,
+      sidangTA:
+        location.pathname.startsWith("/sidangs") || openDropdowns.sidangTA,
+      dataMaster:
+        location.pathname.startsWith("/data-master") ||
+        openDropdowns.dataMaster,
+      exportData:
+        location.pathname.startsWith("/export-data") ||
+        openDropdowns.exportData,
+      revisiSidang:
+        location.pathname.startsWith("/revisions/index/dosen") ||
+        openDropdowns.revisiSidang,
+    });
+  }, [location.pathname]);
 
   return (
-    <div className="sidebar shadow">
+    <div
+      className="sidebar shadow"
+      style={{ marginLeft: isOpenSidebar ? "-200px" : 0 }}
+    >
       <nav className="sidebar-nav">
         <ul className="nav">
           <li className="nav-item mb-2">
             <NavLink
               to="/home"
-              className={`nav-link ${isActive("/home")}`}
+              className={`nav-link`}
               style={{
                 fontSize: "14px",
                 fontWeight: "bold",
@@ -36,110 +286,49 @@ const Sidebar = () => {
 
           {userData.role?.find((roles) => "RLMHS".includes(roles)) && (
             <>
-              <li
-                className={`nav-item nav-dropdown mb-2 ${isOpen(
-                  "/sidangs"
-                )} ${isOpen("/slides")} ${isOpen("/teams")}`}
-              >
-                <div
-                  className={`nav-link nav-dropdown-toggle ${isActive(
-                    "/sidangs"
-                  )} ${isActive("/slides")} ${isActive("/teams")}`}
-                  // href="#"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+              {MHSMenu.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
                 >
-                  <i className="nav-icon icon-user"></i>Mahasiswa
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/sidangs/create"
-                      className={`nav-link ${isActive("/sidangs")} open`}
-                    >
-                      <i className="nav-icon icon-info ml-1"></i>
-                      <span>Informasi Pendaftaran</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/slides"
-                      className={`nav-link ${isActive("/slides")} open`}
-                    >
-                      <i className="nav-icon fa fa-folder-o ml-1"></i>
-                      <span>Materi Presentasi</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/teams"
-                      className={`nav-link ${isActive("/teams")} open`}
-                    >
-                      <i className="nav-icon fa fa-users ml-1"></i>
-                      <span>Buat Tim</span>
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item nav-dropdown mb-2">
-                <a
-                  className="nav-link nav-dropdown-toggle {{ Request::is('schedule*') ? 'active' : '' }}"
-                  href="#"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="nav-icon icon-list"></i>Jadwal Sidang
-                </a>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('schedule.mahasiswa') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
-                      <span>Jadwal Sidang</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <div id="submenumhs3" className="collapse sidebar-submenu">
-                <li className="nav-item {{ Request::is('revisions.index.mahasiswa') ? 'active' : '' }}">
-                  <a className="nav-link" href="#">
-                    <i className="nav-icon icon-note"></i>
-                    <span>Revisi TA</span>
-                  </a>
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
-              </div>
-              <li className="nav-item nav-dropdown mb-2">
-                <a
-                  className="nav-link nav-dropdown-toggle {{ Request::is('revision*') ? 'active' : '' }}"
-                  href="#"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="nav-icon icon-note"></i>Revisi TA
-                </a>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('revisions.index.mahasiswa') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-check-square-o ml-1"></i>
-                      <span>Revisi TA</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+              ))}
             </>
           )}
 
@@ -147,363 +336,254 @@ const Sidebar = () => {
             ["RLPGJ", "RLPBB"].includes(roles)
           ) && (
             <>
-              <li
-                className={`nav-item nav-dropdown mb-2 ${isOpen(
-                  "/sidangs/pembimbing"
-                )}`}
-              >
-                <div
-                  className="nav-link nav-dropdown-toggle"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+              {PBBPGJMenu1.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
                 >
-                  <i className="nav-icon fa fa-book"></i>Pembimbing
-                </div>
-                <ul className="nav-dropdown-items">
-                  <li className="nav-item">
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active" : "nav-link"
-                      }
-                      to="/sidangs/pembimbing"
-                    >
-                      <i className="nav-icon fa fa-check-square-o ml-1"></i>
-                      <span>Bimbingan TA</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('schedule.pembimbing') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
-                      <span>Jadwal Sidang Bimbingan</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </>
           )}
 
           {userData.role?.find((roles) => ["RLPGJ"].includes(roles)) && (
             <>
-              <li className="nav-item nav-dropdown mb-2">
-                <div
-                  className="nav-link nav-dropdown-toggle"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+              {PGJMenu.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
                 >
-                  <i className="nav-icon fa fa-hourglass-half"></i>
-                  Penguji
-                </div>
-                <ul className="nav-dropdown-items">
-                  <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('schedule.penguji') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
-                      <span>Jadwal Sidang Penguji</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </>
           )}
 
           {userData.role?.find((roles) => ["RLPIC"].includes(roles)) && (
             <>
-              <li
-                className={`nav-item nav-dropdown mb-2 ${isOpen(
-                  "/sidangs/pic"
-                )}`}
-              >
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+              {PICMenu.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
                 >
-                  <i className="nav-icon icon-list"></i>PIC TA
-                </div>
-                <ul className="nav-dropdown-items">
-                  <li className="nav-item">
-                    <NavLink
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active" : "nav-link"
-                      }
-                      to="/sidangs/pic"
-                    >
-                      <i className="nav-icon fa fa-calendar ml-1"></i>
-                      <span>Penjadwalan Sidang</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('schedules.index') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-calendar-check-o ml-1"></i>
-                      <span>Jadwal Sidang KK</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a
-                      className="nav-link {{ Request::is('schedule.bukaAkses') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-key ml-1"></i>
-                      <span>Buka Akses Menu</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>{" "}
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </>
           )}
 
           {userData.role?.find((roles) => "RLADM".includes(roles)) && (
             <>
-              <li
-                className={`nav-item nav-dropdown mb-2 ${isOpen("/sidangs")}`}
-              >
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
+              {ADMMenu.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
                 >
-                  <i className="nav-icon icon-list"></i>Sidang TA
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className={`nav-item ${isActive("/sidangs")}`}>
-                    <NavLink className="nav-link" to="/sidangs">
-                      <i className="nav-icon icon-list"></i>
-                      <span>Pengajuan</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedules') ? 'active' : '' }}">
-                    <a className="nav-link" href="#">
-                      <i className="nav-icon icon-list"></i>
-                      <span>Jadwal Sidang</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedules') ? 'active' : '' }}">
-                    <a className="nav-link" href="#">
-                      <i className="nav-icon icon-calendar"></i>
-                      <span>Perubahan Hak Akses</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedule.adminBermasalah') ? 'active' : '' }}">
-                    <a className="nav-link" href="#">
-                      <i className="nav-icon icon-exclamation"></i>
-                      <span>Sidang Bermasalah</span>
-                    </a>
-                  </li>
-                  <li className={`nav-item ${isActive("/sidangs")}`}>
-                    <NavLink className="nav-link" to="/sidangs/surat-tugas">
-                      <i className="nav-icon icon-list"></i>
-                      <span>Surat Tugas Penguji</span>
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item nav-dropdown mb-2">
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="nav-icon fa fa-database"></i>Data Master
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item {{ Request::is('users*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('users*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-user"></i>
-                      <span>Pengguna</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('lecturers*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('lecturers*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-users"></i>
-                      <span>Hak Akses</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('periods*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('periods*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-clock-o"></i>
-                      <span>Periode</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/studyPrograms"
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active open" : "nav-link open"
-                      }
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Program Studi</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item {{ Request::is('peminatans*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('peminatans*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Peminatan</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('verifyDocuments*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('verifyDocuments*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-doc"></i>
-                      <span>List SN Dokumen</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ (Request::is('cLOS*') OR Request::is('clo*')) ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ (Request::is('cLOS*') OR Request::is('clo*')) ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-key"></i>
-                      <span>Setting CLO</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('scorePortions*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('scorePortions*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-key"></i>
-                      <span>Porsi Nilai</span>
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink
-                      to="/studyPrograms"
-                      className={({ isActive }) =>
-                        isActive ? "nav-link active open" : "nav-link open"
-                      }
-                    >
-                      <i className="nav-icon icon-cursor"></i>
-                      <span>Program Studi</span>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item {{ Request::is('parameters.index') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('parameters.index') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Parameters</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('schedule/status_revisi') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('schedule/status_revisi') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon icon-list"></i>
-                      <span>Status Revisi Mahasiswa</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item nav-dropdown mb-2">
-                <div
-                  className="nav-link nav-dropdown-toggle "
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  <i className="nav-icon icon-doc"></i>Export Data
-                </div>
-                <ul className="nav-dropdown-items" style={{ fontSize: "12px" }}>
-                  <li className="nav-item {{ Request::is('cetak/index*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('cetak/index*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-files-o"></i>
-                      <span>Dokumen Sidang</span>
-                    </a>
-                  </li>
-                  <li className="nav-item {{ Request::is('exports*') ? 'active' : '' }}">
-                    <a
-                      className="nav-link {{ Request::is('exports*') ? 'active' : '' }}"
-                      href="#"
-                    >
-                      <i className="nav-icon fa fa-files-o"></i>
-                      <span>Export Dokumen</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </>
           )}
 
           {userData.role?.find((roles) =>
             ["RLPGJ", "RLPBB"].includes(roles)
           ) && (
-            <li className="nav-item nav-dropdown">
-              <div
-                className="nav-link nav-dropdown-toggle {{ Request::is('revision*') ? 'active' : '' }}"
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                <i className="nav-icon icon-note"></i>Revisi Sidang
-              </div>
-              <ul className="nav-dropdown-items">
-                <li className="nav-item">
-                  <a
-                    className="nav-link {{ Request::is('revisions.index.dosen') ? 'active' : '' }}"
-                    href="#"
+            <>
+              {PBBPGJMenu2.map((menu) => (
+                <li
+                  key={menu.key}
+                  className={`nav-item nav-dropdown mb-2  ${
+                    openDropdowns[menu.key] ? "open" : ""
+                  }`}
+                  onClick={() => toggleDropdown(menu.key)}
+                >
+                  <div
+                    className="nav-link nav-dropdown-toggle"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
                   >
-                    <i className="nav-icon fa fa-check-square-o ml-1"></i>
-                    <span>Revisi Mahasiswa</span>
-                  </a>
+                    <i className={`nav-icon ${menu.icon}`}></i> {menu.title}
+                  </div>
+                  <ul
+                    className="nav-dropdown-items"
+                    style={{ fontSize: "12px" }}
+                  >
+                    {menu.items.map((item, index) => (
+                      <li
+                        key={index}
+                        className={`nav-item ${isActive(item.path)}`}
+                      >
+                        {item.path.startsWith("/") ? (
+                          <NavLink className="nav-link" to={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </NavLink>
+                        ) : (
+                          <a className="nav-link" href={item.path}>
+                            <i className={`nav-icon ${item.icon}`}></i>
+                            <span>{item.label}</span>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
-              </ul>
-            </li>
+              ))}
+            </>
           )}
 
           {/* Guide Book */}
           <li
-            className={`nav-item nav-dropdown mb-2 ${isOpen(
+            className={`nav-item nav-dropdown mb-2  ${isOpen(
               "/guide-book-admin"
             )} ${isOpen("/guide-book-pembimbing")} ${isOpen(
               "/guide-book-student"
-            )} ${isOpen("/guide-book-PIC")}`}
+            )} ${isOpen("/guide-book-PIC")} ${guideBookDropdowns && "open"} `}
+            onClick={() => toogleGuideBookDropdowns()}
           >
             <a
               className="nav-link nav-dropdown-toggle "
@@ -577,6 +657,7 @@ const Sidebar = () => {
       <button
         className="sidebar-minimizer brand-minimizer"
         type="button"
+        onClick={toggleMinimize}
       ></button>
     </div>
   );

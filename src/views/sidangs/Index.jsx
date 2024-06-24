@@ -16,6 +16,7 @@ import Loading from "../../components/Loading";
 import DatatableComponent from "../../components/Datatable";
 import ModalComponent from "../../components/Modal";
 import DownloadButton from "../../components/DownloadButton";
+import Alert from "../../components/Alert";
 
 const SidangIndex = () => {
   const [cookies] = useCookies();
@@ -446,6 +447,7 @@ const SidangIndex = () => {
           }
         } else if (jwtDecoded.role.find((role) => ["RLADM"].includes(role))) {
           datas = await dispatch(getAllSidang(cookies["auth-token"]));
+          console.log(datas);
           if (datas.type === "getAllSidang/fulfilled") {
             if (datas.payload) {
               const dataSidangMHS = await Promise.all(
@@ -571,6 +573,10 @@ const SidangIndex = () => {
 
       if (approveSidang.type === "feedbackSidang/fulfilled") {
         fetchData();
+        localStorage.removeItem("errorMessage");
+        localStorage.removeItem("warningMessage");
+        localStorage.removeItem("successMessage");
+        localStorage.setItem("successMessage", "Berhasil di Disetujui");
         setFeedback("");
       }
     } catch (error) {
@@ -594,6 +600,10 @@ const SidangIndex = () => {
 
       if (approveSidang.type === "approveFeedbackSidang/fulfilled") {
         fetchData();
+        localStorage.removeItem("errorMessage");
+        localStorage.removeItem("warningMessage");
+        localStorage.removeItem("successMessage");
+        localStorage.setItem("successMessage", "Feedback Sudah Dikirim");
         setFeedbackApprove("");
       }
     } catch (error) {
@@ -649,6 +659,7 @@ const SidangIndex = () => {
           </ol>
           <div className="container-fluid">
             <div className="animated fadeIn">
+              <Alert type="success" />
               <div className="row">
                 <div className="col-lg-12">
                   <div className="card">

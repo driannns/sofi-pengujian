@@ -3,15 +3,15 @@ import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import { useAuth } from "../middleware/AuthContext";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const { logout } = useAuth();
-
   const location = useLocation();
   const [cookies] = useCookies();
   const [notification, setNotification] = useState([]);
+  const previousNotificationRef = useRef([]);
   const decodedToken = jwtDecode(cookies["auth-token"]);
 
   const handleLogout = () => {
@@ -30,6 +30,9 @@ const Navbar = () => {
     const signal = abortController.signal;
 
     try {
+      if (userId === "-" || userId === 0) {
+        return "-";
+      }
       const res = await axios.get(`https://sofi.my.id/api/user/${userId}`, {
         signal,
       });
@@ -68,22 +71,33 @@ const Navbar = () => {
               };
             })
           );
-          setNotification(formatNotification);
+          if (
+            JSON.stringify(previousNotificationRef.current) !==
+            JSON.stringify(formatNotification)
+          ) {
+            setNotification(formatNotification);
+            previousNotificationRef.current = formatNotification;
+          }
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
     fetchNotif();
-  }, [location.pathname]);
+  }, [location.pathname, cookies["auth-token"]]);
+
+  const notificationCount = useMemo(
+    () => (notification ? notification.length : 0),
+    [notification]
+  );
 
   return (
     <header className="app-header navbar">
       <button
         className="navbar-toggler sidebar-toggler d-lg-none mr-auto"
         type="button"
-        data-toggle="sidebar-show"
+        onClick={toggleSidebar}
       >
         <span className="navbar-toggler-icon"></span>
       </button>
@@ -106,7 +120,7 @@ const Navbar = () => {
       <button
         className="navbar-toggler sidebar-toggler d-md-down-none"
         type="button"
-        data-toggle="sidebar-lg-show"
+        onClick={toggleSidebar}
       >
         <span className="navbar-toggler-icon"></span>
       </button>
@@ -123,7 +137,7 @@ const Navbar = () => {
           >
             <i className="c-icon icon-bell"></i>
             <span className="badge badge-pill badge-danger">
-              {notification ? notification.length : 0}
+              {notificationCount}
             </span>
           </a>
           <div
