@@ -266,7 +266,7 @@ const SidangShow = () => {
                               <td>
                                 {dataSidang.data.doc_ta ? (
                                   <DownloadButton
-                                    url={`${import.meta.env.VITE_API_URL}${
+                                    url={`/doc/${import.meta.env.VITE_API_URL}${
                                       dataSidang.data.doc_ta
                                     }`}
                                   />
