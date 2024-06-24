@@ -6,19 +6,18 @@ export const getAllSidang = createAsyncThunk(
   "getAllSidang",
   async (authToken) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/get`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.get(`/api/pengajuan/get`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
+      console.log(res);
       if (res.data.code === 200) {
         return res.data.data;
       }
     } catch (error) {
+      console.log(error.response);
       throw error;
     }
   }
@@ -221,20 +220,18 @@ export const checkSidang = createAsyncThunk(
   "checkSidang",
   async (authToken) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/user/get`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
-
+      const res = await axios.get(`/api/pengajuan/user/get`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
+      console.log(res);
       if (res.data.code === 200) {
         return res.data.data;
       }
     } catch (error) {
+      console.log(error.response);
       if (error.message === "Network Error") {
         throw error;
       }
