@@ -11,7 +11,6 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
   const userData = jwtDecode(authToken);
 
   const isActive = (path) => {
-    console.log(location.pathname, location.pathname === path);
     return location.pathname === path ? "active" : "";
   };
   const isOpen = (path) => {

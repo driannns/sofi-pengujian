@@ -98,6 +98,7 @@ const SidangShow = () => {
           `https://sofi.my.id/api/lecturer/${dataSidang.data.pembimbing1_id}`,
           { signal }
         );
+        console.log(resPembimbing1);
 
         setPembimbing1(
           `${resPembimbing1.data.data.code} - ${resPembimbing1.data.data.user.nama}`
@@ -107,6 +108,7 @@ const SidangShow = () => {
           `https://sofi.my.id/api/lecturer/${dataSidang.data.pembimbing2_id}`,
           { signal }
         );
+        console.log(resPembimbing2);
         setPembimbing2(
           `${resPembimbing2.data.data.code} - ${resPembimbing2.data.data.user.nama}`
         );
