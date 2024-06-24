@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import Alert from "../../components/Alert";
 import Loading from "../../components/Loading";
 import DownloadButton from "../../components/DownloadButton";
+import axios from "axios";
 
 const formatUser = async (userId) => {
   const abortController = new AbortController();
