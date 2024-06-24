@@ -112,9 +112,7 @@ const SidangShow = () => {
         );
 
         const resPeriod = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/period/get/${
-            dataSidang.data.period_id
-          }`,
+          `/api/period/get/${dataSidang.data.period_id}`,
           {
             headers: {
               "ngrok-skip-browser-warning": true,

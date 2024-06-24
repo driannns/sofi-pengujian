@@ -23,12 +23,9 @@ const IndexAll = () => {
         navigate("/sidangs/indexSuperadmin");
         return;
       }
-      const resPeriodNow = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/check-period`,
-        {
-          headers: { Authorization: "Bearer " + cookies["auth-token"] },
-        }
-      );
+      const resPeriodNow = await axios.get(`/api/period/check-period`, {
+        headers: { Authorization: "Bearer " + cookies["auth-token"] },
+      });
       console.log(resPeriodNow.data);
 
       dispatch(getSidangByPeriod(resPeriodNow.data.data));

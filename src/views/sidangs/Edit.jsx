@@ -164,7 +164,7 @@ const SidangEdit = () => {
       setStatusLog(formatStatusLog);
 
       const resALlPeriods = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/get`,
+        `/api/period/get`,
         {
           headers: {
             Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -250,7 +250,7 @@ const SidangEdit = () => {
         setStatusLog(formatStatusLog);
 
         const resALlPeriods = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/period/get`,
+          `/api/period/get`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -596,9 +596,7 @@ const SidangEdit = () => {
                               {dataSidang.data && dataSidang.data.doc_ta ? (
                                 <p>
                                   <DownloadButton
-                                    url={`${import.meta.env.VITE_API_URL}${
-                                      dataSidang.data.doc_ta
-                                    }`}
+                                    url={`${dataSidang.data.doc_ta}`}
                                   />
                                 </p>
                               ) : (
@@ -627,9 +625,7 @@ const SidangEdit = () => {
                               {dataSidang.data && dataSidang.data.makalah ? (
                                 <p>
                                   <DownloadButton
-                                    url={`${import.meta.env.VITE_API_URL}${
-                                      dataSidang.data.makalah
-                                    }`}
+                                    url={`${dataSidang.data.makalah}`}
                                   />
                                 </p>
                               ) : (

@@ -55,10 +55,7 @@ const SidangIndex = () => {
     const signal = abortController.signal;
 
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/get/${periodId}`,
-        { signal }
-      );
+      const res = await axios.get(`/api/period/get/${periodId}`, { signal });
       return res.data.data.name;
     } catch (error) {
       return "-";
@@ -78,15 +75,12 @@ const SidangIndex = () => {
   const updateData = async (sidangId) => {
     try {
       setIsLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/get/${sidangId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.get(`/api/pengajuan/get/${sidangId}`, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       //? Parameter
 
       const resGetAllStudent = await axios.get(
@@ -204,22 +198,14 @@ const SidangIndex = () => {
     {
       name: "Dokumen TA",
       selector: (row) =>
-        row.doc_ta != null ? (
-          <DownloadButton
-            url={`${import.meta.env.VITE_API_URL}${row.doc_ta}`}
-          />
-        ) : null,
+        row.doc_ta != null ? <DownloadButton url={`${row.doc_ta}`} /> : null,
       sortable: true,
       width: "120px",
     },
     {
       name: "Jurnal",
       selector: (row) =>
-        row.makalah != null ? (
-          <DownloadButton
-            url={`${import.meta.env.VITE_API_URL}${row.makalah}`}
-          />
-        ) : null,
+        row.makalah != null ? <DownloadButton url={`${row.makalah}`} /> : null,
       sortable: true,
       width: "120px",
     },

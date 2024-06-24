@@ -27,20 +27,14 @@ const IndexSuperAdmin = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const resPeriodNow = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/check-period`,
-        {
-          headers: { Authorization: "Bearer " + cookies["auth-token"] },
-        }
-      );
+      const resPeriodNow = await axios.get(`/api/period/check-period`, {
+        headers: { Authorization: "Bearer " + cookies["auth-token"] },
+      });
       console.log(resPeriodNow.data);
 
-      const resPeriodAll = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/get`,
-        {
-          headers: { Authorization: "Bearer " + cookies["auth-token"] },
-        }
-      );
+      const resPeriodAll = await axios.get(`/api/period/get`, {
+        headers: { Authorization: "Bearer " + cookies["auth-token"] },
+      });
       console.log(resPeriodAll.data);
       setPeriodAll(resPeriodAll.data.data);
       if (period) {

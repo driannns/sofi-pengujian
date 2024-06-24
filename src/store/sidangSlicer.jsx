@@ -27,15 +27,12 @@ export const getPICSidang = createAsyncThunk(
   "getPICSidang",
   async (authToken) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/pic/get`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.get(`/api/pengajuan/pic/get`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       if (res.data.code === 200) {
         return res.data.data;
       }
@@ -49,15 +46,12 @@ export const getPembimbingSidang = createAsyncThunk(
   "getPembimbingSidang",
   async (authToken) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/pembimbing/get`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.get(`/api/pengajuan/pembimbing/get`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       if (res.data.code === 200) {
         return res.data.data;
       }
@@ -71,12 +65,9 @@ export const getSidangById = createAsyncThunk(
   "getSidangById",
   async ({ authToken, sidangId }) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/get/${sidangId}`,
-        {
-          headers: { Authorization: "Bearer " + authToken },
-        }
-      );
+      const res = await axios.get(`/api/pengajuan/get/${sidangId}`, {
+        headers: { Authorization: "Bearer " + authToken },
+      });
       if (res.data.code === 200) {
         return res.data.data;
       }
@@ -90,14 +81,11 @@ export const getSidangByPeriod = createAsyncThunk(
   "getSidangByPeriod",
   async (authToken, period) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/get/${period}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
+      const res = await axios.get(`/api/period/get/${period}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       return res.data.data;
     } catch (error) {
       throw error;
@@ -138,17 +126,13 @@ export const createSidang = createAsyncThunk(
         peminatan: peminatanId,
       };
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/create`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "multipart/form-data",
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.post(`/api/pengajuan/create`, data, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       localStorage.setItem("successMessage", "Sidang Berhasil Disimpan.");
       return res.data.data;
     } catch (error) {
@@ -194,17 +178,13 @@ export const updateSidang = createAsyncThunk(
         peminatan: peminatanId,
       };
 
-      const res = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/update/${sidangId}`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "multipart/form-data",
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.patch(`/api/pengajuan/update/${sidangId}`, data, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       localStorage.setItem("successMessage", "Sidang berhasil diedit");
       return res.data.data;
     } catch (error) {
@@ -245,7 +225,7 @@ export const feedbackSidang = createAsyncThunk(
   async ({ authToken, feedback, sidangId }, thunkAPI) => {
     try {
       const res = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/rejected/${sidangId}`,
+        `/api/pengajuan/rejected/${sidangId}`,
         { feedback: feedback },
         {
           headers: {
@@ -270,7 +250,7 @@ export const approveFeedbackSidang = createAsyncThunk(
     try {
       const isEnglish = bahasa === "true" ? true : false;
       const res = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/pengajuan/approve/${sidangId}`,
+        `/api/pengajuan/approve/${sidangId}`,
         { feedback: feedbackApprove, is_english: isEnglish },
         {
           headers: {

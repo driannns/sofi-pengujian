@@ -51,7 +51,7 @@ const Navbar = ({ toggleSidebar }) => {
             "ngrok-skip-browser-warning": true,
           },
         });
-        console.log(res);
+
         const filteredNotifications = res?.data?.data?.filter(
           (notification) => notification.read_at === "0001-01-01T00:00:00Z"
         );

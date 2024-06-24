@@ -95,15 +95,12 @@ const SidangCreate = () => {
           : ""
       );
 
-      const resALlPeriods = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/get`,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const resALlPeriods = await axios.get(`/api/period/get`, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       setPeriods(resALlPeriods.data.data);
 
       //? Parameter
@@ -209,15 +206,12 @@ const SidangCreate = () => {
             : ""
         );
 
-        const resALlPeriods = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/period/get`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-              "ngrok-skip-browser-warning": true,
-            },
-          }
-        );
+        const resALlPeriods = await axios.get(`/api/period/get`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        });
         setPeriods(resALlPeriods.data.data);
 
         //? Parameter

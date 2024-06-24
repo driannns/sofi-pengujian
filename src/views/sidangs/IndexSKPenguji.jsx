@@ -47,10 +47,7 @@ const IndexSKPenguji = () => {
     const signal = abortController.signal;
 
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/period/get/${periodId}`,
-        { signal }
-      );
+      const res = await axios.get(`/api/period/get/${periodId}`, { signal });
       return res.data.data.name;
     } catch (error) {
       console.error(error);
@@ -109,10 +106,7 @@ const IndexSKPenguji = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/period/check-period`,
-          { signal }
-        );
+        const res = await axios.get(`/api/period/check-period`, { signal });
 
         if (res.data.code === 200) {
           setPeriodNowId(res.data.data.id);

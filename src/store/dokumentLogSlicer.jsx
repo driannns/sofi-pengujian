@@ -6,7 +6,7 @@ export const uploadSlide = createAsyncThunk(
   async ({ authToken, slide }) => {
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/documentLog/create/slide`,
+        `/api/documentLog/create/slide`,
         { slide },
         {
           headers: {
