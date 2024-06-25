@@ -73,6 +73,7 @@ const UploadSKForm = () => {
           },
         }
       );
+      console.log(res);
       if (res.data.code === 201) {
         localStorage.removeItem("errorMessage");
         localStorage.removeItem("warningMessage");
@@ -84,7 +85,6 @@ const UploadSKForm = () => {
       localStorage.removeItem("errorMessage");
       localStorage.removeItem("warningMessage");
       localStorage.removeItem("successMessage");
-      console.error(error.response);
       if (error.response.data.code === 400) {
         if (error.response.data.message === "file size exceeds 5MB") {
           localStorage.setItem("errorMessage", "File harus kurang dari 5MB");
@@ -96,7 +96,6 @@ const UploadSKForm = () => {
       } else {
         localStorage.setItem("errorMessage", "Gagal Upload SK Penguji");
       }
-      console.error(error);
     } finally {
       setIsLoading(false);
       setSKPengujiFile(null);
