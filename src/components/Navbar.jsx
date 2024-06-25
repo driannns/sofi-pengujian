@@ -19,40 +19,35 @@ const Navbar = ({ toggleSidebar }) => {
   const logoutRef = useRef(null);
 
   const handleToggleisNotifOpen = () => {
-    setIsNotifOpen((prev) => !prev);
+    setIsNotifOpen(!isNotifOpen);
+    setIsLogOutOpen(false);
   };
 
-  const handleClickOutsideNotif = (event) => {
-    if (notifRef.current && !notifRef.current.contains(event.target)) {
+  const handleToggleisLogoutOpen = () => {
+    setIsLogOutOpen(!isLogOutOpen);
+    setIsNotifOpen(false);
+  };
+
+  const handleClickOutside = (event) => {
+    if (
+      notifRef.current &&
+      !notifRef.current.contains(event.target) &&
+      logoutRef.current &&
+      !logoutRef.current.contains(event.target)
+    ) {
       setIsNotifOpen(false);
-    }
-  };
-
-  const handleToggleisLogOut = () => {
-    setIsLogOutOpen((prev) => !prev);
-  };
-
-  const handleClickOutsideLogout = (event) => {
-    if (logoutRef.current && !logoutRef.current.contains(event.target)) {
       setIsLogOutOpen(false);
     }
   };
 
   useEffect(() => {
-    if (isNotifOpen) {
-      document.addEventListener("mousedown", handleClickOutsideNotif);
+    if (isNotifOpen || isLogOutOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener("mousedown", handleClickOutsideNotif);
-    }
-
-    if (isLogOutOpen) {
-      document.addEventListener("mousedown", handleClickOutsideLogout);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutsideLogout);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutsideNotif);
-      document.removeEventListener("mousedown", handleClickOutsideLogout);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isNotifOpen, isLogOutOpen]);
 
@@ -165,22 +160,30 @@ const Navbar = ({ toggleSidebar }) => {
       </button>
 
       <ul className="nav navbar-nav ml-auto">
-        <li className="c-header-nav-item dropdown d-md-down-none mx-2">
-          <a
+        <li
+          className={`c-header-nav-item dropdown d-md-down-none mx-2 ${
+            isNotifOpen ? "show" : ""
+          }`}
+          ref={notifRef}
+        >
+          <div
             className="c-header-nav-link"
             data-toggle="dropdown"
-            href=""
+            style={{ cursor: "pointer" }}
             role="button"
             aria-haspopup="true"
-            aria-expanded="false"
+            aria-expanded={isNotifOpen ? "true" : "false"}
+            onClick={handleToggleisNotifOpen}
           >
             <i className="c-icon icon-bell"></i>
             <span className="badge badge-pill badge-danger">
               {notificationCount}
             </span>
-          </a>
+          </div>
           <div
-            className="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0"
+            className={`dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0 ${
+              isNotifOpen ? "show" : ""
+            }`}
             style={{ height: "300px", overflowY: "scroll" }}
           >
             <div className="dropdown-header bg-light">
@@ -218,21 +221,24 @@ const Navbar = ({ toggleSidebar }) => {
             </Link>
           </div>
         </li>
-        <li className="nav-item dropdown" ref={logoutRef}>
-          <a
+        <li className={`nav-item dropdown ${isLogOutOpen ? "show" : ""}`}>
+          <div
             className="nav-link font-weight-bold"
-            style={{ marginRight: "40px", fontSize: "12px" }}
+            style={{ marginRight: "40px", fontSize: "12px", cursor: "pointer" }}
             data-toggle="dropdown"
-            href="#"
             role="button"
+            href="#"
             aria-haspopup="true"
+            ref={logoutRef}
             aria-expanded={isLogOutOpen ? "true" : "false"}
-            onClick={handleToggleisLogOut}
+            onClick={handleToggleisLogoutOpen}
           >
             {decodedToken.nama}
-          </a>
+          </div>
           <div
-            className="dropdown-menu dropdown-menu-right"
+            className={`dropdown-menu dropdown-menu-right ${
+              isLogOutOpen ? "show" : ""
+            }`}
             style={{ marginRight: "40px" }}
           >
             <div className="dropdown-header text-center">
