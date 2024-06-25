@@ -16,7 +16,6 @@ export const getAllSidang = createAsyncThunk(
         return res.data.data;
       }
     } catch (error) {
-      console.log(error.response);
       throw error;
     }
   }
@@ -205,12 +204,10 @@ export const checkSidang = createAsyncThunk(
           "ngrok-skip-browser-warning": true,
         },
       });
-      console.log(res);
       if (res.data.code === 200) {
         return res.data.data;
       }
     } catch (error) {
-      console.log(error.response);
       if (error.message === "Network Error") {
         throw error;
       }
