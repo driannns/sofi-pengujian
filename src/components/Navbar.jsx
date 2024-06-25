@@ -13,6 +13,48 @@ const Navbar = ({ toggleSidebar }) => {
   const [notification, setNotification] = useState([]);
   const previousNotificationRef = useRef([]);
   const decodedToken = jwtDecode(cookies["auth-token"]);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isLogOutOpen, setIsLogOutOpen] = useState(false);
+  const notifRef = useRef(null);
+  const logoutRef = useRef(null);
+
+  const handleToggleisNotifOpen = () => {
+    setIsNotifOpen((prev) => !prev);
+  };
+
+  const handleClickOutsideNotif = (event) => {
+    if (notifRef.current && !notifRef.current.contains(event.target)) {
+      setIsNotifOpen(false);
+    }
+  };
+
+  const handleToggleisLogOut = () => {
+    setIsLogOutOpen((prev) => !prev);
+  };
+
+  const handleClickOutsideLogout = (event) => {
+    if (logoutRef.current && !logoutRef.current.contains(event.target)) {
+      setIsLogOutOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isNotifOpen) {
+      document.addEventListener("mousedown", handleClickOutsideNotif);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideNotif);
+    }
+
+    if (isLogOutOpen) {
+      document.addEventListener("mousedown", handleClickOutsideLogout);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideLogout);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideNotif);
+      document.removeEventListener("mousedown", handleClickOutsideLogout);
+    };
+  }, [isNotifOpen, isLogOutOpen]);
 
   const handleLogout = () => {
     logout();
@@ -176,7 +218,7 @@ const Navbar = ({ toggleSidebar }) => {
             </Link>
           </div>
         </li>
-        <li className="nav-item dropdown">
+        <li className="nav-item dropdown" ref={logoutRef}>
           <a
             className="nav-link font-weight-bold"
             style={{ marginRight: "40px", fontSize: "12px" }}
@@ -184,7 +226,8 @@ const Navbar = ({ toggleSidebar }) => {
             href="#"
             role="button"
             aria-haspopup="true"
-            aria-expanded="false"
+            aria-expanded={isLogOutOpen ? "true" : "false"}
+            onClick={handleToggleisLogOut}
           >
             {decodedToken.nama}
           </a>
@@ -196,7 +239,6 @@ const Navbar = ({ toggleSidebar }) => {
               <strong>Account</strong>
             </div>
             <a
-              // href="{{ url('/logout') }}"
               className="dropdown-item btn btn-default btn-flat"
               onClick={handleLogout}
             >
