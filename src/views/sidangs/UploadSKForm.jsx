@@ -82,10 +82,9 @@ const UploadSKForm = () => {
         localStorage.removeItem("successMessage");
         localStorage.setItem("successMessage", "Berhasil Upload SK Penguji");
         navigate("/sidangs/surat-tugas");
+        return;
       }
     } catch (error) {
-      console.error(error);
-      console.error(error.response);
       localStorage.removeItem("errorMessage");
       localStorage.removeItem("warningMessage");
       localStorage.removeItem("successMessage");

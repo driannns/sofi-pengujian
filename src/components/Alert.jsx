@@ -12,15 +12,17 @@ const Alert = ({ type, message }) => {
   };
 
   useEffect(() => {
-    const messageType = `${type}Message`;
-    const storedMessage = localStorage.getItem("errorMessage");
+    const storedMessage =
+      localStorage.getItem("errorMessage") ||
+      localStorage.removeItem("successMessage") ||
+      localStorage.removeItem("warningMessage");
     if (storedMessage) {
       setAlertMessage(storedMessage);
     }
 
     return () => {
       if (storedMessage) {
-        localStorage.removeItem("errorMessage");
+        clearLocalStorage();
       }
     };
   }, [location, type]);
