@@ -295,9 +295,7 @@ const SidangShow = () => {
                               <td>
                                 {dataSidang.data.makalah ? (
                                   <DownloadButton
-                                    url={`${import.meta.env.VITE_API_URL}${
-                                      dataSidang.data.makalah
-                                    }`}
+                                    url={`/doc/${dataSidang.data.makalah}`}
                                   />
                                 ) : (
                                   <a

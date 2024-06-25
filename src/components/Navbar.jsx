@@ -221,7 +221,10 @@ const Navbar = ({ toggleSidebar }) => {
             </Link>
           </div>
         </li>
-        <li className={`nav-item dropdown ${isLogOutOpen ? "show" : ""}`}>
+        <li
+          className={`nav-item dropdown ${isLogOutOpen ? "show" : ""}`}
+          ref={logoutRef}
+        >
           <div
             className="nav-link font-weight-bold"
             style={{ marginRight: "40px", fontSize: "12px", cursor: "pointer" }}
@@ -229,7 +232,6 @@ const Navbar = ({ toggleSidebar }) => {
             role="button"
             href="#"
             aria-haspopup="true"
-            ref={logoutRef}
             aria-expanded={isLogOutOpen ? "true" : "false"}
             onClick={handleToggleisLogoutOpen}
           >
@@ -244,18 +246,13 @@ const Navbar = ({ toggleSidebar }) => {
             <div className="dropdown-header text-center">
               <strong>Account</strong>
             </div>
-            <a
+            <div
               className="dropdown-item btn btn-default btn-flat"
+              style={{ cursor: "pointer" }}
               onClick={handleLogout}
             >
               <i className="fa fa-lock"></i>Logout
-            </a>
-            <form
-              id="logout-form"
-              action="{{ url('/logout') }}"
-              method="POST"
-              style={{ display: "none" }}
-            ></form>
+            </div>
           </div>
         </li>
       </ul>

@@ -36,15 +36,12 @@ const Notification = () => {
   const fetchNotif = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/notification/user/get`,
-        {
-          headers: {
-            Authorization: "Bearer " + cookies["auth-token"],
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.get(`/api/notification/user/get`, {
+        headers: {
+          Authorization: "Bearer " + cookies["auth-token"],
+          "ngrok-skip-browser-warning": true,
+        },
+      });
 
       if (res.data.data) {
         const formatNotification = await Promise.all(
@@ -70,9 +67,7 @@ const Notification = () => {
   const markAsRead = async (id) => {
     try {
       setIsLoading(true);
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/notification/update/${id}`
-      );
+      await axios.patch(`/api/notification/update/${id}`);
       fetchNotif();
     } catch (error) {
       setIsLoading(false);
@@ -135,7 +130,7 @@ const Notification = () => {
       try {
         setIsLoading(true);
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/notification/user/get`,
+          `/api/notification/user/get`,
           {
             headers: {
               Authorization: "Bearer " + cookies["auth-token"],

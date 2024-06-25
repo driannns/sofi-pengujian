@@ -321,9 +321,7 @@ const MateriPresentasi = () => {
                             {dataSidang?.data?.slide ? (
                               <div className="row ml-0">
                                 <DownloadButton
-                                  url={`${import.meta.env.VITE_API_URL}${
-                                    dataSidang.data.slide.file_url
-                                  }`}
+                                  url={`/doc/${dataSidang.data.slide.file_url}`}
                                   className="btn btn-danger mr-2"
                                 />
                                 <br />
