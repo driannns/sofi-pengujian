@@ -96,6 +96,8 @@ const UploadSKForm = () => {
           error.response.data.message === "extension file must be pdf"
         ) {
           localStorage.setItem("errorMessage", "File harus dalam format pdf");
+        } else if (error.response.data.message === "must upload document") {
+          localStorage.setItem("errorMessage", "Harus mengunggah dokumen");
         }
       } else {
         localStorage.setItem("errorMessage", "Gagal Upload SK Penguji");
