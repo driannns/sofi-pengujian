@@ -553,6 +553,7 @@ const SidangIndex = () => {
   const handleFeedbackSidang = async (e, sidangId) => {
     try {
       e.preventDefault();
+      setRejectModal(false);
       const approveSidang = await dispatch(
         feedbackSidang({ authToken: cookies["auth-token"], feedback, sidangId })
       );
@@ -562,19 +563,19 @@ const SidangIndex = () => {
         localStorage.removeItem("errorMessage");
         localStorage.removeItem("warningMessage");
         localStorage.removeItem("successMessage");
-        localStorage.setItem("successMessage", "Berhasil di Disetujui");
+        localStorage.setItem("successMessage", "Feedback Sudah Dikirim");
         setFeedback("");
       }
     } catch (error) {
       console.error("error", error);
-    } finally {
-      setRejectModal(false);
     }
   };
 
   const handleApproveFeedbackSidang = async (e, sidangId) => {
     try {
       e.preventDefault();
+      setApproveModal(false);
+
       const approveSidang = await dispatch(
         approveFeedbackSidang({
           authToken: cookies["auth-token"],
@@ -589,13 +590,11 @@ const SidangIndex = () => {
         localStorage.removeItem("errorMessage");
         localStorage.removeItem("warningMessage");
         localStorage.removeItem("successMessage");
-        localStorage.setItem("successMessage", "Feedback Sudah Dikirim");
+        localStorage.setItem("successMessage", "Berhasil di Disetujui");
         setFeedbackApprove("");
       }
     } catch (error) {
       console.error("error", error);
-    } finally {
-      setApproveModal(false);
     }
   };
 

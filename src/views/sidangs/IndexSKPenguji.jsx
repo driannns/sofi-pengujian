@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { useCookies } from "react-cookie";
 import Loading from "../../components/Loading";
 import { format } from "date-fns";
+import Alert from "../../components/Alert";
 
 const IndexSKPenguji = () => {
   const location = useLocation();
@@ -178,7 +179,8 @@ const IndexSKPenguji = () => {
 
           <div className="container-fluid">
             <div className="animated fadeIn">
-              {/* @include('flash::message') */}
+              <Alert type="error" />
+              <Alert type="success" />
               <div className="row">
                 <div className="col-lg-12">
                   <div className="card">

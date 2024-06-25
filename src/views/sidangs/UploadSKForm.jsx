@@ -63,9 +63,7 @@ const UploadSKForm = () => {
       formData.append("skPenguji", SKPengujiFile);
 
       const res = await axios.post(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/pengajuan/create/sk_penguji/${sidangId}`,
+        `/api/pengajuan/create/sk_penguji/${sidangId}`,
         formData,
         {
           headers: {
@@ -76,9 +74,28 @@ const UploadSKForm = () => {
         }
       );
       if (res.data.code === 201) {
+        localStorage.removeItem("errorMessage");
+        localStorage.removeItem("warningMessage");
+        localStorage.removeItem("successMessage");
+        localStorage.setItem("successMessage", "Berhasil Upload SK Penguji");
         navigate("/sidangs/surat-tugas");
       }
     } catch (error) {
+      localStorage.removeItem("errorMessage");
+      localStorage.removeItem("warningMessage");
+      localStorage.removeItem("successMessage");
+      console.error(error.response);
+      if (error.response.data.code === 400) {
+        if (error.response.data.message === "file size exceeds 5MB") {
+          localStorage.setItem("errorMessage", "File harus kurang dari 5MB");
+        } else if (
+          error.response.data.message === "extension file must be pdf"
+        ) {
+          localStorage.setItem("errorMessage", "File harus dalam format pdf");
+        }
+      } else {
+        localStorage.setItem("errorMessage", "Gagal Upload SK Penguji");
+      }
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -106,6 +123,7 @@ const UploadSKForm = () => {
           </ol>
 
           <div className="container-fluid">
+            <Alert type="error" />
             <div className="animated fadeIn">
               <Alert type="danger" />
               {location.pathname === "/sidangs/create" && (

@@ -45,7 +45,6 @@ export const AuthProvider = ({ children }) => {
         });
         setIsLoggedIn(true);
         navigate("/home");
-        // window.location.reload();
       } else {
         console.error("Login failed");
       }
@@ -76,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       delete axios.defaults.headers.common["Authorization"];
       persistor.purge();
       clearLocalStorage();
+      navigate("/loginsso");
       removeCookie("auth-token");
     }
   }, [cookies["auth-token"]]);
