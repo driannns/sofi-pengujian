@@ -96,6 +96,8 @@ const UploadSKForm = () => {
       } else {
         localStorage.setItem("errorMessage", "Gagal Upload SK Penguji");
       }
+      console.error(error);
+      console.error(error.response);
     } finally {
       setIsLoading(false);
       setSKPengujiFile(null);
