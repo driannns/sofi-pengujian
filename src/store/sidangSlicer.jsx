@@ -12,7 +12,6 @@ export const getAllSidang = createAsyncThunk(
           "ngrok-skip-browser-warning": true,
         },
       });
-      console.log(res);
       if (res.data.code === 200) {
         return res.data.data;
       }

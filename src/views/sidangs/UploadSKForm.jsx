@@ -36,6 +36,7 @@ const UploadSKForm = () => {
           navigate(-1);
           return;
         }
+        console.log(dataSidangAdmin);
       } catch (error) {
         console.error(error);
       } finally {
