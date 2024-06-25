@@ -22,7 +22,7 @@ const TeamsCreate = () => {
       setIsLoading(true);
       e.preventDefault();
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/team/create/individual`,
+        `/api/team/create/individual`,
         {},
         {
           headers: {
@@ -53,16 +53,12 @@ const TeamsCreate = () => {
       const body = {
         name: teamName,
       };
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/team/create/team`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.post(`/api/team/create/team`, body, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       if (res.data.code === 201) {
         localStorage.setItem("successMessage", "Berhasil Membuat Team");
         navigate("/teams");
