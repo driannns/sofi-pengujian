@@ -38,16 +38,12 @@ const Teams = () => {
         team_id: team.id,
         user_id: userIdLeave,
       };
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/team/leave-team`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.post(`/api/team/leave-team`, body, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       if (res.data.code === 200) {
         fetchSidangData();
         localStorage.setItem("successMessage", "Berhasil Dihapus.");
@@ -68,16 +64,12 @@ const Teams = () => {
         team_id: team.id,
         user_id: memberId,
       };
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/team/add-member`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const res = await axios.post(`/api/team/add-member`, body, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       console.log(res);
       if (res.data.code === 200) {
         localStorage.setItem(
@@ -113,15 +105,12 @@ const Teams = () => {
 
   const fetchTeam = async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/team/user/get`,
-        {
-          headers: {
-            "ngrok-skip-browser-warning": true,
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-          },
-        }
-      );
+      const res = await axios.get(`/api/team/user/get`, {
+        headers: {
+          "ngrok-skip-browser-warning": true,
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+        },
+      });
 
       handleIsIndividu(res.data.data);
       if (res.data.code === 200) {
@@ -142,15 +131,12 @@ const Teams = () => {
 
   const fetchMember = async () => {
     try {
-      const studentRegistered = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/team/available-member`,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        }
-      );
+      const studentRegistered = await axios.get(`/api/team/available-member`, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+          "ngrok-skip-browser-warning": true,
+        },
+      });
       setStudent(studentRegistered.data.data);
     } catch (error) {
       if (error.response?.status !== 404 || error.message === "Network Error") {
@@ -270,15 +256,11 @@ const Teams = () => {
       const body = {
         name: teamName,
       };
-      const res = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/team/update/${teamId}`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-          },
-        }
-      );
+      const res = await axios.patch(`/api/team/update/${teamId}`, body, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+        },
+      });
       if (res.data.code === 200) {
         localStorage.setItem("successMessage", "Tim Berhasil Di Ubah.");
         await fetchSidangData();

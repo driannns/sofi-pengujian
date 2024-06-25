@@ -55,7 +55,7 @@ const MateriPresentasi = () => {
       try {
         setIsLoading(true);
         const resPeriodNow = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/period/check-period`,
+          `/api/period/check-period`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -109,9 +109,7 @@ const MateriPresentasi = () => {
         if (dataSidangMHS.payload.status === "tidak lulus") {
           setOldPeriod(dataSidangMHS.payload.period_id);
           const resPeriodNow = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/period/get/${
-              dataSidangMHS.payload.period_id
-            }`,
+            `/api/period/get/${dataSidangMHS.payload.period_id}`,
             {
               headers: {
                 Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -125,6 +123,8 @@ const MateriPresentasi = () => {
           }
         }
       } catch (error) {
+        console.error(error);
+        console.error(error.response);
         if (
           error.response?.status !== 404 ||
           error.message === "Networking error"
