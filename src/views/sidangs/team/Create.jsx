@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Alert from "../../../components/Alert";
 import Loading from "../../../components/Loading";
 import ModalComponent from "../../../components/Modal";
+import axios from "axios";
 
 const TeamsCreate = () => {
   const [cookies] = useCookies();
