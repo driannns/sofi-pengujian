@@ -83,6 +83,8 @@ const UploadSKForm = () => {
         navigate("/sidangs/surat-tugas");
       }
     } catch (error) {
+      console.error(error);
+      console.error(error.response);
       localStorage.removeItem("errorMessage");
       localStorage.removeItem("warningMessage");
       localStorage.removeItem("successMessage");
@@ -97,8 +99,6 @@ const UploadSKForm = () => {
       } else {
         localStorage.setItem("errorMessage", "Gagal Upload SK Penguji");
       }
-      console.error(error);
-      console.error(error.response);
     } finally {
       setIsLoading(false);
       setSKPengujiFile(null);
