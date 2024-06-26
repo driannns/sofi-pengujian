@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import lecturerReducer from "./lecturerSlicer";
 import sidangReducer from "./sidangSlicer";
 import dokumenLogReducer from "./dokumentLogSlicer";
+import scheduleReducer from "./scheduleSlicer";
 import storage from "redux-persist/lib/storage";
 import {
   persistReducer,
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   lecturer: lecturerReducer,
   sidang: sidangReducer,
   dokumenLog: dokumenLogReducer,
+  schedule: scheduleReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
