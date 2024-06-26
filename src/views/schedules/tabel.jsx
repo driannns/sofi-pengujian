@@ -378,7 +378,7 @@ const JadwalTable = () => {
                     type="button"
                     data-toggle="modal"
                     data-target="#detailSidangModal"
-                    className="btn btn-outline-primary border-0 view w-100"
+                    className="dropdown-item"
                     onClick={() => openModal(row.id)}
                   >
                     Detail
@@ -386,7 +386,7 @@ const JadwalTable = () => {
                   <hr className="mt-0 mb-0" />
                   <Link
                     to={`/schedule/${row.id}/edit`}
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       row.status !== "belum dilaksanakan" ? "disabled" : ""
                     }`}
                   >
@@ -395,7 +395,7 @@ const JadwalTable = () => {
                   <br />
                   <hr className="mt-0 mb-0" />
                   <button
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       row.status !== "belum dilaksanakan" ? "disabled" : ""
                     }`}
                     onClick={() => handleDeleteClick(row.id)}
@@ -443,10 +443,7 @@ const JadwalTable = () => {
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
                 >
-                  <Link
-                    to={`/schedules/${row.id}`}
-                    className="btn btn-outline-primary border-0 w-100"
-                  >
+                  <Link to={`/schedules/${row.id}`} className="dropdown-item">
                     Detail
                   </Link>
                   <hr className="mt-0 mb-0" />
@@ -454,14 +451,14 @@ const JadwalTable = () => {
                     <div>
                       <Link
                         to={`/scores/simpulan/${row.id}`}
-                        className="btn btn-outline-primary border-0 w-100"
+                        className="dropdown-item"
                       >
                         Simpulan Nilai
                       </Link>
                       <hr className="mt-0 mb-0" />
                       <Link
                         to={`/revisions/show/${row.id}`}
-                        className="btn btn-outline-primary border-0 w-100"
+                        className="dropdown-item"
                       >
                         Lihat Revisi
                       </Link>
@@ -469,7 +466,7 @@ const JadwalTable = () => {
                   )}
                   <hr className="mt-0 mb-0" />
                   <button
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       row.status === "belum dilaksanakan" ? "disabled" : ""
                     }`}
                     onClick={() => handleFlagChange(row.id, "rev")}
@@ -478,7 +475,7 @@ const JadwalTable = () => {
                   </button>
                   <hr className="mt-0 mb-0" />
                   <button
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       row.status === "belum dilaksanakan" ? "disabled" : ""
                     }`}
                     onClick={() => handleFlagChange(row.id, "scr")}
@@ -509,24 +506,21 @@ const JadwalTable = () => {
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
                 >
-                  <Link
-                    to={`/schedules/${row.id}`}
-                    className="btn btn-outline-primary border-0 w-100"
-                  >
+                  <Link to={`/schedules/${row.id}`} className="dropdown-item">
                     Detail
                   </Link>
                   <hr className="mt-0 mb-0" />
                   {isNilai ? (
                     <Link
                       to={`/scores/penguji/edit/${row.id}`}
-                      className="btn btn-outline-primary border-0 w-100"
+                      className="dropdown-item"
                     >
                       Ubah Nilai
                     </Link>
                   ) : (
                     <Link
                       to={`/scores/penguji/create/${row.id}`}
-                      className={`btn btn-outline-primary border-0 w-100 ${
+                      className={`dropdown-item ${
                         row.status === "sedang dilaksanakan" && row.isHadir
                           ? ""
                           : "disabled"
@@ -538,7 +532,7 @@ const JadwalTable = () => {
                   <hr className="mt-0 mb-0" />
                   <Link
                     to={`/revisions/create/${row.id}`}
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       (row.status !== "belum dilaksanakan" ||
                         row.flag_add_revision) &&
                       row.isHadir
@@ -551,7 +545,7 @@ const JadwalTable = () => {
                   <hr className="mt-0 mb-0" />
                   <Link
                     to={`/scores/simpulan/${row.id}`}
-                    className="btn btn-outline-primary border-0 w-100"
+                    className="dropdown-item"
                   >
                     Simpulan Nilai
                   </Link>
@@ -592,24 +586,21 @@ const JadwalTable = () => {
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
                 >
-                  <Link
-                    to={`/schedules/${row.id}`}
-                    className="btn btn-outline-primary border-0 w-100"
-                  >
+                  <Link to={`/schedules/${row.id}`} className="dropdown-item">
                     Detail
                   </Link>
                   <hr className="mt-0 mb-0" />
                   {isNilai ? (
                     <Link
                       to={`/scores/pembimbing/edit/${row.id}`}
-                      className="btn btn-outline-primary border-0 w-100"
+                      className="dropdown-item"
                     >
                       Ubah Nilai
                     </Link>
                   ) : (
                     <Link
                       to={`/scores/pembimbing/create/${row.id}`}
-                      className={`btn btn-outline-primary border-0 w-100 ${
+                      className={`dropdown-item ${
                         row.status === "sedang dilaksanakan" && row.isHadir
                           ? ""
                           : "disabled"
@@ -621,7 +612,7 @@ const JadwalTable = () => {
                   <hr className="mt-0 mb-0" />
                   <Link
                     to={`/revisions/create/${row.id}`}
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       (row.status !== "belum dilaksanakan" ||
                         row.flag_add_revision) &&
                       row.isHadir
