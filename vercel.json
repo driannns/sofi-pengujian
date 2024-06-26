@@ -5,6 +5,10 @@
       "destination": "http://103.117.56.153:3000/api/:path*"
     },
     {
+      "source": "/schedule/:path*",
+      "destination": "http://103.117.56.153:8080/api/:path*"
+    },
+    {
       "source": "/doc/:path*",
       "destination": "http://103.117.56.153:3000/:path*"
     },

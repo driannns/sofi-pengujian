@@ -50,7 +50,7 @@ const JadwalCreate = () => {
       try {
         setIsLoading(true);
         const teamResponse = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/team/get/${params.id}`,
+          `/schedule/team/get/${params.id}`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
