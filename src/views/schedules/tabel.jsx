@@ -190,17 +190,6 @@ const JadwalTable = () => {
   };
 
   const toggleDropdown = (id) => {
-    const dropdown = document.getElementById(`dropdown-${id}`);
-    const rect = dropdown.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const dropdownHeight = dropdown.offsetHeight;
-
-    if (rect.top + dropdownHeight > windowHeight) {
-      dropdown.classList.add("dropdown-menu-up");
-    } else {
-      dropdown.classList.remove("dropdown-menu-up");
-    }
-
     setDropdownOpen((prevState) => ({
       ...prevState,
       [id]: !prevState[id],
@@ -364,23 +353,25 @@ const JadwalTable = () => {
       location.pathname === "/schedule/admin") && {
       name: "Aksi",
       cell: (row) => (
-        <div className="dropdown">
-          <button
-            className="btn btn-success dropdown-toggle w-100"
-            type="button"
-            id={`dropdownMenuButton-${row.id}`}
-            onClick={() => toggleDropdown(row.id)}
-          >
-            Pilih
-          </button>
-          <div
-            id={`dropdown-${row.id}`}
-            className={`dropdown-menu ${dropdownOpen[row.id] ? "show" : ""}`}
-            aria-labelledby={`dropdownMenuButton-${row.id}`}
-          >
-            {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
-              location.pathname === "/schedules" && (
-                <>
+        <div>
+          {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
+            location.pathname === "/schedules" && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  onClick={() => toggleDropdown(row.id)}
+                >
+                  Pilih
+                </button>
+                <div
+                  className="dropdown-menu"
+                  aria-labelledby="dropdownMenuButton"
+                >
                   <button
                     type="button"
                     data-toggle="modal"
@@ -425,15 +416,28 @@ const JadwalTable = () => {
                     </button>
                     <hr className="mt-0 mb-0" />
                   </form>
-                </>
-              )}
-            {jwtDecoded.role.some((role) =>
-              ["RLPIC", "RLADM"].includes(role)
-            ) &&
-              (location.pathname === "/schedule/bermasalah" ||
-                location.pathname === "/schedule/bukaAkses" ||
-                location.pathname === "/schedule/admin") && (
-                <>
+                </div>
+              </div>
+            )}
+          {jwtDecoded.role.some((role) => ["RLPIC", "RLADM"].includes(role)) &&
+            (location.pathname === "/schedule/bermasalah" ||
+              location.pathname === "/schedule/bukaAkses" ||
+              location.pathname === "/schedule/admin") && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Pilih
+                </button>
+                <div
+                  className="dropdown-menu"
+                  aria-labelledby="dropdownMenuButton"
+                >
                   <Link
                     to={`/schedules/${row.id}`}
                     className="btn btn-outline-primary border-0 w-100"
@@ -442,7 +446,7 @@ const JadwalTable = () => {
                   </Link>
                   <hr className="mt-0 mb-0" />
                   {location.pathname === "/schedule/bermasalah" && (
-                    <>
+                    <div>
                       <Link
                         to={`/scores/simpulan/${row.id}`}
                         className="btn btn-outline-primary border-0 w-100"
@@ -456,7 +460,7 @@ const JadwalTable = () => {
                       >
                         Lihat Revisi
                       </Link>
-                    </>
+                    </div>
                   )}
                   <hr className="mt-0 mb-0" />
                   <button
@@ -477,11 +481,26 @@ const JadwalTable = () => {
                     Buka Penilaian
                   </button>
                   <hr className="mt-0 mb-0" />
-                </>
-              )}
-            {jwtDecoded.role.some((role) => ["RLPGJ"].includes(role)) &&
-              location.pathname === "/schedule/penguji" && (
-                <>
+                </div>
+              </div>
+            )}
+          {jwtDecoded.role.some((role) => ["RLPGJ"].includes(role)) &&
+            location.pathname === "/schedule/penguji" && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Pilih
+                </button>
+                <div
+                  className="dropdown-menu"
+                  aria-labelledby="dropdownMenuButton"
+                >
                   <Link
                     to={`/schedules/${row.id}`}
                     className="btn btn-outline-primary border-0 w-100"
@@ -542,11 +561,26 @@ const JadwalTable = () => {
                     </button>
                     <hr className="mt-0 mb-0" />
                   </form>
-                </>
-              )}
-            {jwtDecoded.role.some((role) => ["RLPBB"].includes(role)) &&
-              location.pathname === "/schedule/pembimbing" && (
-                <>
+                </div>
+              </div>
+            )}
+          {jwtDecoded.role.some((role) => ["RLPBB"].includes(role)) &&
+            location.pathname === "/schedule/pembimbing" && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Pilih
+                </button>
+                <div
+                  className="dropdown-menu"
+                  aria-labelledby="dropdownMenuButton"
+                >
                   <Link
                     to={`/schedules/${row.id}`}
                     className="btn btn-outline-primary border-0 w-100"
@@ -602,9 +636,9 @@ const JadwalTable = () => {
                     </button>
                     <hr className="mt-0 mb-0" />
                   </form>
-                </>
-              )}
-          </div>
+                </div>
+              </div>
+            )}
         </div>
       ),
     },
