@@ -116,13 +116,10 @@ const JadwalCreate = () => {
         const pengujiId = penguji.split(" - ")[0];
         const dateTime = `${date}T${time}:00+07:00`;
         axios
-          .post(
-            `http://103.117.56.153:8080/api/schedule/check-penguji/${pengujiId}?condition=create`,
-            {
-              date_time: dateTime,
-              pengajuan_id: [],
-            }
-          )
+          .post(`/schedule/check-penguji/${pengujiId}?condition=create`, {
+            date_time: dateTime,
+            pengajuan_id: [],
+          })
           .then((response) => {
             setMessage(response.data.data.message);
             setAlertClass(
@@ -280,17 +277,13 @@ const JadwalCreate = () => {
     };
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/create`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-          },
-        }
-      );
+      const response = await axios.post(`/schedule/create`, data, {
+        headers: {
+          Authorization: `Bearer ${cookies["auth-token"]}`,
+        },
+      });
       if (response.status) {
-        navigate("/schedule", {
+        navigate("/schedules", {
           state: {
             successMessage: "Berhasil Menjadwalkan",
           },

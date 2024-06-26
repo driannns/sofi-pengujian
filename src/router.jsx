@@ -162,7 +162,7 @@ const router = (
     {/* RLPIC Routes */}
     <Route element={<PrivateRoutes role={["RLPIC"]} />}>
       <Route path="/sidangs/pic" element={<SidangIndex />} />
-      <Route path="/schedule" element={<JadwalIndex />} />
+      <Route path="/schedules" element={<JadwalIndex />} />
       <Route path="/schedules/create/:id" element={<JadwalCreate />} />
       <Route path="/schedule/:id/edit" element={<JadwalEdit />} />
       <Route path="schedule/bukaAkses" element={<JadwalIndex />} />

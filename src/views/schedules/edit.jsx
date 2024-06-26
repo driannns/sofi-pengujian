@@ -52,9 +52,7 @@ const JadwalEdit = () => {
       try {
         setIsLoading(true);
         const scheduleResponse = await axios.get(
-          `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/team/get/${
-            params.id
-          }`,
+          `/schedule/team/get/${params.id}`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -78,7 +76,7 @@ const JadwalEdit = () => {
             .slice(0, 5);
 
           if (currentTime > twoHoursBefore) {
-            navigate("/schedule", {
+            navigate("/schedules", {
               state: {
                 errorMessage: "Maksimal merubah jadwal sidang h - 2 jam",
               },
@@ -151,9 +149,7 @@ const JadwalEdit = () => {
         }));
 
         const teamResponse = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/team/get/${
-            scheduleData.team_id
-          }`,
+          `/api/team/get/${scheduleData.team_id}`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -167,7 +163,7 @@ const JadwalEdit = () => {
         );
         setLecturers(lecturersResponse.data.data);
       } catch (error) {
-        navigate("/schedule", {
+        navigate("/schedules", {
           state: {
             errorMessage: error,
           },
@@ -191,13 +187,10 @@ const JadwalEdit = () => {
         const pengujiId = penguji.split(" - ")[0];
         const dateTime = `${date}T${time}:00+07:00`;
         axios
-          .post(
-            `http://103.117.56.153:8080/api/schedule/check-penguji/${pengujiId}?condition=update`,
-            {
-              date_time: dateTime,
-              pengajuan_id: pengajuanId,
-            }
-          )
+          .post(`/schedule/check-penguji/${pengujiId}?condition=update`, {
+            date_time: dateTime,
+            pengajuan_id: pengajuanId,
+          })
           .then((response) => {
             setMessage(response.data.data.message);
             setAlertClass(
@@ -335,9 +328,7 @@ const JadwalEdit = () => {
 
     try {
       const response = await axios.patch(
-        `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/update/${
-          params.id
-        }`,
+        `/schedule/update/${params.id}`,
         data,
         {
           headers: {
@@ -346,14 +337,14 @@ const JadwalEdit = () => {
         }
       );
       if (response.status) {
-        navigate("/schedule", {
+        navigate("/schedules", {
           state: {
             successMessage: "Jadwal Berhasil Diubah",
           },
         });
       }
     } catch (error) {
-      navigate("/schedule", {
+      navigate("/schedules", {
         state: {
           errorMessage: "Jadwal Gagal Diubah",
         },
@@ -621,7 +612,7 @@ const JadwalEdit = () => {
                             )}
                           </button>
                           <Link
-                            to="/schedule"
+                            to="/schedules"
                             className="btn btn-secondary ml-1"
                           >
                             Batal

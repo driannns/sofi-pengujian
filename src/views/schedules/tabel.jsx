@@ -34,38 +34,28 @@ const JadwalTable = () => {
           jwtDecoded.role.includes("RLPBB") &&
           location.pathname === "/schedule/pembimbing"
         ) {
-          apiSchedule = `${
-            import.meta.env.VITE_API_URLSCHEDULE
-          }/api/schedule/pembimbing/get`;
+          apiSchedule = `/schedule/pembimbing/get`;
         } else if (
           jwtDecoded.role.includes("RLPGJ") &&
           location.pathname === "/schedule/penguji"
         ) {
-          apiSchedule = `${
-            import.meta.env.VITE_API_URLSCHEDULE
-          }/api/schedule/penguji/get`;
+          apiSchedule = `/schedule/penguji/get`;
         } else if (
           jwtDecoded.role.includes("RLADM") &&
           location.pathname === "/schedule/admin"
         ) {
-          apiSchedule = `${
-            import.meta.env.VITE_API_URLSCHEDULE
-          }/api/schedule/admin/get`;
+          apiSchedule = `/schedule/admin/get`;
         } else if (
           jwtDecoded.role.includes("RLADM") &&
           location.pathname === "/schedule/admin-before"
         ) {
-          apiSchedule = `${
-            import.meta.env.VITE_API_URLSCHEDULE
-          }/api/schedule/admin-before/get`;
+          apiSchedule = `/schedule/admin-before/get`;
         } else if (
           (jwtDecoded.role.includes("RLPIC") &&
-            location.pathname === "/schedule") ||
+            location.pathname === "/schedules") ||
           location.pathname === "/schedule/bukaAkses"
         ) {
-          apiSchedule = `${
-            import.meta.env.VITE_API_URLSCHEDULE
-          }/api/schedule/get`;
+          apiSchedule = `/schedule/get`;
         }
 
         if (apiSchedule) {
@@ -114,9 +104,7 @@ const JadwalTable = () => {
     setIsModalOpen(true);
     setIsModalLoading(true);
     try {
-      const detailResponse = await axios.get(
-        `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/get/${id}`
-      );
+      const detailResponse = await axios.get(`/schedule/get/${id}`);
       const data = detailResponse.data.data;
 
       const pembimbing1Response = await axios.get(
@@ -138,7 +126,7 @@ const JadwalTable = () => {
       };
       setDetailSidang(updatedData);
     } catch (error) {
-      navigate("/schedule");
+      navigate("/schedules");
     } finally {
       setIsModalLoading(false);
     }
@@ -146,9 +134,7 @@ const JadwalTable = () => {
 
   const deleteSchedule = async (id) => {
     try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/delete/${id}`
-      );
+      const response = await axios.delete(`/schedule/delete/${id}`);
       if (response.status === 200) {
         Swal.fire("Berhasil", "Jadwal berhasil dihapus", "success");
         navigate(0);
@@ -181,9 +167,7 @@ const JadwalTable = () => {
   const handleFlagChange = async (id, code, pathname) => {
     try {
       const response = await axios.patch(
-        `${
-          import.meta.env.VITE_API_URLSCHEDULE
-        }/api/schedule/change-flag/${id}?code=${code}`
+        `/schedule/change-flag/${id}?code=${code}`
       );
       if (response.status === 200) {
         navigate(pathname, {
@@ -356,13 +340,13 @@ const JadwalTable = () => {
     (location.pathname === "/schedule/bukaAkses" ||
       location.pathname === "/schedule/pembimbing" ||
       location.pathname === "/schedule/penguji" ||
-      location.pathname === "/schedule" ||
+      location.pathname === "/schedules" ||
       location.pathname === "/schedule/admin") && {
       name: "Aksi",
       cell: (row) => (
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
-            location.pathname === "/schedule" && (
+            location.pathname === "/schedules" && (
               <div className="dropdown">
                 <button
                   className="btn btn-success dropdown-toggle w-100"

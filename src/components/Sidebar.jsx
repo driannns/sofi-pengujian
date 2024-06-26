@@ -24,7 +24,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
       location.pathname.startsWith("/sidangs") ||
       location.pathname.startsWith("teams") ||
       location.pathname.startsWith("slides"),
-    jadwalSidang: location.pathname.startsWith("/schedule"),
+    jadwalSidang: location.pathname.startsWith("/schedule/mahasiswa"),
     revisiTA: location.pathname.startsWith("/revision/mahasiswa"),
     pembimbing:
       location.pathname.startsWith("/schedule/pembimbing") ||
@@ -203,7 +203,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
           label: "Penjadwalan Sidang",
         },
         {
-          path: "/schedule/bukaAkses",
+          path: "/schedules",
           icon: "fa fa-calendar-check-o",
           label: "Jadwal Sidang KK",
         },

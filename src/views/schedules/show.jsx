@@ -18,16 +18,11 @@ const JadwalShow = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const detailResponse = await axios.get(
-          `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/get/${
-            params.id
-          }`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
+        const detailResponse = await axios.get(`/schedule/get/${params.id}`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        });
         const data = detailResponse.data.data;
 
         const penguji1Response = await axios.get(

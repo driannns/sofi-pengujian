@@ -19,14 +19,11 @@ const TabelMahasiswa = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const schedulerResponse = await axios.get(
-          `${import.meta.env.VITE_API_URLSCHEDULE}/api/schedule/mahasiswa/get`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
+        const schedulerResponse = await axios.get(`/schedule/mahasiswa/get`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        });
 
         const data = schedulerResponse.data.data;
 
@@ -44,14 +41,11 @@ const TabelMahasiswa = () => {
         };
         setscheduleData([updatedData]);
 
-        const teamResponse = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/team/user/get`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
+        const teamResponse = await axios.get(`/api/team/user/get`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        });
         setTeam(teamResponse.data.data);
       } catch (err) {
         navigate("/home");
