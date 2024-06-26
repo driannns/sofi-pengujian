@@ -351,7 +351,7 @@ const JadwalTable = () => {
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
-                  id="dropdownMenuButton"
+                  id={`dropdownMenuButton${row.id}`}
                   data-bs-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
@@ -360,7 +360,7 @@ const JadwalTable = () => {
                 </button>
                 <div
                   className="dropdown-menu"
-                  aria-labelledby="dropdownMenuButton"
+                  aria-labelledby={`dropdownMenuButton${row.id}`}
                 >
                   <button
                     type="button"
