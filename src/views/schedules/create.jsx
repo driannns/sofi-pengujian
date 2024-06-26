@@ -49,14 +49,11 @@ const JadwalCreate = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const teamResponse = await axios.get(
-          `/schedule/team/get/${params.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${cookies["auth-token"]}`,
-            },
-          }
-        );
+        const teamResponse = await axios.get(`/api/team/get/${params.id}`, {
+          headers: {
+            Authorization: `Bearer ${cookies["auth-token"]}`,
+          },
+        });
         setTeams(teamResponse.data.data);
 
         const memberPromises = teamResponse.data.data?.members.map(
