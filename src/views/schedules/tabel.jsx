@@ -373,6 +373,7 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
+                  style={{ position: "absolute" }}
                 >
                   <button
                     type="button"
@@ -442,6 +443,7 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
+                  style={{ position: "absolute" }}
                 >
                   <Link to={`/schedules/${row.id}`} className="dropdown-item">
                     Detail
@@ -505,6 +507,7 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
+                  style={{ position: "absolute" }}
                 >
                   <Link to={`/schedules/${row.id}`} className="dropdown-item">
                     Detail
@@ -585,6 +588,7 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby={`dropdownMenuButton${row.id}`}
+                  style={{ position: "absolute" }}
                 >
                   <Link to={`/schedules/${row.id}`} className="dropdown-item">
                     Detail
