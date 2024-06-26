@@ -369,7 +369,9 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className="dropdown-menu"
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <button
