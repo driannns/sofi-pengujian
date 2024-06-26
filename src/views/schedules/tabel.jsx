@@ -361,6 +361,7 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
+                  data-toggle="dropdown"
                   onClick={() => handleToggle(row.id)}
                   aria-haspopup="true"
                   aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
@@ -368,9 +369,7 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <button
@@ -429,16 +428,14 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -494,16 +491,14 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -576,16 +571,14 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
