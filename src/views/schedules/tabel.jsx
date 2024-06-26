@@ -55,11 +55,7 @@ const JadwalTable = () => {
             location.pathname === "/schedules") ||
           location.pathname === "/schedule/bukaAkses"
         ) {
-<<<<<<< HEAD
           apiSchedule = `/api/schedule/get`;
-=======
-          apiSchedule = `/api/schedule/`;
->>>>>>> fb3a570e4659817838b3ee201abd6039064c3fa4
         }
 
         if (apiSchedule) {
