@@ -196,13 +196,9 @@ const JadwalTable = () => {
     const dropdownHeight = dropdown.offsetHeight;
 
     if (rect.top + dropdownHeight > windowHeight) {
-      dropdown.style.bottom = "100%";
-      dropdown.style.left = "0";
-      dropdown.style.top = "auto";
+      dropdown.classList.add("dropdown-menu-up");
     } else {
-      dropdown.style.top = "100%";
-      dropdown.style.left = "0";
-      dropdown.style.bottom = "auto";
+      dropdown.classList.remove("dropdown-menu-up");
     }
 
     setDropdownOpen((prevState) => ({
