@@ -23,7 +23,7 @@ const JadwalTable = () => {
   const [isNilai, setIsNilai] = useState(false);
   const [filterText, setFilterText] = useState("");
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -189,8 +189,11 @@ const JadwalTable = () => {
     }
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+  const toggleDropdown = (id) => {
+    setDropdownOpen((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
   };
 
   const columns = [
@@ -353,20 +356,22 @@ const JadwalTable = () => {
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
-              <div className={`dropdown ${dropdownOpen ? "show" : ""}`}>
+              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen}
-                  onClick={toggleDropdown}
+                  aria-expanded={dropdownOpen[row.id] || false}
+                  onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <button
@@ -421,20 +426,22 @@ const JadwalTable = () => {
             (location.pathname === "/schedule/bermasalah" ||
               location.pathname === "/schedule/bukaAkses" ||
               location.pathname === "/schedule/admin") && (
-              <div className={`dropdown ${dropdownOpen ? "show" : ""}`}>
+              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen}
-                  onClick={toggleDropdown}
+                  aria-expanded={dropdownOpen[row.id] || false}
+                  onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -486,20 +493,22 @@ const JadwalTable = () => {
 
           {jwtDecoded.role.some((role) => ["RLPGJ"].includes(role)) &&
             location.pathname === "/schedule/penguji" && (
-              <div className={`dropdown ${dropdownOpen ? "show" : ""}`}>
+              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen}
-                  onClick={toggleDropdown}
+                  aria-expanded={dropdownOpen[row.id] || false}
+                  onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -568,20 +577,22 @@ const JadwalTable = () => {
 
           {jwtDecoded.role.some((role) => ["RLPBB"].includes(role)) &&
             location.pathname === "/schedule/pembimbing" && (
-              <div className={`dropdown ${dropdownOpen ? "show" : ""}`}>
+              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen}
-                  onClick={toggleDropdown}
+                  aria-expanded={dropdownOpen[row.id] || false}
+                  onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${dropdownOpen ? "show" : ""}`}
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
