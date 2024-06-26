@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/schedule/:path*",
-      "destination": "http://103.117.56.153:8080/api/:path*"
+      "destination": "http://103.117.56.153:8080/api/schedule/:path*"
     },
     {
       "source": "/api/:path*",
