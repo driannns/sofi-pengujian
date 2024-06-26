@@ -23,6 +23,8 @@ const JadwalTable = () => {
   const [isNilai, setIsNilai] = useState(false);
   const [filterText, setFilterText] = useState("");
 
+  const [dropdownOpen, setDropdownOpen] = useState({});
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -187,70 +189,11 @@ const JadwalTable = () => {
     }
   };
 
-  const handleDropdown = (row) => {
-    return (
-      <div className="dropdown">
-        <button
-          className="btn btn-success dropdown-toggle w-100"
-          type="button"
-          id={`dropdownMenuButton${row.id}`}
-          data-bs-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          Pilih
-        </button>
-        <div
-          className="dropdown-menu"
-          aria-labelledby={`dropdownMenuButton${row.id}`}
-        >
-          <button
-            type="button"
-            data-toggle="modal"
-            data-target="#detailSidangModal"
-            className="btn btn-outline-primary border-0 view w-100"
-            onClick={() => openModal(row.id)}
-          >
-            Detail
-          </button>
-          <hr className="mt-0 mb-0" />
-          <Link
-            to={`/schedule/${row.id}/edit`}
-            className={`btn btn-outline-primary border-0 w-100 ${
-              row.status !== "belum dilaksanakan" ? "disabled" : ""
-            }`}
-          >
-            Ubah Jadwal
-          </Link>
-          <br />
-          <hr className="mt-0 mb-0" />
-          <button
-            className={`btn btn-outline-primary border-0 w-100 ${
-              row.status !== "belum dilaksanakan" ? "disabled" : ""
-            }`}
-            onClick={() => handleDeleteClick(row.id)}
-          >
-            Hapus
-          </button>
-          <hr className="mt-0 mb-0" />
-          <form
-            className=""
-            action={`/schedules/berita_acara/show/${row.id}`}
-            method="get"
-          >
-            <button
-              type="submit"
-              className={`btn btn-outline-primary border-0 rounded-0 w-100 ${
-                row.status === "belum dilaksanakan" ? "disabled" : ""
-              }`}
-            >
-              Berita Acara
-            </button>
-            <hr className="mt-0 mb-0" />
-          </form>
-        </div>
-      </div>
-    );
+  const toggleDropdown = (id) => {
+    setDropdownOpen((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
   };
 
   const columns = [
@@ -412,19 +355,301 @@ const JadwalTable = () => {
       cell: (row) => (
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
-            location.pathname === "/schedules" &&
-            handleDropdown(row)}
+            location.pathname === "/schedules" && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id={`dropdownMenuButton${row.id}`}
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  onClick={() => toggleDropdown(row.id)}
+                >
+                  Pilih
+                </button>
+                <div
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
+                  aria-labelledby={`dropdownMenuButton${row.id}`}
+                >
+                  <button
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#detailSidangModal"
+                    className="btn btn-outline-primary border-0 view w-100"
+                    onClick={() => openModal(row.id)}
+                  >
+                    Detail
+                  </button>
+                  <hr className="mt-0 mb-0" />
+                  <Link
+                    to={`/schedule/${row.id}/edit`}
+                    className={`btn btn-outline-primary border-0 w-100 ${
+                      row.status !== "belum dilaksanakan" ? "disabled" : ""
+                    }`}
+                  >
+                    Ubah Jadwal
+                  </Link>
+                  <br />
+                  <hr className="mt-0 mb-0" />
+                  <button
+                    className={`btn btn-outline-primary border-0 w-100 ${
+                      row.status !== "belum dilaksanakan" ? "disabled" : ""
+                    }`}
+                    onClick={() => handleDeleteClick(row.id)}
+                  >
+                    Hapus
+                  </button>
+                  <hr className="mt-0 mb-0" />
+                  <form
+                    className=""
+                    action={`/schedules/berita_acara/show/${row.id}`}
+                    method="get"
+                  >
+                    <button
+                      type="submit"
+                      className={`btn btn-outline-primary border-0 rounded-0 w-100 ${
+                        row.status === "belum dilaksanakan" ? "disabled" : ""
+                      }`}
+                    >
+                      Berita Acara
+                    </button>
+                    <hr className="mt-0 mb-0" />
+                  </form>
+                </div>
+              </div>
+            )}
           {jwtDecoded.role.some((role) => ["RLPIC", "RLADM"].includes(role)) &&
             (location.pathname === "/schedule/bermasalah" ||
               location.pathname === "/schedule/bukaAkses" ||
-              location.pathname === "/schedule/admin") &&
-            handleDropdown(row)}
+              location.pathname === "/schedule/admin") && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id={`dropdownMenuButton${row.id}`}
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  onClick={() => toggleDropdown(row.id)}
+                >
+                  Pilih
+                </button>
+                <div
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
+                  aria-labelledby={`dropdownMenuButton${row.id}`}
+                >
+                  <Link
+                    to={`/schedules/${row.id}`}
+                    className="btn btn-outline-primary border-0 w-100"
+                  >
+                    Detail
+                  </Link>
+                  <hr className="mt-0 mb-0" />
+                  {location.pathname === "/schedule/bermasalah" && (
+                    <div>
+                      <Link
+                        to={`/scores/simpulan/${row.id}`}
+                        className="btn btn-outline-primary border-0 w-100"
+                      >
+                        Simpulan Nilai
+                      </Link>
+                      <hr className="mt-0 mb-0" />
+                      <Link
+                        to={`/revisions/show/${row.id}`}
+                        className="btn btn-outline-primary border-0 w-100"
+                      >
+                        Lihat Revisi
+                      </Link>
+                    </div>
+                  )}
+                  <hr className="mt-0 mb-0" />
+                  <button
+                    className={`btn btn-outline-primary border-0 w-100 ${
+                      row.status === "belum dilaksanakan" ? "disabled" : ""
+                    }`}
+                    onClick={() => handleFlagChange(row.id, "rev")}
+                  >
+                    Buka Revisi
+                  </button>
+                  <hr className="mt-0 mb-0" />
+                  <button
+                    className={`btn btn-outline-primary border-0 w-100 ${
+                      row.status === "belum dilaksanakan" ? "disabled" : ""
+                    }`}
+                    onClick={() => handleFlagChange(row.id, "scr")}
+                  >
+                    Buka Penilaian
+                  </button>
+                  <hr className="mt-0 mb-0" />
+                </div>
+              </div>
+            )}
           {jwtDecoded.role.some((role) => ["RLPGJ"].includes(role)) &&
-            location.pathname === "/schedule/penguji" &&
-            handleDropdown(row)}
+            location.pathname === "/schedule/penguji" && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id={`dropdownMenuButton${row.id}`}
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  onClick={() => toggleDropdown(row.id)}
+                >
+                  Pilih
+                </button>
+                <div
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
+                  aria-labelledby={`dropdownMenuButton${row.id}`}
+                >
+                  <Link
+                    to={`/schedules/${row.id}`}
+                    className="btn btn-outline-primary border-0 w-100"
+                  >
+                    Detail
+                  </Link>
+                  <hr className="mt-0 mb-0" />
+                  {isNilai ? (
+                    <Link
+                      to={`/scores/penguji/edit/${row.id}`}
+                      className="btn btn-outline-primary border-0 w-100"
+                    >
+                      Ubah Nilai
+                    </Link>
+                  ) : (
+                    <Link
+                      to={`/scores/penguji/create/${row.id}`}
+                      className={`btn btn-outline-primary border-0 w-100 ${
+                        row.status === "sedang dilaksanakan" && row.isHadir
+                          ? ""
+                          : "disabled"
+                      }`}
+                    >
+                      Nilai
+                    </Link>
+                  )}
+                  <hr className="mt-0 mb-0" />
+                  <Link
+                    to={`/revisions/create/${row.id}`}
+                    className={`btn btn-outline-primary border-0 w-100 ${
+                      (row.status !== "belum dilaksanakan" ||
+                        row.flag_add_revision) &&
+                      row.isHadir
+                        ? ""
+                        : "disabled"
+                    }`}
+                  >
+                    Revisi TA
+                  </Link>
+                  <hr className="mt-0 mb-0" />
+                  <Link
+                    to={`/scores/simpulan/${row.id}`}
+                    className="btn btn-outline-primary border-0 w-100"
+                  >
+                    Simpulan Nilai
+                  </Link>
+                  <hr className="mt-0 mb-0" />
+                  <form
+                    className=""
+                    action={`/schedules/berita_acara/show/${row.id}`}
+                    method="get"
+                  >
+                    <button
+                      type="submit"
+                      className="btn btn-outline-primary border-0 rounded-0 w-100"
+                    >
+                      Berita Acara
+                    </button>
+                    <hr className="mt-0 mb-0" />
+                  </form>
+                </div>
+              </div>
+            )}
           {jwtDecoded.role.some((role) => ["RLPBB"].includes(role)) &&
-            location.pathname === "/schedule/pembimbing" &&
-            handleDropdown(row)}
+            location.pathname === "/schedule/pembimbing" && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-success dropdown-toggle w-100"
+                  type="button"
+                  id={`dropdownMenuButton${row.id}`}
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  onClick={() => toggleDropdown(row.id)}
+                >
+                  Pilih
+                </button>
+                <div
+                  className={`dropdown-menu ${
+                    dropdownOpen[row.id] ? "show" : ""
+                  }`}
+                  aria-labelledby={`dropdownMenuButton${row.id}`}
+                >
+                  <Link
+                    to={`/schedules/${row.id}`}
+                    className="btn btn-outline-primary border-0 w-100"
+                  >
+                    Detail
+                  </Link>
+                  <hr className="mt-0 mb-0" />
+                  {isNilai ? (
+                    <Link
+                      to={`/scores/pembimbing/edit/${row.id}`}
+                      className="btn btn-outline-primary border-0 w-100"
+                    >
+                      Ubah Nilai
+                    </Link>
+                  ) : (
+                    <Link
+                      to={`/scores/pembimbing/create/${row.id}`}
+                      className={`btn btn-outline-primary border-0 w-100 ${
+                        row.status === "sedang dilaksanakan" && row.isHadir
+                          ? ""
+                          : "disabled"
+                      }`}
+                    >
+                      Nilai
+                    </Link>
+                  )}
+                  <hr className="mt-0 mb-0" />
+                  <Link
+                    to={`/revisions/create/${row.id}`}
+                    className={`btn btn-outline-primary border-0 w-100 ${
+                      (row.status !== "belum dilaksanakan" ||
+                        row.flag_add_revision) &&
+                      row.isHadir
+                        ? ""
+                        : "disabled"
+                    }`}
+                  >
+                    Revisi TA
+                  </Link>
+                  <hr className="mt-0 mb-0" />
+                  <form
+                    className=""
+                    action={`/schedules/berita_acara/show/${row.id}`}
+                    method="get"
+                  >
+                    <button
+                      type="submit"
+                      className={`btn btn-outline-primary border-0 rounded-0 w-100 ${
+                        row.status === "belum dilaksanakan" ? "disabled" : ""
+                      }`}
+                    >
+                      Berita Acara
+                    </button>
+                    <hr className="mt-0 mb-0" />
+                  </form>
+                </div>
+              </div>
+            )}
         </div>
       ),
     },
