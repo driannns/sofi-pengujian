@@ -23,8 +23,6 @@ const JadwalTable = () => {
   const [isNilai, setIsNilai] = useState(false);
   const [filterText, setFilterText] = useState("");
 
-  const [dropdownOpen, setDropdownOpen] = useState({});
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -189,13 +187,6 @@ const JadwalTable = () => {
     }
   };
 
-  const handleToggle = (id) => {
-    setDropdownOpen((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-  };
-
   const columns = [
     {
       name: "NIM",
@@ -355,13 +346,13 @@ const JadwalTable = () => {
       cell: (row) => (
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
-            location.pathname === "/schedule" && (
+            location.pathname === "/schedules" && (
               <div className="dropdown">
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  data-toggle="dropdown"
+                  data-bs-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
