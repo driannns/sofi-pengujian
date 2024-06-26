@@ -34,28 +34,28 @@ const JadwalTable = () => {
           jwtDecoded.role.includes("RLPBB") &&
           location.pathname === "/schedule/pembimbing"
         ) {
-          apiSchedule = `/schedule/pembimbing/get`;
+          apiSchedule = `/api/schedule/pembimbing/get`;
         } else if (
           jwtDecoded.role.includes("RLPGJ") &&
           location.pathname === "/schedule/penguji"
         ) {
-          apiSchedule = `/schedule/penguji/get`;
+          apiSchedule = `/api/schedule/penguji/get`;
         } else if (
           jwtDecoded.role.includes("RLADM") &&
           location.pathname === "/schedule/admin"
         ) {
-          apiSchedule = `/schedule/admin/get`;
+          apiSchedule = `/api/schedule/admin/get`;
         } else if (
           jwtDecoded.role.includes("RLADM") &&
           location.pathname === "/schedule/admin-before"
         ) {
-          apiSchedule = `/schedule/admin-before/get`;
+          apiSchedule = `/api/schedule/admin-before/get`;
         } else if (
           (jwtDecoded.role.includes("RLPIC") &&
             location.pathname === "/schedules") ||
           location.pathname === "/schedule/bukaAkses"
         ) {
-          apiSchedule = `/schedule/get`;
+          apiSchedule = `/api/schedule/`;
         }
 
         if (apiSchedule) {
