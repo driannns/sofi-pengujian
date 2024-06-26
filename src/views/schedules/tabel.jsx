@@ -55,7 +55,7 @@ const JadwalTable = () => {
             location.pathname === "/schedules") ||
           location.pathname === "/schedule/bukaAkses"
         ) {
-          apiSchedule = `/api/schedule/`;
+          apiSchedule = `/api/schedule/get`;
         }
 
         if (apiSchedule) {
@@ -104,7 +104,7 @@ const JadwalTable = () => {
     setIsModalOpen(true);
     setIsModalLoading(true);
     try {
-      const detailResponse = await axios.get(`/schedule/get/${id}`);
+      const detailResponse = await axios.get(`/api/schedule/get/${id}`);
       const data = detailResponse.data.data;
 
       const pembimbing1Response = await axios.get(
@@ -134,7 +134,7 @@ const JadwalTable = () => {
 
   const deleteSchedule = async (id) => {
     try {
-      const response = await axios.delete(`/schedule/delete/${id}`);
+      const response = await axios.delete(`/api/schedule/delete/${id}`);
       if (response.status === 200) {
         Swal.fire("Berhasil", "Jadwal berhasil dihapus", "success");
         navigate(0);
@@ -167,7 +167,7 @@ const JadwalTable = () => {
   const handleFlagChange = async (id, code, pathname) => {
     try {
       const response = await axios.patch(
-        `/schedule/change-flag/${id}?code=${code}`
+        `/api/schedule/change-flag/${id}?code=${code}`
       );
       if (response.status === 200) {
         navigate(pathname, {
