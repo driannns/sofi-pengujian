@@ -358,7 +358,7 @@ const JadwalTable = () => {
             location.pathname === "/schedules" && (
               <div className="dropdown">
                 <button
-                  className="btn btn-success dropdown-toggle w-100"
+                  className="btn btn-success dropdown-toggle"
                   type="button"
                   id="dropdownMenuButton"
                   onClick={() => handleToggle(row.id)}
@@ -368,7 +368,7 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
@@ -377,45 +377,42 @@ const JadwalTable = () => {
                     type="button"
                     data-toggle="modal"
                     data-target="#detailSidangModal"
-                    className="btn btn-outline-primary border-0 view w-100"
+                    className="dropdown-item"
                     onClick={() => openModal(row.id)}
                   >
                     Detail
                   </button>
-                  <hr className="mt-0 mb-0" />
+                  <hr className="dropdown-divider" />
                   <Link
                     to={`/schedule/${row.id}/edit`}
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       row.status !== "belum dilaksanakan" ? "disabled" : ""
                     }`}
                   >
                     Ubah Jadwal
                   </Link>
-                  <br />
-                  <hr className="mt-0 mb-0" />
+                  <hr className="dropdown-divider" />
                   <button
-                    className={`btn btn-outline-primary border-0 w-100 ${
+                    className={`dropdown-item ${
                       row.status !== "belum dilaksanakan" ? "disabled" : ""
                     }`}
                     onClick={() => handleDeleteClick(row.id)}
                   >
                     Hapus
                   </button>
-                  <hr className="mt-0 mb-0" />
+                  <hr className="dropdown-divider" />
                   <form
-                    className=""
                     action={`/schedules/berita_acara/show/${row.id}`}
                     method="get"
                   >
                     <button
                       type="submit"
-                      className={`btn btn-outline-primary border-0 rounded-0 w-100 ${
+                      className={`dropdown-item ${
                         row.status === "belum dilaksanakan" ? "disabled" : ""
                       }`}
                     >
                       Berita Acara
                     </button>
-                    <hr className="mt-0 mb-0" />
                   </form>
                 </div>
               </div>
