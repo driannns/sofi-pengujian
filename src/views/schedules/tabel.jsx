@@ -355,64 +355,65 @@ const JadwalTable = () => {
       cell: (row) => (
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
-            location.pathname === "/schedules" && (
+            location.pathname === "/schedule" && (
               <div className="dropdown">
                 <button
-                  className="btn btn-success dropdown-toggle"
+                  className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu dropdown-menu-right ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <button
                     type="button"
                     data-toggle="modal"
                     data-target="#detailSidangModal"
-                    className="dropdown-item"
+                    className="btn btn-outline-primary border-0 view w-100"
                     onClick={() => openModal(row.id)}
                   >
                     Detail
                   </button>
-                  <hr className="dropdown-divider" />
+                  <hr className="mt-0 mb-0" />
                   <Link
                     to={`/schedule/${row.id}/edit`}
-                    className={`dropdown-item ${
+                    className={`btn btn-outline-primary border-0 w-100 ${
                       row.status !== "belum dilaksanakan" ? "disabled" : ""
                     }`}
                   >
                     Ubah Jadwal
                   </Link>
-                  <hr className="dropdown-divider" />
+                  <br />
+                  <hr className="mt-0 mb-0" />
                   <button
-                    className={`dropdown-item ${
+                    className={`btn btn-outline-primary border-0 w-100 ${
                       row.status !== "belum dilaksanakan" ? "disabled" : ""
                     }`}
                     onClick={() => handleDeleteClick(row.id)}
                   >
                     Hapus
                   </button>
-                  <hr className="dropdown-divider" />
+                  <hr className="mt-0 mb-0" />
                   <form
+                    className=""
                     action={`/schedules/berita_acara/show/${row.id}`}
                     method="get"
                   >
                     <button
                       type="submit"
-                      className={`dropdown-item ${
+                      className={`btn btn-outline-primary border-0 rounded-0 w-100 ${
                         row.status === "belum dilaksanakan" ? "disabled" : ""
                       }`}
                     >
                       Berita Acara
                     </button>
+                    <hr className="mt-0 mb-0" />
                   </form>
                 </div>
               </div>
@@ -426,16 +427,14 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -491,16 +490,14 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -573,16 +570,14 @@ const JadwalTable = () => {
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
-                  onClick={() => handleToggle(row.id)}
+                  data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] ? "true" : "false"}
+                  aria-expanded="false"
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
