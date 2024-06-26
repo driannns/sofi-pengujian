@@ -113,7 +113,7 @@ const JadwalCreate = () => {
         const pengujiId = penguji.split(" - ")[0];
         const dateTime = `${date}T${time}:00+07:00`;
         axios
-          .post(`/schedule/check-penguji/${pengujiId}?condition=create`, {
+          .post(`/api/schedule/check-penguji/${pengujiId}?condition=create`, {
             date_time: dateTime,
             pengajuan_id: [],
           })
@@ -274,7 +274,7 @@ const JadwalCreate = () => {
     };
 
     try {
-      const response = await axios.post(`/schedule/create`, data, {
+      const response = await axios.post(`/api/schedule/create`, data, {
         headers: {
           Authorization: `Bearer ${cookies["auth-token"]}`,
         },

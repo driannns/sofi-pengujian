@@ -19,11 +19,14 @@ const TabelMahasiswa = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const schedulerResponse = await axios.get(`/schedule/mahasiswa/get`, {
-          headers: {
-            Authorization: `Bearer ${cookies["auth-token"]}`,
-          },
-        });
+        const schedulerResponse = await axios.get(
+          `/api/schedule/mahasiswa/get`,
+          {
+            headers: {
+              Authorization: `Bearer ${cookies["auth-token"]}`,
+            },
+          }
+        );
 
         const data = schedulerResponse.data.data;
 

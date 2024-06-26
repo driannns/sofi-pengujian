@@ -52,7 +52,7 @@ const JadwalEdit = () => {
       try {
         setIsLoading(true);
         const scheduleResponse = await axios.get(
-          `/schedule/team/get/${params.id}`,
+          `/api/schedule/team/get/${params.id}`,
           {
             headers: {
               Authorization: `Bearer ${cookies["auth-token"]}`,
@@ -187,7 +187,7 @@ const JadwalEdit = () => {
         const pengujiId = penguji.split(" - ")[0];
         const dateTime = `${date}T${time}:00+07:00`;
         axios
-          .post(`/schedule/check-penguji/${pengujiId}?condition=update`, {
+          .post(`/api/schedule/check-penguji/${pengujiId}?condition=update`, {
             date_time: dateTime,
             pengajuan_id: pengajuanId,
           })
@@ -328,7 +328,7 @@ const JadwalEdit = () => {
 
     try {
       const response = await axios.patch(
-        `/schedule/update/${params.id}`,
+        `/api/schedule/update/${params.id}`,
         data,
         {
           headers: {

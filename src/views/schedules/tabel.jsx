@@ -34,28 +34,28 @@ const JadwalTable = () => {
           jwtDecoded.role.includes("RLPBB") &&
           location.pathname === "/schedule/pembimbing"
         ) {
-          apiSchedule = `/schedule/pembimbing/get`;
+          apiSchedule = `/api/schedule/pembimbing/get`;
         } else if (
           jwtDecoded.role.includes("RLPGJ") &&
           location.pathname === "/schedule/penguji"
         ) {
-          apiSchedule = `/schedule/penguji/get`;
+          apiSchedule = `/api/schedule/penguji/get`;
         } else if (
           jwtDecoded.role.includes("RLADM") &&
           location.pathname === "/schedule/admin"
         ) {
-          apiSchedule = `/schedule/admin/get`;
+          apiSchedule = `/api/schedule/admin/get`;
         } else if (
           jwtDecoded.role.includes("RLADM") &&
           location.pathname === "/schedule/admin-before"
         ) {
-          apiSchedule = `/schedule/admin-before/get`;
+          apiSchedule = `/api/schedule/admin-before/get`;
         } else if (
           (jwtDecoded.role.includes("RLPIC") &&
             location.pathname === "/schedules") ||
           location.pathname === "/schedule/bukaAkses"
         ) {
-          apiSchedule = `/schedule/get`;
+          apiSchedule = `/api/schedule/get`;
         }
 
         if (apiSchedule) {
@@ -104,7 +104,7 @@ const JadwalTable = () => {
     setIsModalOpen(true);
     setIsModalLoading(true);
     try {
-      const detailResponse = await axios.get(`/schedule/get/${id}`);
+      const detailResponse = await axios.get(`/api/schedule/get/${id}`);
       const data = detailResponse.data.data;
 
       const pembimbing1Response = await axios.get(
@@ -134,7 +134,7 @@ const JadwalTable = () => {
 
   const deleteSchedule = async (id) => {
     try {
-      const response = await axios.delete(`/schedule/delete/${id}`);
+      const response = await axios.delete(`/api/schedule/delete/${id}`);
       if (response.status === 200) {
         Swal.fire("Berhasil", "Jadwal berhasil dihapus", "success");
         navigate(0);
@@ -167,7 +167,7 @@ const JadwalTable = () => {
   const handleFlagChange = async (id, code, pathname) => {
     try {
       const response = await axios.patch(
-        `/schedule/change-flag/${id}?code=${code}`
+        `/api/schedule/change-flag/${id}?code=${code}`
       );
       if (response.status === 200) {
         navigate(pathname, {
