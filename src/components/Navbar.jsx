@@ -191,7 +191,7 @@ const Navbar = ({ toggleSidebar }) => {
             </div>
             {notification &&
               notification.map((data, index) => (
-                <a className="dropdown-item" href={data.url} key={index}>
+                <Link className="dropdown-item" to="/notification" key={index}>
                   <div className="message">
                     <div className="py-3 mfe-3 float-left">
                       <div className="c-icon">
@@ -211,7 +211,7 @@ const Navbar = ({ toggleSidebar }) => {
                       {data.message}
                     </div>
                   </div>
-                </a>
+                </Link>
               ))}
             <Link
               to="/notification"
