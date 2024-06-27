@@ -377,10 +377,11 @@ const JadwalTable = () => {
                     dropdownOpen[row.id]
                       ? {
                           position: "absolute",
-                          transform: "translate3d(0px, 0px, 0px)",
+                          transform: "translate3d(-98px, -63px, 0px)",
                           top: "0px",
                           left: "0px",
                           willChange: "transform",
+                          xplacement: "top-start",
                         }
                       : {}
                   }
