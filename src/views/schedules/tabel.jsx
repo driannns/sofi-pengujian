@@ -356,7 +356,10 @@ const JadwalTable = () => {
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
-              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
+              <div
+                className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}
+                style={{ position: "relative" }}
+              >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
@@ -373,7 +376,13 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  style={{ position: "absolute", zIndex: 1050 }}
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    zIndex: 1050,
+                    display: dropdownOpen[row.id] ? "block" : "none",
+                  }}
                 >
                   <button
                     type="button"
@@ -705,12 +714,6 @@ const JadwalTable = () => {
         whiteSpace: "nowrap",
       },
     },
-    tableWrapper: {
-      style: {
-        maxHeight: "500px",
-        overflowY: "auto",
-      },
-    },
   };
 
   const searchSchedules = schedules.filter((row) => {
@@ -746,7 +749,7 @@ const JadwalTable = () => {
           <div className="table-responsive-sm">
             <div
               className="table table-striped"
-              style={{ overflowX: "scroll", overflowY: "scroll" }}
+              style={{ overflowX: "scroll" }}
             >
               <div
                 className="search-container"
