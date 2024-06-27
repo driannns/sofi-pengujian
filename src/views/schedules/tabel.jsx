@@ -196,6 +196,30 @@ const JadwalTable = () => {
     }));
   };
 
+  const handleDropdownPosition = (dropdownMenu) => {
+    const rect = dropdownMenu.getBoundingClientRect();
+    const isOffScreenRight = rect.right > window.innerWidth;
+    const isOffScreenBottom = rect.bottom > window.innerHeight;
+
+    if (isOffScreenRight) {
+      dropdownMenu.style.left = `${window.innerWidth - rect.right}px`;
+    }
+    if (isOffScreenBottom) {
+      dropdownMenu.style.top = `${window.innerHeight - rect.bottom}px`;
+    }
+  };
+
+  useEffect(() => {
+    Object.keys(dropdownOpen).forEach((key) => {
+      if (dropdownOpen[key]) {
+        const dropdownMenu = document.querySelector(`#dropdownMenu${key}`);
+        if (dropdownMenu) {
+          handleDropdownPosition(dropdownMenu);
+        }
+      }
+    });
+  }, [dropdownOpen]);
+
   const columns = [
     {
       name: "NIM",
