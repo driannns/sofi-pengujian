@@ -356,10 +356,7 @@ const JadwalTable = () => {
         <div>
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
-              <div
-                className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}
-                style={{ position: "relative" }}
-              >
+              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
@@ -376,13 +373,6 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    zIndex: 1050,
-                    display: dropdownOpen[row.id] ? "block" : "none",
-                  }}
                 >
                   <button
                     type="button"
@@ -449,20 +439,10 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
                 >
                   <Link
                     to={`/schedules/${row.id}`}
@@ -526,20 +506,10 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
                 >
                   <Link
                     to={`/schedules/${row.id}`}
@@ -620,20 +590,10 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
                 >
                   <Link
                     to={`/schedules/${row.id}`}
