@@ -305,12 +305,12 @@ const SidangIndex = () => {
           } else if (row.status === "sudah dijadwalkan") {
             return (
               <div className="btn-group w-100">
-                <Link
-                  to={`/schedules/${formatScheduleId(row.id)}`}
+                <div
+                  onClick={() => formatScheduleId(row.id)}
                   className="btn btn-light w-100"
                 >
                   Lihat Jadwal
-                </Link>
+                </div>
               </div>
             );
           }
