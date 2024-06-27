@@ -373,7 +373,7 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  style={{ maxHeight: "200px", overflowY: "auto" }}
+                  style={{ position: "absolute", zIndex: 1050 }}
                 >
                   <button
                     type="button"
@@ -746,7 +746,7 @@ const JadwalTable = () => {
           <div className="table-responsive-sm">
             <div
               className="table table-striped"
-              style={{ overflowX: "scroll" }}
+              style={{ overflowX: "scroll", overflowY: "scroll" }}
             >
               <div
                 className="search-container"
