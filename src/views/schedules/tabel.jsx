@@ -440,20 +440,10 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
                 >
                   <Link
                     to={`/schedules/${row.id}`}
@@ -517,20 +507,10 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
                 >
                   <Link
                     to={`/schedules/${row.id}`}
@@ -611,20 +591,10 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu ${
+                  className={`dropdown-menu dropdown-menu-right ${
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
                 >
                   <Link
                     to={`/schedules/${row.id}`}
