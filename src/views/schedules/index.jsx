@@ -42,7 +42,7 @@ const JadwalIndex = () => {
             </h6>
           </div>
         ) : jwtDecoded.role.find((role) => ["RLPIC"].includes(role)) &&
-          location.pathname === "/schedule" ? (
+          location.pathname === "/schedules" ? (
           <div className="col-12">
             <h3>JADWAL SIDANG KK</h3>
             <hr className="mt-0" />

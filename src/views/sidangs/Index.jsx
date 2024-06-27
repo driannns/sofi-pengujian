@@ -333,10 +333,7 @@ const SidangIndex = () => {
               <div className="btn-group">
                 {row.status === "belum dijadwalkan" ||
                 row.status === "tidak lulus (belum dijadwalkan)" ? (
-                  <a
-                    href="{{ route('schedules.create', [$sidang->mahasiswa->team->id]) }}"
-                    className="btn btn-primary"
-                  >
+                  <a href={`/schedules/create/3`} className="btn btn-primary">
                     Jadwalkan
                   </a>
                 ) : (
