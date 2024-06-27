@@ -52,8 +52,9 @@ const SidangIndex = () => {
 
   const formatScheduleId = async (pengajuanId) => {
     try {
-      const res = axios.get(`/api/schedule/pengajuan/get/${pengajuanId}`);
-      console.log(res);
+      const res = await axios.get(`/api/schedule/pengajuan/get/${pengajuanId}`);
+      console.log(res.data);
+      console.log(res.data[0].id);
     } catch (error) {
       console.error(error);
     }
