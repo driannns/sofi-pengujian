@@ -50,6 +50,15 @@ const SidangIndex = () => {
     }
   };
 
+  const formatScheduleId = async (pengajuanId) => {
+    try {
+      const res = axios.get(`/api/schedule/pengajuan/get/${pengajuanId}`);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const periodById = async (periodId) => {
     const abortController = new AbortController();
     const signal = abortController.signal;
@@ -296,12 +305,12 @@ const SidangIndex = () => {
           } else if (row.status === "sudah dijadwalkan") {
             return (
               <div className="btn-group w-100">
-                <a
-                  href="{{ route('schedules.show', [$sidang->schedules[0]->id]) }}"
+                <Link
+                  to={`/schedules/${formatScheduleId(row.id)}`}
                   className="btn btn-light w-100"
                 >
                   Lihat Jadwal
-                </a>
+                </Link>
               </div>
             );
           }
