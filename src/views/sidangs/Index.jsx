@@ -50,6 +50,19 @@ const SidangIndex = () => {
     }
   };
 
+  const getTeamId = async (userId) => {
+    try {
+      const res = await axios.get(`https://sofi.my.id/api/student/${userId}`);
+      console.log(res.data.data.team_id);
+      if (res.data.code === 200) {
+        navigate(`/schedules/create/${res.data.data.team_id}`);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const formatScheduleId = async (pengajuanId) => {
     try {
       const res = await axios.get(`/api/schedule/pengajuan/get/${pengajuanId}`);
@@ -336,9 +349,12 @@ const SidangIndex = () => {
               <div className="btn-group">
                 {row.status === "belum dijadwalkan" ||
                 row.status === "tidak lulus (belum dijadwalkan)" ? (
-                  <a href={`/schedules/create/3`} className="btn btn-primary">
+                  <div
+                    onClick={() => getTeamId(row.user_id)}
+                    className="btn btn-primary"
+                  >
                     Jadwalkan
-                  </a>
+                  </div>
                 ) : (
                   ""
                 )}
