@@ -54,6 +54,7 @@ const SidangIndex = () => {
     try {
       const res = await axios.get(`/api/schedule/pengajuan/get/${pengajuanId}`);
       console.log(res.data);
+      console.log(res.data[0]);
       console.log(res.data[0].id);
     } catch (error) {
       console.error(error);
