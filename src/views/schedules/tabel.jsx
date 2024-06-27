@@ -196,30 +196,6 @@ const JadwalTable = () => {
     }));
   };
 
-  const handleDropdownPosition = (dropdownMenu) => {
-    const rect = dropdownMenu.getBoundingClientRect();
-    const isOffScreenRight = rect.right > window.innerWidth;
-    const isOffScreenBottom = rect.bottom > window.innerHeight;
-
-    if (isOffScreenRight) {
-      dropdownMenu.style.left = `${window.innerWidth - rect.right}px`;
-    }
-    if (isOffScreenBottom) {
-      dropdownMenu.style.top = `${window.innerHeight - rect.bottom}px`;
-    }
-  };
-
-  useEffect(() => {
-    Object.keys(dropdownOpen).forEach((key) => {
-      if (dropdownOpen[key]) {
-        const dropdownMenu = document.querySelector(`#dropdownMenu${key}`);
-        if (dropdownMenu) {
-          handleDropdownPosition(dropdownMenu);
-        }
-      }
-    });
-  }, [dropdownOpen]);
-
   const columns = [
     {
       name: "NIM",
@@ -397,6 +373,7 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
+                  style={{ maxHeight: "200px", overflowY: "auto" }}
                 >
                   <button
                     type="button"
@@ -726,6 +703,12 @@ const JadwalTable = () => {
     cells: {
       style: {
         whiteSpace: "nowrap",
+      },
+    },
+    tableWrapper: {
+      style: {
+        maxHeight: "500px",
+        overflowY: "auto",
       },
     },
   };
