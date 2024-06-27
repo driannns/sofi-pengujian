@@ -373,16 +373,17 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  {...(dropdownOpen[row.id] && {
-                    style: {
-                      position: "absolute",
-                      transform: "translate3d(0px, 0px, 0px)",
-                      top: "0px",
-                      left: "0px",
-                      willChange: "transform",
-                    },
-                    "x-placement": "top-start",
-                  })}
+                  style={
+                    dropdownOpen[row.id]
+                      ? {
+                          position: "absolute",
+                          transform: "translate3d(0px, 0px, 0px)",
+                          top: "0px",
+                          left: "0px",
+                          willChange: "transform",
+                        }
+                      : {}
+                  }
                 >
                   <button
                     type="button"
