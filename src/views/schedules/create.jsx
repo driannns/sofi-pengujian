@@ -85,10 +85,28 @@ const JadwalCreate = () => {
           members: updatedMembers,
         }));
 
+        const penguji = updatedMembers.flatMap((member) => [
+          member.pengajuan.pembimbing1_id,
+          member.pengajuan.pembimbing2_id,
+        ]);
+
         const lecturersResponse = await axios.get(
           "https://sofi.my.id/api/lecturer"
         );
-        setLecturers(lecturersResponse.data.data);
+        const allLecturers = lecturersResponse.data.data;
+
+        const filteredLecturers1 = allLecturers.filter(
+          (lecturer) =>
+            lecturer.jfa === "NJFA" && !penguji.includes(lecturer.user_id)
+        );
+        const filteredLecturers2 = allLecturers.filter(
+          (lecturer) => !penguji.includes(lecturer.user_id)
+        );
+
+        setLecturers({
+          penguji1: filteredLecturers1,
+          penguji2: filteredLecturers2,
+        });
       } catch (error) {
         navigate("/sidangs/pic", {
           state: {
@@ -473,14 +491,15 @@ const JadwalCreate = () => {
                             onChange={(e) => setPenguji1(e.target.value)}
                           >
                             <option value="">Pilih Penguji 1</option>
-                            {lecturers.map((lecturer) => (
-                              <option
-                                key={lecturer.id}
-                                value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
-                              >
-                                {lecturer.user.nama} - {lecturer.kk}
-                              </option>
-                            ))}
+                            {lecturers.penguji1 &&
+                              lecturers.penguji1.map((lecturer) => (
+                                <option
+                                  key={lecturer.id}
+                                  value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
+                                >
+                                  {lecturer.user.nama} - {lecturer.kk}
+                                </option>
+                              ))}
                           </select>
                         </div>
 
@@ -505,14 +524,15 @@ const JadwalCreate = () => {
                             onChange={(e) => setPenguji2(e.target.value)}
                           >
                             <option value="">Pilih Penguji 2</option>
-                            {lecturers.map((lecturer) => (
-                              <option
-                                key={lecturer.id}
-                                value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
-                              >
-                                {lecturer.user.nama} - {lecturer.kk}
-                              </option>
-                            ))}
+                            {lecturers.penguji2 &&
+                              lecturers.penguji2.map((lecturer) => (
+                                <option
+                                  key={lecturer.id}
+                                  value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
+                                >
+                                  {lecturer.user.nama} - {lecturer.kk}
+                                </option>
+                              ))}
                           </select>
                         </div>
 
