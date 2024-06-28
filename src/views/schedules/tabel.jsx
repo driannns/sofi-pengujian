@@ -373,7 +373,11 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   }`}
                   aria-labelledby="dropdownMenuButton"
-                  style={{ position: "absolute", zIndex: 1050 }}
+                  style={{
+                    position: "absolute",
+                    zIndex: 1050,
+                    overflow: "visible",
+                  }}
                 >
                   <button
                     type="button"
@@ -664,15 +668,20 @@ const JadwalTable = () => {
   const customStyles = {
     headCells: {
       style: {
+        paddingTop: "8px",
+        paddingBottom: "8px",
         backgroundColor: "#20a8d8",
         color: "white",
         fontWeight: "bold",
         borderBottom: "1px solid black",
+        textAlign: "left",
       },
     },
     cells: {
       style: {
         whiteSpace: "nowrap",
+        paddingTop: "8px",
+        paddingBottom: "8px",
       },
     },
   };

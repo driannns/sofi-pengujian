@@ -550,7 +550,7 @@ const JadwalCreate = () => {
                             )}
                           </button>
                           <Link
-                            to="/sidang/pic"
+                            to="/sidangs/pic"
                             className="btn btn-secondary ml-1"
                           >
                             Batal
