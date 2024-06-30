@@ -3449,7 +3449,6 @@ input[type="button"].btn-block {
 .dropdown-container {
   position: relative;
   overflow: visible;
-  margin-bottom: 20vh;
 }
 
 .dropdown-menu {

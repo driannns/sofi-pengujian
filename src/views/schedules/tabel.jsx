@@ -666,7 +666,7 @@ const JadwalTable = () => {
   const customStyles = {
     rows: {
       style: {
-        height: "30vh",
+        height: "40vh",
       },
     },
     headCells: {
