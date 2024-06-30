@@ -357,9 +357,8 @@ const JadwalTable = () => {
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
               <div
-                className={`dropdown my-5 ${
-                  dropdownOpen[row.id] ? "show" : ""
-                }`}
+                className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}
+                style={{ marginTop: "40px", marginBottom: "40px" }}
               >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
@@ -381,7 +380,6 @@ const JadwalTable = () => {
                     position: "absolute",
                     zIndex: 10,
                     overflow: "visible",
-                    margin: "20px",
                     backgroundColor: "red",
                   }}
                 >
