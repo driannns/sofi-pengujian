@@ -196,6 +196,8 @@ const JadwalTable = () => {
     }));
   };
 
+  const isLastRow = (index) => index === searchSchedules.length - 1;
+
   const columns = [
     {
       name: "NIM",
@@ -352,11 +354,15 @@ const JadwalTable = () => {
       location.pathname === "/schedules" ||
       location.pathname === "/schedule/admin") && {
       name: "Aksi",
-      cell: (row) => (
+      cell: (row, index) => (
         <div className="dropdown-container">
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
-              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
+              <div
+                className={`dropdown ${dropdownOpen[row.id] ? "show" : ""} ${
+                  isLastRow(index) ? "dropup" : ""
+                }`}
+              >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
@@ -373,9 +379,6 @@ const JadwalTable = () => {
                     dropdownOpen[row.id] ? "show" : ""
                   } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
-                  style={{
-                    zIndex: 1050,
-                  }}
                 >
                   <button
                     type="button"
@@ -666,7 +669,7 @@ const JadwalTable = () => {
   const customStyles = {
     rows: {
       style: {
-        height: "40vh",
+        height: "20vh",
       },
     },
     headCells: {
