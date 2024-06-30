@@ -358,7 +358,7 @@ const JadwalTable = () => {
             location.pathname === "/schedules" && (
               <div
                 className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}
-                style={{ marginTop: "80px", marginBottom: "80px" }}
+                style={{ marginTop: "50px", marginBottom: "50px" }}
               >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
@@ -379,8 +379,8 @@ const JadwalTable = () => {
                   style={{
                     position: "absolute",
                     zIndex: 20,
+                    marginBottom: "60px",
                     overflow: "visible",
-                    backgroundColor: "red",
                   }}
                 >
                   <button
