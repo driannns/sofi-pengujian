@@ -23,7 +23,7 @@ const JadwalTable = () => {
   const [isNilai, setIsNilai] = useState(false);
   const [filterText, setFilterText] = useState("");
 
-  const [dropdownOpen, setDropdownOpen] = useState({});
+  const [dropdownOpen, setDropdownOpen] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -190,10 +190,7 @@ const JadwalTable = () => {
   };
 
   const toggleDropdown = (id) => {
-    setDropdownOpen((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
+    setDropdownOpen((prevState) => (prevState === id ? null : id));
   };
 
   const isLastRow = (index) => index === searchSchedules.length - 1;
@@ -359,7 +356,7 @@ const JadwalTable = () => {
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
               <div
-                className={`dropdown ${dropdownOpen[row.id] ? "show" : ""} ${
+                className={`dropdown ${dropdownOpen === row.id ? "show" : ""} ${
                   isLastRow(index) ? "dropup" : ""
                 }`}
               >
@@ -369,14 +366,14 @@ const JadwalTable = () => {
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] || false}
-                  onClick={() => toggleDropdown(row.id)}
+                  aria-expanded={dropdownOpen === row.id || false}
+                  onClick={() => toggleDropdown(row.isd)}
                 >
                   Pilih
                 </button>
                 <div
                   className={`dropdown-menu ${
-                    dropdownOpen[row.id] ? "show" : ""
+                    dropdownOpen === row.id ? "show" : ""
                   } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
                 >
