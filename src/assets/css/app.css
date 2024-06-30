@@ -3473,7 +3473,7 @@ input[type="button"].btn-block {
 }
 
 .dropup .dropdown-menu {
-  top: 10;
+  border-width: 1px;
   bottom: 100%;
   margin-bottom: 0.125rem;
 }
