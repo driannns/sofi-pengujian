@@ -369,13 +369,13 @@ const JadwalTable = () => {
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu dropdown-menu-right ${
+                  className={`dropdown-menu ${
                     dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
                   style={{
                     position: "absolute",
-                    zIndex: 1050,
+                    zIndex: 10,
                     overflow: "visible",
                   }}
                 >
