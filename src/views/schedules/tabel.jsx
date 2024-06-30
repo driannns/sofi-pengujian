@@ -195,6 +195,20 @@ const JadwalTable = () => {
 
   const isLastRow = (index) => index === searchSchedules.length - 1;
 
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (dropdownOpen && !event.target.closest(".dropdown")) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [dropdownOpen]);
+
   const columns = [
     {
       name: "NIM",
