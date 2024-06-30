@@ -664,10 +664,17 @@ const JadwalTable = () => {
   const filteredColumns = columns.filter((col) => col);
 
   const customStyles = {
+    rows: {
+      style: {
+        minHeight: "72px",
+      },
+    },
     headCells: {
       style: {
         paddingTop: "8px",
         paddingBottom: "8px",
+        paddingLeft: "8px",
+        paddingRight: "8px",
         backgroundColor: "#20a8d8",
         color: "white",
         fontWeight: "bold",
