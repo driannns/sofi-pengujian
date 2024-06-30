@@ -381,6 +381,8 @@ const JadwalTable = () => {
                     position: "absolute",
                     zIndex: 10,
                     overflow: "visible",
+                    margin: "20px",
+                    backgroundColor: "red",
                   }}
                 >
                   <button
