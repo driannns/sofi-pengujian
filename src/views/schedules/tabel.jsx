@@ -367,7 +367,7 @@ const JadwalTable = () => {
                   data-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded={dropdownOpen === row.id || false}
-                  onClick={() => toggleDropdown(row.isd)}
+                  onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
