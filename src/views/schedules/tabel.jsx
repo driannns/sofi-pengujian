@@ -353,7 +353,7 @@ const JadwalTable = () => {
       location.pathname === "/schedule/admin") && {
       name: "Aksi",
       cell: (row) => (
-        <div>
+        <div className="dropdown-container">
           {jwtDecoded.role.some((role) => ["RLPIC"].includes(role)) &&
             location.pathname === "/schedules" && (
               <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>

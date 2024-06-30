@@ -3446,6 +3446,11 @@ input[type="button"].btn-block {
   margin-left: 0;
 }
 
+.dropdown-container {
+  position: relative;
+  overflow: visible; /* Ensure this container doesn't clip overflow */
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
