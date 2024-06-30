@@ -358,7 +358,7 @@ const JadwalTable = () => {
             location.pathname === "/schedules" && (
               <div
                 className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}
-                style={{ marginTop: "40px", marginBottom: "40px" }}
+                style={{ marginTop: "80px", marginBottom: "80px" }}
               >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
@@ -378,7 +378,7 @@ const JadwalTable = () => {
                   aria-labelledby="dropdownMenuButton"
                   style={{
                     position: "absolute",
-                    zIndex: 10,
+                    zIndex: 20,
                     overflow: "visible",
                     backgroundColor: "red",
                   }}
