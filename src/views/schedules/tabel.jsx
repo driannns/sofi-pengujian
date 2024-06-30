@@ -443,22 +443,26 @@ const JadwalTable = () => {
             (location.pathname === "/schedule/bermasalah" ||
               location.pathname === "/schedule/bukaAkses" ||
               location.pathname === "/schedule/admin") && (
-              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
+              <div
+                className={`dropdown ${dropdownOpen === row.id ? "show" : ""} ${
+                  isLastRow(index) ? "dropup" : ""
+                }`}
+              >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] || false}
+                  aria-expanded={dropdownOpen === row.id || false}
                   onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu dropdown-menu-right ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className={`dropdown-menu ${
+                    dropdownOpen === row.id ? "show" : ""
+                  } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -510,22 +514,26 @@ const JadwalTable = () => {
 
           {jwtDecoded.role.some((role) => ["RLPGJ"].includes(role)) &&
             location.pathname === "/schedule/penguji" && (
-              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
+              <div
+                className={`dropdown ${dropdownOpen === row.id ? "show" : ""} ${
+                  isLastRow(index) ? "dropup" : ""
+                }`}
+              >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] || false}
+                  aria-expanded={dropdownOpen === row.id || false}
                   onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu dropdown-menu-right ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className={`dropdown-menu ${
+                    dropdownOpen === row.id ? "show" : ""
+                  } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
@@ -594,22 +602,26 @@ const JadwalTable = () => {
 
           {jwtDecoded.role.some((role) => ["RLPBB"].includes(role)) &&
             location.pathname === "/schedule/pembimbing" && (
-              <div className={`dropdown ${dropdownOpen[row.id] ? "show" : ""}`}>
+              <div
+                className={`dropdown ${dropdownOpen === row.id ? "show" : ""} ${
+                  isLastRow(index) ? "dropup" : ""
+                }`}
+              >
                 <button
                   className="btn btn-success dropdown-toggle w-100"
                   type="button"
                   id="dropdownMenuButton"
                   data-toggle="dropdown"
                   aria-haspopup="true"
-                  aria-expanded={dropdownOpen[row.id] || false}
+                  aria-expanded={dropdownOpen === row.id || false}
                   onClick={() => toggleDropdown(row.id)}
                 >
                   Pilih
                 </button>
                 <div
-                  className={`dropdown-menu dropdown-menu-right ${
-                    dropdownOpen[row.id] ? "show" : ""
-                  }`}
+                  className={`dropdown-menu ${
+                    dropdownOpen === row.id ? "show" : ""
+                  } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
                 >
                   <Link
