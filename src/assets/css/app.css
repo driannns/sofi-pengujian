@@ -3472,6 +3472,13 @@ input[type="button"].btn-block {
   border-radius: 0.25rem;
 }
 
+.dropup .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 0.125rem;
+}
+
+
 .dropdown-menu-left {
   right: auto;
   left: 0;
