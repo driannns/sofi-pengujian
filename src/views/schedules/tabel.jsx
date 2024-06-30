@@ -374,7 +374,7 @@ const JadwalTable = () => {
                   } dropdown-menu-right`}
                   aria-labelledby="dropdownMenuButton"
                   style={{
-                    position: "absolute",
+                    // position: "absolute",
                     zIndex: 10,
                     overflow: "visible",
                   }}
