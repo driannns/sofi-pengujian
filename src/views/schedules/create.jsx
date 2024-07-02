@@ -97,7 +97,7 @@ const JadwalCreate = () => {
 
         const filteredLecturers1 = allLecturers.filter(
           (lecturer) =>
-            lecturer.jfa === "NJFA" && !penguji.includes(lecturer.user_id)
+            lecturer.jfa !== "NJFA" && !penguji.includes(lecturer.user_id)
         );
         const filteredLecturers2 = allLecturers.filter(
           (lecturer) => !penguji.includes(lecturer.user_id)
@@ -249,7 +249,7 @@ const JadwalCreate = () => {
     }
 
     // penguji 1 harus memiliki jfa
-    if (penguji1Data.jfa !== "NJFA") {
+    if (penguji1Data.jfa === "NJFA") {
       setErrorMessage("Penguji 1 harus memiliki JFA");
       setIsSubmitting(false);
       return;
