@@ -284,7 +284,7 @@ const JadwalEdit = () => {
     }
 
     // penguji 1 harus memiliki jfa
-    if (penguji1.jfa !== "NJFA") {
+    if (penguji1.jfa === "NJFA") {
       setErrorMessage("Penguji 1 harus memiliki JFA");
       setIsSubmitting(false);
       return;
