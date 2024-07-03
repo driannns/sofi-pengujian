@@ -158,10 +158,22 @@ const JadwalEdit = () => {
         );
         setTeamName(teamResponse.data.data);
 
+        const penguji = updatedMembers.flatMap((member) => [
+          member.pengajuan.pembimbing1_id,
+          member.pengajuan.pembimbing2_id,
+        ]);
+
         const lecturersResponse = await axios.get(
-          "https://sofi.my.id/api/lecturer"
+          `https://sofi.my.id/api/schedule/penguji?lectureid=${penguji.join(
+            ","
+          )}`
         );
-        setLecturers(lecturersResponse.data.data);
+        const allLecturers = lecturersResponse.data.data;
+
+        setLecturers({
+          penguji1: allLecturers.penguji1,
+          penguji2: allLecturers.penguji2,
+        });
       } catch (error) {
         navigate("/schedules", {
           state: {
@@ -535,14 +547,15 @@ const JadwalEdit = () => {
                             onChange={handlePenguji1Change}
                           >
                             <option value="">{schedule.penguji_1}</option>
-                            {lecturers.map((lecturer) => (
-                              <option
-                                key={lecturer.id}
-                                value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
-                              >
-                                {lecturer.user.nama} - {lecturer.kk}
-                              </option>
-                            ))}
+                            {lecturers.penguji1 &&
+                              lecturers.penguji1.map((lecturer) => (
+                                <option
+                                  key={lecturer.id}
+                                  value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
+                                >
+                                  {lecturer.user.nama} - {lecturer.kk}
+                                </option>
+                              ))}
                           </select>
                         </div>
 
@@ -567,14 +580,15 @@ const JadwalEdit = () => {
                             onChange={handlePenguji2Change}
                           >
                             <option value="">{schedule.penguji_2}</option>
-                            {lecturers.map((lecturer) => (
-                              <option
-                                key={lecturer.id}
-                                value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
-                              >
-                                {lecturer.user.nama} - {lecturer.kk}
-                              </option>
-                            ))}
+                            {lecturers.penguji2 &&
+                              lecturers.penguji2.map((lecturer) => (
+                                <option
+                                  key={lecturer.id}
+                                  value={`${lecturer.user_id} - ${lecturer.jfa} - ${lecturer.kk}`}
+                                >
+                                  {lecturer.user.nama} - {lecturer.kk}
+                                </option>
+                              ))}
                           </select>
                         </div>
 

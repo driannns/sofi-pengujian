@@ -45,6 +45,8 @@ const JadwalCreate = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [timer, setTimer] = useState(null); // State untuk menyimpan interval timer
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,7 +91,6 @@ const JadwalCreate = () => {
           member.pengajuan.pembimbing1_id,
           member.pengajuan.pembimbing2_id,
         ]);
-        console.log(penguji);
 
         const lecturersResponse = await axios.get(
           `https://sofi.my.id/api/schedule/penguji?lectureid=${penguji.join(
@@ -97,7 +98,6 @@ const JadwalCreate = () => {
           )}`
         );
         const allLecturers = lecturersResponse.data.data;
-        console.log(allLecturers);
 
         setLecturers({
           penguji1: allLecturers.penguji1,
@@ -190,6 +190,33 @@ const JadwalCreate = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [errorMessage]);
+
+  useEffect(() => {
+    // Fungsi yang dijalankan setiap 30 menit
+    const handleInterval = () => {
+      console.log("Waktu sidang:", time);
+      // Anda bisa menambahkan logika lain yang ingin dijalankan setiap 30 menit
+    };
+
+    if (time) {
+      // Memastikan waktu telah di-set
+      // Membersihkan timer yang ada untuk menghindari multiple intervals
+      if (timer) {
+        clearInterval(timer);
+      }
+
+      // Membuat timer baru
+      const newTimer = setInterval(handleInterval, 1800000); // 1800000 ms = 30 menit
+      setTimer(newTimer);
+    }
+
+    // Bersihkan timer saat component akan unmount
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [time]); // useEffect ini akan dijalankan ulang saat nilai 'time' berubah
 
   const createPenjadwalan = async () => {
     const userDate = new Date(date + "T" + time);
