@@ -189,16 +189,16 @@ const JadwalCreate = () => {
     }
   }, [errorMessage]);
 
-  const generateTimeOptions = () => {
-    const times = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const formattedHour = hour.toString().padStart(2, "0");
-        const formattedMinute = minute.toString().padStart(2, "0");
-        times.push(`${formattedHour}:${formattedMinute}`);
-      }
+  const handleTimeChange = (e) => {
+    const value = e.target.value;
+    const [hours, minutes] = value.split(":").map(Number);
+
+    if (minutes % 30 !== 0) {
+      alert("Please select a time in 30-minute intervals.");
+      return;
     }
-    return times;
+
+    setTime(value);
   };
 
   const createPenjadwalan = async () => {
@@ -470,17 +470,13 @@ const JadwalCreate = () => {
                         {/*<!-- Time Field -->*/}
                         <div className="form-group col-sm-6">
                           <label>WAKTU SIDANG</label>
-                          <select
+                          <input
+                            type="time"
                             className="form-control time"
                             value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                          >
-                            {generateTimeOptions().map((timeOption) => (
-                              <option key={timeOption} value={timeOption}>
-                                {timeOption}
-                              </option>
-                            ))}
-                          </select>
+                            step="1800"
+                            onChange={handleTimeChange}
+                          />
                         </div>
 
                         <div className="form-group col-sm-6">
