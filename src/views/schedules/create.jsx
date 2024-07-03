@@ -45,8 +45,6 @@ const JadwalCreate = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [timer, setTimer] = useState(null); // State untuk menyimpan interval timer
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -191,32 +189,17 @@ const JadwalCreate = () => {
     }
   }, [errorMessage]);
 
-  useEffect(() => {
-    // Fungsi yang dijalankan setiap 30 menit
-    const handleInterval = () => {
-      console.log("Waktu sidang:", time);
-      // Anda bisa menambahkan logika lain yang ingin dijalankan setiap 30 menit
-    };
-
-    if (time) {
-      // Memastikan waktu telah di-set
-      // Membersihkan timer yang ada untuk menghindari multiple intervals
-      if (timer) {
-        clearInterval(timer);
+  const generateTimeOptions = () => {
+    const times = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const formattedHour = hour.toString().padStart(2, "0");
+        const formattedMinute = minute.toString().padStart(2, "0");
+        times.push(`${formattedHour}:${formattedMinute}`);
       }
-
-      // Membuat timer baru
-      const newTimer = setInterval(handleInterval, 1800000); // 1800000 ms = 30 menit
-      setTimer(newTimer);
     }
-
-    // Bersihkan timer saat component akan unmount
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [time]); // useEffect ini akan dijalankan ulang saat nilai 'time' berubah
+    return times;
+  };
 
   const createPenjadwalan = async () => {
     const userDate = new Date(date + "T" + time);
@@ -487,12 +470,17 @@ const JadwalCreate = () => {
                         {/*<!-- Time Field -->*/}
                         <div className="form-group col-sm-6">
                           <label>WAKTU SIDANG</label>
-                          <input
-                            type="time"
+                          <select
                             className="form-control time"
                             value={time}
                             onChange={(e) => setTime(e.target.value)}
-                          />
+                          >
+                            {generateTimeOptions().map((timeOption) => (
+                              <option key={timeOption} value={timeOption}>
+                                {timeOption}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
                         <div className="form-group col-sm-6">
