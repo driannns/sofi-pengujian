@@ -89,23 +89,19 @@ const JadwalCreate = () => {
           member.pengajuan.pembimbing1_id,
           member.pengajuan.pembimbing2_id,
         ]);
+        console.log(penguji);
 
         const lecturersResponse = await axios.get(
-          "https://sofi.my.id/api/lecturer"
+          `https://sofi.my.id/api/schedule/penguji?lectureid=${penguji.join(
+            ","
+          )}`
         );
         const allLecturers = lecturersResponse.data.data;
-
-        const filteredLecturers1 = allLecturers.filter(
-          (lecturer) =>
-            lecturer.jfa !== "NJFA" && !penguji.includes(lecturer.user_id)
-        );
-        const filteredLecturers2 = allLecturers.filter(
-          (lecturer) => !penguji.includes(lecturer.user_id)
-        );
+        console.log(allLecturers);
 
         setLecturers({
-          penguji1: filteredLecturers1,
-          penguji2: filteredLecturers2,
+          penguji1: allLecturers.penguji1,
+          penguji2: allLecturers.penguji2,
         });
       } catch (error) {
         navigate("/sidangs/pic", {
