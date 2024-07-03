@@ -189,18 +189,6 @@ const JadwalCreate = () => {
     }
   }, [errorMessage]);
 
-  const handleTimeChange = (e) => {
-    const value = e.target.value;
-    const [hours, minutes] = value.split(":").map(Number);
-
-    if (minutes % 30 !== 0) {
-      alert("Please select a time in 30-minute intervals.");
-      return;
-    }
-
-    setTime(value);
-  };
-
   const createPenjadwalan = async () => {
     const userDate = new Date(date + "T" + time);
     const gmtDateTime = userDate.toISOString();
@@ -474,8 +462,7 @@ const JadwalCreate = () => {
                             type="time"
                             className="form-control time"
                             value={time}
-                            step="1800"
-                            onChange={handleTimeChange}
+                            onChange={(e) => setTime(e.target.value)}
                           />
                         </div>
 
