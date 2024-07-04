@@ -135,21 +135,10 @@ const Notification = () => {
     const fetchNotif = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(
-          `/api/notification/user/get`,
-          {
-            headers: {
-              Authorization: "Bearer " + cookies["auth-token"],
-              "ngrok-skip-browser-warning": true,
-            },
-          },
-          {
-            signal,
-          }
-        );
-        if (res.data.data) {
+        const res = await dispatch(fetchNotification(cookies["auth-token"]));
+        if (res.payload) {
           const formatNotification = await Promise.all(
-            res?.data?.data?.map(async (value) => {
+            res?.payload?.map(async (value) => {
               const manipulatedData = await formatUser(value.createdBy);
               const formatTime = formatDate(value.created_at);
               return {
