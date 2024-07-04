@@ -10,8 +10,6 @@ import { fetchNotification } from "../store/notificationSlicer";
 import { updateNotification } from "../store/notificationSlicer";
 
 const Notification = () => {
-  const dataNotifications = useSelector((state) => state.notification);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [cookies] = useCookies();
@@ -129,13 +127,11 @@ const Notification = () => {
   ];
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-
     const fetchNotif = async () => {
       try {
         setIsLoading(true);
         const res = await dispatch(fetchNotification(cookies["auth-token"]));
+        console.log(res);
         if (res.payload) {
           const formatNotification = await Promise.all(
             res?.payload?.map(async (value) => {
