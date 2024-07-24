@@ -24,7 +24,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
       location.pathname.startsWith("/sidangs") ||
       location.pathname.startsWith("teams") ||
       location.pathname.startsWith("slides"),
-    jadwalSidang: location.pathname.startsWith("/schedule"),
+    jadwalSidang: location.pathname.startsWith("/schedule/mahasiswa"),
     revisiTA: location.pathname.startsWith("/revision/mahasiswa"),
     pembimbing:
       location.pathname.startsWith("/schedule/pembimbing") ||
@@ -82,7 +82,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
       title: "Jadwal Sidang",
       items: [
         {
-          path: "#",
+          path: "/schedule/mahasiswa",
           icon: "fa fa-calendar-check-o",
           label: "Jadwal Sidang",
         },
@@ -109,8 +109,16 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
       title: "Sidang TA",
       items: [
         { path: "/sidangs", icon: "icon-list", label: "Pengajuan" },
-        { path: "#", icon: "icon-list", label: "Jadwal Sidang" },
-        { path: "#", icon: "icon-calendar", label: "Perubahan Hak Akses" },
+        {
+          path: "/schedule/admin-before",
+          icon: "icon-list",
+          label: "Jadwal Sidang",
+        },
+        {
+          path: "/schedule/admin",
+          icon: "icon-calendar",
+          label: "Perubahan Hak Akses",
+        },
         { path: "#", icon: "icon-exclamation", label: "Sidang Bermasalah" },
         {
           path: "/sidangs/surat-tugas",
@@ -160,7 +168,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
           label: "Bimbingan TA",
         },
         {
-          path: "#",
+          path: "/schedule/pembimbing",
           icon: "fa fa-calendar-check-o",
           label: "Jadwal Sidang Bimbingan",
         },
@@ -175,7 +183,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
       title: "Penguji",
       items: [
         {
-          path: "#",
+          path: "/schedule/penguji",
           icon: "fa fa-calendar-check-o",
           label: "Jadwal Sidang Penguji",
         },
@@ -195,12 +203,12 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
           label: "Penjadwalan Sidang",
         },
         {
-          path: "#",
+          path: "/schedules",
           icon: "fa fa-calendar-check-o",
           label: "Jadwal Sidang KK",
         },
         {
-          path: "#",
+          path: "/schedule/bukaAkses",
           icon: "icon-key",
           label: "Buka Akses Menu",
         },
@@ -215,7 +223,7 @@ const Sidebar = ({ isOpenSidebar, toggleMinimize }) => {
       title: "Revisi Sidang",
       items: [
         {
-          path: "#",
+          path: "/statusrevisi",
           icon: "fa fa-check-square-o",
           label: "Revisi Mahasiswa",
         },

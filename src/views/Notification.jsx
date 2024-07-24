@@ -5,9 +5,13 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import DatatableComponent from "../components/Datatable";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchNotification } from "../store/notificationSlicer";
+import { updateNotification } from "../store/notificationSlicer";
 
 const Notification = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [cookies] = useCookies();
   const [notification, setNotification] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,16 +40,10 @@ const Notification = () => {
   const fetchNotif = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get(`/api/notification/user/get`, {
-        headers: {
-          Authorization: "Bearer " + cookies["auth-token"],
-          "ngrok-skip-browser-warning": true,
-        },
-      });
-
-      if (res.data.data) {
+      const res = await dispatch(fetchNotification(cookies["auth-token"]));
+      if (res.payload) {
         const formatNotification = await Promise.all(
-          res?.data?.data?.map(async (value) => {
+          res?.payload?.map(async (value) => {
             const manipulatedData = await formatUser(value.createdBy);
             const formatTime = formatDate(value.created_at);
             return {
@@ -64,11 +62,17 @@ const Notification = () => {
     }
   };
 
-  const markAsRead = async (id) => {
+  const markAsRead = async (id, callback) => {
     try {
       setIsLoading(true);
-      await axios.patch(`/api/notification/update/${id}`);
-      fetchNotif();
+      const updateRes = await dispatch(
+        updateNotification({ authToken: cookies["auth-token"], id })
+      );
+      console.log(updateRes);
+      if (updateRes.type === "updateNotification/fulfilled") {
+        fetchNotif();
+        if (callback) callback();
+      }
     } catch (error) {
       setIsLoading(false);
     }
@@ -123,27 +127,14 @@ const Notification = () => {
   ];
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-
     const fetchNotif = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(
-          `/api/notification/user/get`,
-          {
-            headers: {
-              Authorization: "Bearer " + cookies["auth-token"],
-              "ngrok-skip-browser-warning": true,
-            },
-          },
-          {
-            signal,
-          }
-        );
-        if (res.data.data) {
+        const res = await dispatch(fetchNotification(cookies["auth-token"]));
+        console.log(res);
+        if (res.payload) {
           const formatNotification = await Promise.all(
-            res?.data?.data?.map(async (value) => {
+            res?.payload?.map(async (value) => {
               const manipulatedData = await formatUser(value.createdBy);
               const formatTime = formatDate(value.created_at);
               return {

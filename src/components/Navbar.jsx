@@ -5,11 +5,15 @@ import { useAuth } from "../middleware/AuthContext";
 import axios from "axios";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchNotification } from "../store/notificationSlicer";
 
 const Navbar = ({ toggleSidebar }) => {
+  const lastUpdated = useSelector((state) => state.notification.lastUpdated);
   const { logout } = useAuth();
   const location = useLocation();
   const [cookies] = useCookies();
+  const dispatch = useDispatch();
   const [notification, setNotification] = useState([]);
   const previousNotificationRef = useRef([]);
   const decodedToken = jwtDecode(cookies["auth-token"]);
@@ -82,15 +86,11 @@ const Navbar = ({ toggleSidebar }) => {
   useEffect(() => {
     const fetchNotif = async () => {
       try {
-        const res = await axios.get(`/api/notification/user/get`, {
-          headers: {
-            Authorization: "Bearer " + cookies["auth-token"],
-            "ngrok-skip-browser-warning": true,
-          },
-        });
-
-        const filteredNotifications = res?.data?.data?.filter(
-          (notification) => notification.read_at === "0001-01-01T00:00:00Z"
+        console.log("navbar1");
+        const res = await dispatch(fetchNotification(cookies["auth-token"]));
+        console.log(res.payload);
+        const filteredNotifications = res?.payload?.filter(
+          (notif) => notif.read_at === "0001-01-01T00:00:00Z"
         );
 
         if (filteredNotifications) {
@@ -105,6 +105,7 @@ const Navbar = ({ toggleSidebar }) => {
               };
             })
           );
+          console.log(formatNotification);
           if (
             JSON.stringify(previousNotificationRef.current) !==
             JSON.stringify(formatNotification)
@@ -114,12 +115,12 @@ const Navbar = ({ toggleSidebar }) => {
           }
         }
       } catch (error) {
-        // console.error(error);
+        console.error(error);
       }
     };
 
     fetchNotif();
-  }, [location.pathname, cookies["auth-token"]]);
+  }, [location.pathname, lastUpdated]);
 
   const notificationCount = useMemo(
     () => (notification ? notification.length : 0),

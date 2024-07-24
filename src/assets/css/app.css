@@ -3446,12 +3446,18 @@ input[type="button"].btn-block {
   margin-left: 0;
 }
 
+.dropdown-container {
+  position: relative;
+  overflow: visible;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: 1000;
+  z-index: 1050;
   display: none;
+  right: auto;
   float: left;
   min-width: 10rem;
   padding: 0.5rem 0;
@@ -3464,6 +3470,12 @@ input[type="button"].btn-block {
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
+}
+
+.dropup .dropdown-menu {
+  top: auto;
+  bottom: calc(100% - 10px);
+  margin-bottom: 0;
 }
 
 .dropdown-menu-left {

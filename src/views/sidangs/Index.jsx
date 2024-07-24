@@ -3,7 +3,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import React, { useState, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   getAllSidang,
@@ -47,6 +47,31 @@ const SidangIndex = () => {
       return res.data.data.nama;
     } catch (error) {
       return "-";
+    }
+  };
+
+  const getTeamId = async (userId) => {
+    try {
+      const res = await axios.get(`https://sofi.my.id/api/student/${userId}`);
+      console.log(res.data.data.team_id);
+      if (res.data.code === 200) {
+        navigate(`/schedules/create/${res.data.data.team_id}`);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const formatScheduleId = async (pengajuanId) => {
+    try {
+      const res = await axios.get(`/api/schedule/pengajuan/get/${pengajuanId}`);
+      if (res.data.code === 200) {
+        navigate(`/schedules/${res.data.data[0].id}`);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -296,12 +321,12 @@ const SidangIndex = () => {
           } else if (row.status === "sudah dijadwalkan") {
             return (
               <div className="btn-group w-100">
-                <a
-                  href="{{ route('schedules.show', [$sidang->schedules[0]->id]) }}"
+                <div
+                  onClick={() => formatScheduleId(row.id)}
                   className="btn btn-light w-100"
                 >
                   Lihat Jadwal
-                </a>
+                </div>
               </div>
             );
           }
@@ -324,12 +349,12 @@ const SidangIndex = () => {
               <div className="btn-group">
                 {row.status === "belum dijadwalkan" ||
                 row.status === "tidak lulus (belum dijadwalkan)" ? (
-                  <a
-                    href="{{ route('schedules.create', [$sidang->mahasiswa->team->id]) }}"
+                  <div
+                    onClick={() => getTeamId(row.user_id)}
                     className="btn btn-primary"
                   >
                     Jadwalkan
-                  </a>
+                  </div>
                 ) : (
                   ""
                 )}
