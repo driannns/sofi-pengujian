@@ -23,6 +23,7 @@ const Home = () => {
         setIsLoading(true);
         if (userData.role?.find((roles) => "RLMHS".includes(roles))) {
           const resSidang = await dispatch(checkSidang(cookies["auth-token"]));
+          console.log(resSidang);
           if (resSidang.payload) {
             setSidang(resSidang.payload);
           }

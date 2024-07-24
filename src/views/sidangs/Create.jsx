@@ -174,6 +174,7 @@ const SidangCreate = () => {
         const dataSidangStudent = await dispatch(
           checkSidang(cookies["auth-token"])
         );
+        console.log(dataSidangStudent);
 
         if (
           dataSidangStudent.payload ||

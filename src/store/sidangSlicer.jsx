@@ -131,6 +131,7 @@ export const createSidang = createAsyncThunk(
           "ngrok-skip-browser-warning": true,
         },
       });
+      console.log(res.data);
       localStorage.setItem("successMessage", "Sidang Berhasil Disimpan.");
       return res.data.data;
     } catch (error) {
